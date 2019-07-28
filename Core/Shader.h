@@ -14,10 +14,10 @@ class Shader
 public:
 	Shader() {}
 	~Shader() {}
-
+	Shader(std::string filename, bool bCore = false);
+	
 	unsigned int ID;
 
-	Shader(const GLchar* vertexPath, const GLchar* fragPath);
 	void use()
 	{
 		glUseProgram(ID);

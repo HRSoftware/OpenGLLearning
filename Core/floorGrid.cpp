@@ -20,8 +20,6 @@ void FloorGrid::setUpBuffers() {
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLfloat) , indices.data(), GL_STATIC_DRAW);
-
-
 	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
 	glEnableVertexAttribArray(0);

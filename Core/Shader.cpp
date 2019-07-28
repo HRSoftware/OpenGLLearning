@@ -1,7 +1,10 @@
 #include "Shader.h"
 
-Shader::Shader(const GLchar* vertexPath, const GLchar* fragPath)
+Shader::Shader(std::string filename, bool bCore )
 {
+	if (bCore)
+		filename = "core/" + filename;
+	std::string filePath = "./Shaders/" + filename;
 	std::string vertexCode;
 	std::string fragCode;
 	std::ifstream vShaderFile;
@@ -24,8 +27,8 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragPath)
 
 
 
-		vShaderFile.open(vertexPath);
-		fShaderFile.open(fragPath);
+		vShaderFile.open(filePath + ".vert");
+		fShaderFile.open(filePath + ".frag");
 
 		std::stringstream vShaderStream, fShaderStream;
 

@@ -96,30 +96,24 @@ int main(int argc, char* argv[]) {
 
 	ModelManager modManager;
 	modManager.loadModeltoMemory("House/house_obj.obj", "Building1");
-	//modManager.loadModeltoMemory("Buildings/Building_A01.obj", "Building2");
+
 	GameObject Building1(*modManager.getModelByName("Building1"));
-	//GameObject Building2(*modManager.getModelByName("Building2"));
 
-	Building1.setPosition({ 0.1f, 0.75f, -0.2f });
+
+	Building1.setPosition({ 0.1f, 0.f, -0.2f });
 	Building1.setScale({ 0.005f, 0.005f, 0.005f });
-	//Building2.setPosition({ 0.5f, 0.1f, -0.9f });
 
-	Shader basicShader("./Shaders/basicShader.vert", "./Shaders/basicShader.frag");
-	Shader lightShader("./Shaders/basicLighting.vert", "./Shaders/basicLighting.frag");
-	Shader materialShader("./Shaders/materialShader.vert", "./Shaders/materialShader.frag");
-	Shader modelShader("./Shaders/model_loadingShader.vert", "./Shaders/model_loadingShader.frag");
-	Shader skyboxShader("./Shaders/core/skyboxShader.vert", "./Shaders/core/skyboxShader.frag");
-	Shader skyboxShaderReflect("./Shaders/core/skyboxShaderReflect.vert", "./Shaders/core/skyboxShaderReflect.frag");
-	Shader gridShader("./Shaders/core/lineGenerate.vert", "./Shaders/core/lineGenerate.frag");
+	Shader basicShader("basicShader");
+	Shader lightShader("basicLighting");
+	Shader materialShader("materialShader");
+	Shader modelShader("model_loadingShader");
+	Shader skyboxShader("skyboxShader", true);
+	Shader gridShader("gridShader", true);
 
 	lightShader.setVec3("lightPos", lightPos);
 
-	//int vertexColourLocation = glGetUniformLocation(basicShader.ID, "ourColor");
-	//int vertexPositionLocation = glGetUniformLocation(basicShader.ID, "ourPosition");
-	//std::cout << "Uniform ID = " << vertexColourLocation << std::endl;
 
 	materialShader.use();
-	//materialShader.setVec3("material.ambient", 0.0f, 0.5f, 0.31f);
 	materialShader.setInt("material.diffuse", 0.1f);
 	materialShader.setInt("material.specular", 1.0f);
 	materialShader.setFloat("material.shininess", 32.0f);
@@ -138,8 +132,6 @@ int main(int argc, char* argv[]) {
 	Skybox skybox;
 	skybox.setShader(skyboxShader);
 
-
-	float TimeCalc;
 	// Rendering Loop
 	while (glfwWindowShouldClose(mWindow) == false)
 	{
