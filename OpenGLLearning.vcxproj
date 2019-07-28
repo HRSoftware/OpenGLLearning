@@ -166,6 +166,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\floorGrid.cpp" />
     <ClCompile Include="Core\Shader.cpp" />
     <ClCompile Include="Core\Skybox.cpp" />
     <ClCompile Include="glad.c" />
@@ -174,6 +175,7 @@
   <ItemGroup>
     <ClInclude Include="Callbacks\Callbacks.h" />
     <ClInclude Include="Core\Camera.h" />
+    <ClInclude Include="Core\floorGrid.h" />
     <ClInclude Include="Core\GameObject.h" />
     <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Core\LoadTextures.h" />

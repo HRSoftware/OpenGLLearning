@@ -25,6 +25,7 @@
 #include "Core\GameObject.h"
 #include "Managers\ModelManager.h"
 #include "Core/LoadTextures.h"
+#include "Core/floorGrid.h"
 
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -109,7 +110,8 @@ int main(int argc, char* argv[]) {
 	Shader modelShader("./Shaders/model_loadingShader.vert", "./Shaders/model_loadingShader.frag");
 	Shader skyboxShader("./Shaders/core/skyboxShader.vert", "./Shaders/core/skyboxShader.frag");
 	Shader skyboxShaderReflect("./Shaders/core/skyboxShaderReflect.vert", "./Shaders/core/skyboxShaderReflect.frag");
-	
+	Shader gridShader("./Shaders/core/lineGenerate.vert", "./Shaders/core/lineGenerate.frag");
+
 	lightShader.setVec3("lightPos", lightPos);
 
 	//int vertexColourLocation = glGetUniformLocation(basicShader.ID, "ourColor");
@@ -127,70 +129,15 @@ int main(int argc, char* argv[]) {
 	materialShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
 	materialShader.setVec3("light.specular", 1.f, 1.f, 1.f);
 
-	/*modelShader.use();
-	modelShader.setVec3("lightPos", lightPos);*/
 	
 	Shader currentShader = materialShader;
 
-
+	FloorGrid grid;
+	grid.setShader(gridShader);
 
 	Skybox skybox;
 	skybox.setShader(skyboxShader);
 
-	std::vector<float> skyboxVertices = {
-		// positions          
-	 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-	};
-
-	/*for_each(skyboxVertices.begin(), skyboxVertices.end(), [](float& num)
-	{
-		num = num / 100;
-	});*/
-
-	Skybox smallSkybox;
-	smallSkybox.setVerticies(skyboxVertices);
-	smallSkybox.setShader(skyboxShaderReflect);
-	smallSkybox.enableNormals = true;
 
 	float TimeCalc;
 	// Rendering Loop
@@ -222,21 +169,20 @@ int main(int argc, char* argv[]) {
 		currentShader.setMat4("model", currentModelMat);
 		Building1.Draw(currentShader);
 
-		currentModelMat = glm::mat4(1.f);
-		
-		skyboxShaderReflect.use();
-		skyboxShaderReflect.setMat4("model", currentModelMat);
-		smallSkybox.Draw(camera.GetViewMatrix(), projection);
+		gridShader.use();
+		gridShader.setMat4("projection", projection);
+		gridShader.setVec3("lightPos", lightPos);
+		gridShader.setMat4("view", view);
+		gridShader.setMat4("model", glm::mat4(1.f));
+		grid.Draw();
 
-		//skybox.Draw(camera.GetViewMatrix(), projection);
-
+		skyboxShader.use();
+		skyboxShader.setMat4("model", glm::mat4(1.f));
+		skybox.Draw(camera.GetViewMatrix(), projection);
 
 		glfwPollEvents();
 		glfwSwapBuffers(mWindow);		// Flip Buffers and Draw
 	}
-
-
-
 
 	glfwTerminate();
 	return EXIT_SUCCESS;

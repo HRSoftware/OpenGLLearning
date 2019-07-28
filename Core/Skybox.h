@@ -26,18 +26,16 @@ public:
 	void Draw(glm::mat4 view, glm::mat4 projection);
 	void setShader(Shader shader);
 	void setVerticies(std::vector<float> vert);
-	
-	bool enableNormals = false;
 
 private:
 
 	GLuint skyboxVAO, skyboxVBO;
 	GLuint skyboxTextureID;
 
+
 	void loadSkyboxMap();
 	void setUpBuffers();
 	
-	void loadTexture(char const* path);
 	Shader skyShader;
 
 	std::vector<float> skyboxVertices = {

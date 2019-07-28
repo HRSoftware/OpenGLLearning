@@ -19,6 +19,9 @@
     <ClCompile Include="Core\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Core\floorGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Callbacks\Callbacks.h" />
@@ -31,6 +34,7 @@
     <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Core\Skybox.h" />
     <ClInclude Include="Core\LoadTextures.h" />
+    <ClInclude Include="Core\floorGrid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\basicLighting.frag" />
