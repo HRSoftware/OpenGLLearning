@@ -32,12 +32,12 @@ public:
 		_model = &model;
 	}
 
-	void setPosition(const glm::vec3 pos)
+	void setPosition( glm::vec3 pos)
 	{
 		_position = pos;
 	}
 
-	void moveBy(const glm::vec3 pos)
+	void moveBy( glm::vec3 pos)
 	{
 		_position =+ pos;
 	}
@@ -76,13 +76,22 @@ public:
 
 	void Draw()
 	{
-		glm::mat4 currentModelMat = glm::mat4(1.0f);
-		glm::mat4 projection = glm::perspective(_camera->Zoom, (float)_width / (float)_height, 0.01f, 1000.f);
-		currentModelMat = glm::scale(currentModelMat, _scale);
-		currentModelMat = glm::mat4_cast(_orientation) * currentModelMat;
-		currentModelMat = glm::translate(currentModelMat, _position);
 		
+		glm::mat4 projection = glm::perspective(_camera->Zoom, (float)_width / (float)_height, 0.01f, 1000.f);
 
+		glm::mat4 currentModelMat = glm::mat4(1.f);
+
+		currentModelMat = glm::scale(currentModelMat, _scale);
+		
+		
+		currentModelMat = glm::toMat4(_orientation) * currentModelMat;
+
+		//currentModelMat = glm::translate(currentModelMat, _position);			//Does'nt seem to calculate correctlyw
+		currentModelMat[3][0] = _position.x;
+		currentModelMat[3][1] = _position.y;
+		currentModelMat[3][2] = _position.z;
+		
+		
 
 		_modelShader.use();
 		_modelShader.setMat4("projection", projection);
@@ -96,9 +105,9 @@ public:
 private:
 	Model* _model;
 	glm::vec3 _position = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 _scale = { 0.2f, 0.2f, 0.2f };
+	glm::vec3 _scale = { 1.f, 1.f, 1.f };
 	glm::quat _orientation = {1.f, 0.f, 0.f, 0.f};
-
+	
 	Shader _modelShader;
 	Camera* _camera;
 	int _height, _width;

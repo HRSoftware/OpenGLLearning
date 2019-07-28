@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
 	Building1.setPosition({ 0.1f, 0.f, -0.2f });
 	Building1.setScale({ 0.005f, 0.005f, 0.005f }); 
 	
-	Building2.setPosition({ 30.f, 0.f, 30.f });
+	Building2.setPosition({ 10.f, 0.f, 10.f });
 	Building2.setScale({ 0.005f, 0.005f, 0.005f });
 	Building2.setAngle(90, { 0.0, 1.f, 0.0f });
 
