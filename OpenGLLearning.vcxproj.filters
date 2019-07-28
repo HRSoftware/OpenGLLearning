@@ -35,6 +35,7 @@
     <ClInclude Include="Core\Skybox.h" />
     <ClInclude Include="Core\LoadTextures.h" />
     <ClInclude Include="Core\floorGrid.h" />
+    <ClInclude Include="Core\RenderDetails.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\basicLighting.frag" />

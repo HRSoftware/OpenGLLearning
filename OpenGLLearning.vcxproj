@@ -181,6 +181,7 @@
     <ClInclude Include="Core\LoadTextures.h" />
     <ClInclude Include="Core\Mesh.h" />
     <ClInclude Include="Core\Model.h" />
+    <ClInclude Include="Core\RenderDetails.h" />
     <ClInclude Include="Core\Shader.h" />
     <ClInclude Include="Core\Skybox.h" />
     <ClInclude Include="Managers\ModelManager.h" />

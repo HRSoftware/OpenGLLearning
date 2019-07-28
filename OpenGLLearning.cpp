@@ -26,6 +26,7 @@
 #include "Managers\ModelManager.h"
 #include "Core/LoadTextures.h"
 #include "Core/floorGrid.h"
+#include "Core/RenderDetails.h"
 
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -59,12 +60,12 @@ int main(int argc, char* argv[]) {
 	// Load GLFW and Create a Window
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-
+	RenderDetails renderDetails(camera, HEIGHT, WIDTH);
 
 	GLFWwindow* mWindow = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL", nullptr, nullptr);
 
@@ -97,11 +98,6 @@ int main(int argc, char* argv[]) {
 	ModelManager modManager;
 	modManager.loadModeltoMemory("House/house_obj.obj", "Building1");
 
-	GameObject Building1(*modManager.getModelByName("Building1"));
-
-
-	Building1.setPosition({ 0.1f, 0.f, -0.2f });
-	Building1.setScale({ 0.005f, 0.005f, 0.005f });
 
 	Shader basicShader("basicShader");
 	Shader lightShader("basicLighting");
@@ -111,7 +107,16 @@ int main(int argc, char* argv[]) {
 	Shader gridShader("gridShader", true);
 
 	lightShader.setVec3("lightPos", lightPos);
+	
+	GameObject Building1(*modManager.getModelByName("Building1"), materialShader, renderDetails);
+	GameObject Building2(*modManager.getModelByName("Building1"), materialShader, renderDetails);
 
+	Building1.setPosition({ 0.1f, 0.f, -0.2f });
+	Building1.setScale({ 0.005f, 0.005f, 0.005f }); 
+	
+	Building2.setPosition({ 30.f, 0.f, 30.f });
+	Building2.setScale({ 0.005f, 0.005f, 0.005f });
+	Building2.setAngle(90, { 0.0, 1.f, 0.0f });
 
 	materialShader.use();
 	materialShader.setInt("material.diffuse", 0.1f);
@@ -148,18 +153,14 @@ int main(int argc, char* argv[]) {
 		lightPos = glm::vec3(sin(currentFrame), lightPos.y, lightPos.z);
 		glm::mat4 projection = glm::perspective(camera.Zoom, (float)WIDTH / (float)HEIGHT, 0.01f, 1000.f);
 		glm::mat4 view = camera.GetViewMatrix();
-		glm::mat4 currentModelMat = glm::mat4(1.0f);
 
-		
 
-		currentShader.setMat4("projection", projection);
-		currentShader.setVec3("lightPos", lightPos);
-		currentShader.setMat4("view", view);
+		if (glfwGetKey(mWindow, GLFW_KEY_R) == GLFW_PRESS)
+			Building2.rotateBy(0.01f, { 0.f, 1.f, 0.f });
 
-		currentModelMat = glm::translate(currentModelMat, Building1.getPosition());
-		currentModelMat = glm::scale(currentModelMat, Building1.getScale());
-		currentShader.setMat4("model", currentModelMat);
-		Building1.Draw(currentShader);
+		Building1.Draw();
+
+		Building2.Draw();
 
 		gridShader.use();
 		gridShader.setMat4("projection", projection);
