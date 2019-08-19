@@ -15,7 +15,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-
+#include "Core/Lighting.h"
 #include "Core/Skybox.h"
 #include "Callbacks\Callbacks.h"
 #include "Core\Input.h"
@@ -27,11 +27,16 @@
 #include "Core/LoadTextures.h"
 #include "Core/floorGrid.h"
 #include "Core/RenderDetails.h"
+#include "Core/Lighting.h"
+#include "Core/ShadowRender.h"
+#include "Core/Primitive_Shapes/Cube.h"
+
 
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 unsigned int loadTexture(char const* path);
+void renderQuad();
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
@@ -97,19 +102,23 @@ int main(int argc, char* argv[]) {
 
 	ModelManager modManager;
 	modManager.loadModeltoMemory("House/house_obj.obj", "Building1");
+	modManager.loadModeltoMemory("Old_House/Old House.obj", "Building3");
 
 
 	Shader basicShader("basicShader");
-	Shader lightShader("basicLighting");
+	Shader shadowGenShader("shadowMapShader", true);
 	Shader materialShader("materialShader");
-	Shader modelShader("model_loadingShader");
 	Shader skyboxShader("skyboxShader", true);
 	Shader gridShader("gridShader", true);
+	Shader debugDepthShader("debugDepth");
+	Shader frameBufferShader("framebufferShader");
+	Shader lightingShader("basicLighting");
+	Shader newShadowRenderShader("modelLoadingShader", true);
 
-	lightShader.setVec3("lightPos", lightPos);
 	
-	GameObject Building1(*modManager.getModelByName("Building1"), materialShader, renderDetails);
-	GameObject Building2(*modManager.getModelByName("Building1"), materialShader, renderDetails);
+	GameObject Building1(modManager.getModelByName("Building1"), newShadowRenderShader, renderDetails);
+	GameObject Building2(modManager.getModelByName("Building1"), newShadowRenderShader, renderDetails);
+	GameObject Building3(modManager.getModelByName("Building3"), newShadowRenderShader, renderDetails);
 
 	Building1.setPosition({ 0.1f, 0.f, -0.2f });
 	Building1.setScale({ 0.005f, 0.005f, 0.005f }); 
@@ -118,24 +127,45 @@ int main(int argc, char* argv[]) {
 	Building2.setScale({ 0.005f, 0.005f, 0.005f });
 	Building2.setAngle(90, { 0.0, 1.f, 0.0f });
 
-	materialShader.use();
-	materialShader.setInt("material.diffuse", 0.1f);
-	materialShader.setInt("material.specular", 1.0f);
-	materialShader.setFloat("material.shininess", 32.0f);
 
-	materialShader.setVec3("lightPos", 1.2f, 1.0f, 2.0f);
-	materialShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-	materialShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-	materialShader.setVec3("light.specular", 1.f, 1.f, 1.f);
+	Building3.setPosition({ 25.f, 0.f, 5.f });
+	Building3.setScale({ 0.05f, 0.05f, 0.05f});
+
+	DirectionalLight sunLight(glm::vec3(.2f, 0.2f, 0.2f ), 4.f, { 10.f, 15.f, 4.f });
+	sunLight.setAmbient({ 0.2f, 0.2f, 0.2f });
+	sunLight.setDiffuse({ 0.5f, 0.5f, 0.5f}); 
+	sunLight.setSpecular({ 0.1f,0.1f, 0.1f });
+
+
+
+	newShadowRenderShader.setFloat("shininess", 10.0f);
+	newShadowRenderShader.setVec3("light.position", sunLight.getPosition());
+	newShadowRenderShader.setVec3("light.ambient", sunLight.getAmbient());
+	newShadowRenderShader.setVec3("light.diffuse", sunLight.getDiffuse());
+	newShadowRenderShader.setFloat("light.intensity", sunLight.getStrength());
+	newShadowRenderShader.setVec3("light.specular", sunLight.getSpecular());
 
 	
-	Shader currentShader = materialShader;
+	
+	Shader currentShader;
 
-	FloorGrid grid;
-	grid.setShader(gridShader);
+	FloorGrid grid(gridShader, renderDetails);
 
 	Skybox skybox;
 	skybox.setShader(skyboxShader);
+
+
+	ShadowRender shadowRender(shadowGenShader);
+	shadowRender.addLight(sunLight);
+
+	std::vector<GameObject*> buildings = { };
+	buildings.push_back(&grid);
+	buildings.push_back(&Building1);
+	buildings.push_back(&Building2);
+	buildings.push_back(&Building2);
+
+	Cube cube;
+
 
 	// Rendering Loop
 	while (glfwWindowShouldClose(mWindow) == false)
@@ -145,41 +175,52 @@ int main(int argc, char* argv[]) {
 		lastFrame = currentFrame;
 		processInput(mWindow);
 
+		
+		shadowRender.castShadows(buildings);
+
+
+		glViewport(0, 0, WIDTH, HEIGHT);
+
 		glClearColor(0.25f, 0.25f, 0.5f, 1.0f);		// Background Fill Color
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		currentShader.use();
-		
-		lightPos = glm::vec3(sin(currentFrame), lightPos.y, lightPos.z);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
 		glm::mat4 projection = glm::perspective(camera.Zoom, (float)WIDTH / (float)HEIGHT, 0.01f, 1000.f);
 		glm::mat4 view = camera.GetViewMatrix();
 
+		if (glfwGetKey(mWindow, GLFW_KEY_T) == GLFW_PRESS)
+			sunLight.setPosition(camera.Position);
 
 		if (glfwGetKey(mWindow, GLFW_KEY_R) == GLFW_PRESS)
-			Building2.rotateBy(0.01f, { 0.f, 1.f, 0.f });
-
-		Building1.Draw();
-
-		Building2.Draw();
-
-		gridShader.use();
-		gridShader.setMat4("projection", projection);
-		gridShader.setVec3("lightPos", lightPos);
-		gridShader.setMat4("view", view);
-		gridShader.setMat4("model", glm::mat4(1.f));
+			Building1.rotateBy(0.1f, { 0, 1, 0 });
+		
+		
+		newShadowRenderShader.setInt("shadowMap", shadowRender._shadowTexture);
+		
+		
 		grid.Draw();
+		Building1.Draw();
+		Building2.Draw();
+		Building3.Draw();
 
-		skyboxShader.use();
-		skyboxShader.setMat4("model", glm::mat4(1.f));
-		skybox.Draw(camera.GetViewMatrix(), projection);
+		skybox.Draw(view, projection);
 
 		glfwPollEvents();
+
+		
+		glBindFramebuffer(GL_FRAMEBUFFER, shadowRender._shadowFbo);
+		glViewport(0, 0, WIDTH / 2, HEIGHT/ 2);
+		Building1.Draw(false);
+		Building2.Draw(false);
+		Building3.Draw(false);
+
+		
 		glfwSwapBuffers(mWindow);		// Flip Buffers and Draw
 	}
-
+	
 	glfwTerminate();
 	return EXIT_SUCCESS;
 }
+
 
 void processInput(GLFWwindow* window)
 {
@@ -194,6 +235,8 @@ void processInput(GLFWwindow* window)
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+
+	
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 		camera.MovementSpeed = camera.boostSpeed;

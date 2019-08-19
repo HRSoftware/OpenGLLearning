@@ -92,6 +92,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\Documents\Programming\Libraries\C++\Includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -103,7 +104,8 @@
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <PostBuildEvent>
-      <Command>xcopy /y $(SolutionDir)assimp-vc140-mt.dll $(OutDir)</Command>
+      <Command>xcopy /y $(SolutionDir)assimp-vc140-mt.dll $(OutDir) 
+xcopy /y $(SolutionDir)Shaders $(OutDir)Shaders</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy assimp dll file to the debug folder </Message>
@@ -166,25 +168,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Primitive_Shapes\Cube.cpp" />
     <ClCompile Include="Core\floorGrid.cpp" />
+    <ClCompile Include="Core\Lighting.cpp" />
+    <ClCompile Include="Core\PickingTexture.cpp" />
     <ClCompile Include="Core\Shader.cpp" />
     <ClCompile Include="Core\Skybox.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="Core\System\InputController.cpp" />
     <ClCompile Include="OpenGLLearning.cpp" />
+    <ClCompile Include="Core\ShadowRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Callbacks\Callbacks.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\floorGrid.h" />
     <ClInclude Include="Core\GameObject.h" />
+    <ClInclude Include="Core\Interfaces\IBaseLight.h" />
     <ClInclude Include="Core\Input.h" />
+    <ClInclude Include="Core\Interfaces\IRenderCallbacks.h" />
+    <ClInclude Include="Core\Lighting.h" />
     <ClInclude Include="Core\LoadTextures.h" />
     <ClInclude Include="Core\Mesh.h" />
     <ClInclude Include="Core\Model.h" />
+    <ClInclude Include="Core\PickingTextures.h" />
+    <ClInclude Include="Core\Primitive_Shapes\Cube.h" />
+    <ClInclude Include="Core\Primitive_Shapes\PrimitiveObject.h" />
     <ClInclude Include="Core\RenderDetails.h" />
     <ClInclude Include="Core\Shader.h" />
     <ClInclude Include="Core\Skybox.h" />
+    <ClInclude Include="Core\System\InputController.h" />
     <ClInclude Include="Managers\ModelManager.h" />
+    <ClInclude Include="Core\ShadowRender.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\Coke\maps\Thumbs.db" />

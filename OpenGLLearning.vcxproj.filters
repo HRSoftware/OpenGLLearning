@@ -22,6 +22,21 @@
     <ClCompile Include="Core\floorGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Core\System\InputController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PickingTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Lighting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ShadowRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Primitive_Shapes\Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Callbacks\Callbacks.h" />
@@ -36,6 +51,14 @@
     <ClInclude Include="Core\LoadTextures.h" />
     <ClInclude Include="Core\floorGrid.h" />
     <ClInclude Include="Core\RenderDetails.h" />
+    <ClInclude Include="Core\System\InputController.h" />
+    <ClInclude Include="Core\PickingTextures.h" />
+    <ClInclude Include="Core\Interfaces\IRenderCallbacks.h" />
+    <ClInclude Include="Core\Interfaces\IBaseLight.h" />
+    <ClInclude Include="Core\Lighting.h" />
+    <ClInclude Include="Core\ShadowRender.h" />
+    <ClInclude Include="Core\Primitive_Shapes\PrimitiveObject.h" />
+    <ClInclude Include="Core\Primitive_Shapes\Cube.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\basicLighting.frag" />

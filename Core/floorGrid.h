@@ -2,24 +2,32 @@
 
 #include <vector>
 #include "Shader.h"
+#include "RenderDetails.h"
+#include "GameObject.h"
 
-class FloorGrid 
+class FloorGrid : public GameObject
 {
 public:
-	FloorGrid() {
+	FloorGrid(Shader shdr, RenderDetails rd) : _camera(&rd._cam), _gridShader(shdr), GameObject(NULL, shdr, rd) {
+		_width = rd._width;
+		_height = rd._height;
+
 		setUpBuffers();
 		loadTextures();
 	}
 	~FloorGrid(){}
 
 	void setShader(Shader shader);
-	void Draw();
+	void Draw(bool bTextured = true);
+	void Draw(Shader shdr, bool bTextured = true);
 
 private:
 
 	void setUpBuffers();
 	void loadTextures();
 	Shader _gridShader;
+	Camera* _camera;
+	int _height, _width;
 
 	const char* _gridTexture = "./Resources/Textures/Grid3.jpg";
 

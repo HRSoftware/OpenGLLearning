@@ -1,5 +1,5 @@
 #pragma once
-#pragma once
+
 
 #include <glad\glad.h>
 #include <glm\glm.hpp>
@@ -48,22 +48,17 @@ public:
 
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
-		float yaw = YAW,
-		float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+		glm::vec2 screenDimensions = glm::vec2(1024, 728),
+		   float yaw = YAW,
+		   float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
 	{
+		_lensDimensions = screenDimensions;
 		Position = position;
 		WorldUp = up;
 		Yaw = yaw;
 		Pitch = pitch;
-		updateCameraVectors();
-	}
-
-	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
-	{
-		Position = glm::vec3(posX, posY, posZ);
-		WorldUp = glm::vec3(upX, upY, upZ);
-		Yaw = yaw;
-		Pitch = pitch;
+		_projectionMatrix = 
+		_viewMatrix = glm::lookAt(Position, Position + Front, Up);
 		updateCameraVectors();
 	}
 
@@ -74,6 +69,14 @@ public:
 	glm::mat4 GetViewMatrix()
 	{
 		return glm::lookAt(Position, Position + Front, Up);
+	}
+
+	glm::mat4 getProjectionMatrix(){
+		return glm::perspective(Zoom, (float)_lensDimensions.x / (float)_lensDimensions.y, 0.01f, 1000.f);
+	}
+
+	glm::mat4 getProjectionViewMatrix(){
+		return GetViewMatrix() * getProjectionMatrix();
 	}
 
 	// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
@@ -121,6 +124,7 @@ public:
 			Zoom = 1.0f;
 		if (Zoom >= 45.0f)
 			Zoom = 45.0f;
+		
 	}
 
 private:
@@ -136,7 +140,12 @@ private:
 		// Also re-calculate the Right and Up vector
 		Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
 		Up = glm::normalize(glm::cross(Right, Front));
+
 	}
+
+	glm::mat4 _projectionMatrix;
+	glm::mat4 _viewMatrix;
+	glm::vec2 _lensDimensions;
 };
 
 

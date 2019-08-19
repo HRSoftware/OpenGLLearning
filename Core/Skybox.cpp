@@ -9,7 +9,7 @@ void Skybox::Draw(glm::mat4 view, glm::mat4 projection)
 	skyShader.setMat4("view", glm::mat4(glm::mat3(view)));
 	skyShader.setMat4("projection", projection);
 	
-		//glActiveTexture(GL_TEXTURE0);
+
 	glBindVertexArray(skyboxVAO);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTextureID);
 		glDrawArrays(GL_TRIANGLES, 0, 36);

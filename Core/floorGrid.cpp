@@ -28,15 +28,31 @@ void FloorGrid::setUpBuffers() {
 	glEnableVertexAttribArray(1);
 }
 
-void FloorGrid::Draw()
+void FloorGrid::Draw(bool bTextured)
 {
-	_gridShader.use();
-	_gridShader.setInt("gridTexture", 0);
+	Draw(_gridShader, bTextured);
+}
+
+void FloorGrid::Draw(Shader shdr, bool bTextured)
+{
+	glm::mat4 projection = glm::perspective(_camera->Zoom, (float)_width / (float)_height, 0.01f, 1000.f);
+
+	shdr.use();
+	shdr.setInt("gridTexture", 0);
+	shdr.setMat4("projection", projection);
+	if(shdr.checkAttributeExist("viewPos"))
+		shdr.setVec3("viewPos", _camera->Position);
+	shdr.setMat4("view", _camera->GetViewMatrix());
+	shdr.setMat4("model", glm::mat4(1.f));
+
+	if(bTextured)
+		glBindTexture(GL_TEXTURE_2D, gridTextureID);
 
 	glBindVertexArray(gridVAO);
-		glBindTexture(GL_TEXTURE_2D, gridTextureID);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+
+	glActiveTexture(GL_TEXTURE0);
 
 }
 
