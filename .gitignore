@@ -9,6 +9,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+CppProperties.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -37,7 +38,7 @@ Generated\ Files/
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
-.sln
+*.sln
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
