@@ -30,6 +30,7 @@
 #include "Core/Lighting.h"
 #include "Core/ShadowRender.h"
 #include "Core/Primitive_Shapes/Cube.h"
+#include "Core/s"
 
 
 void processInput(GLFWwindow* window);
@@ -135,6 +136,7 @@ int main(int argc, char* argv[]) {
 	sunLight.setAmbient({ 0.2f, 0.2f, 0.2f });
 	sunLight.setDiffuse({ 0.5f, 0.5f, 0.5f}); 
 	sunLight.setSpecular({ 0.1f,0.1f, 0.1f });
+	sunLight.setDirection({ -0.2f, -1.0f, -0.3f });
 
 
 
@@ -145,7 +147,12 @@ int main(int argc, char* argv[]) {
 	newShadowRenderShader.setFloat("light.intensity", sunLight.getStrength());
 	newShadowRenderShader.setVec3("light.specular", sunLight.getSpecular());
 
-	
+	lightingShader.setFloat("shininess", 10.f);
+	lightingShader.setVec3("light.position", sunLight.getPosition());
+	lightingShader.setVec3("light.ambient", sunLight.getAmbient());
+	lightingShader.setVec3("light.diffuse", sunLight.getDiffuse());
+	//lightingShader.setFloat("light.intensity", sunLight.getStrength());
+	lightingShader.setVec3("light.specular", sunLight.getSpecular());
 	
 	Shader currentShader;
 
@@ -166,7 +173,26 @@ int main(int argc, char* argv[]) {
 
 	Cube cube;
 
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth texture
+	unsigned int depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	newShadowRenderShader.setInt("shadowMap", depthMap);
 	// Rendering Loop
 	while (glfwWindowShouldClose(mWindow) == false)
 	{
@@ -175,9 +201,34 @@ int main(int argc, char* argv[]) {
 		lastFrame = currentFrame;
 		processInput(mWindow);
 
-		
-		shadowRender.castShadows(buildings);
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+		float near_plane = 0.01f, far_plane = 1000.f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+		// render scene from light's point of view
+		newShadowRenderShader.use();
+		newShadowRenderShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(GL_TEXTURE0);
+
+		
+		//Building1.Draw(newShadowRenderShader);
+		//Building2.Draw(newShadowRenderShader);
+		//Building3.Draw(newShadowRenderShader);
+		
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		
+		//shadowRender.castShadows(buildings);
+
+
+
+		
 
 		glViewport(0, 0, WIDTH, HEIGHT);
 
@@ -188,29 +239,38 @@ int main(int argc, char* argv[]) {
 		glm::mat4 view = camera.GetViewMatrix();
 
 		if (glfwGetKey(mWindow, GLFW_KEY_T) == GLFW_PRESS)
-			sunLight.setPosition(camera.Position);
+			//sunLight.setPosition(camera.Position);
+			camera.Position = sunLight.getPosition();
 
 		if (glfwGetKey(mWindow, GLFW_KEY_R) == GLFW_PRESS)
 			Building1.rotateBy(0.1f, { 0, 1, 0 });
+
+		if (glfwGetKey(mWindow, GLFW_KEY_DOWN) == GLFW_PRESS)
+			Building2.moveXBy(0.1f);
 		
+		if (glfwGetKey(mWindow, GLFW_KEY_UP) == GLFW_PRESS)
+			Building2.moveXBy(-0.1f);
 		
-		newShadowRenderShader.setInt("shadowMap", shadowRender._shadowTexture);
+		if (glfwGetKey(mWindow, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			Building2.moveZBy(0.1f);
+
+		if (glfwGetKey(mWindow, GLFW_KEY_LEFT) == GLFW_PRESS)
+			Building2.moveZBy(-0.1f);
 		
-		
+		Building1.Draw(newShadowRenderShader );
+		Building2.Draw(lightingShader);
+		Building3.Draw(newShadowRenderShader);
 		grid.Draw();
-		Building1.Draw();
-		Building2.Draw();
-		Building3.Draw();
 
 		skybox.Draw(view, projection);
 
 		glfwPollEvents();
 
 		
-		glBindFramebuffer(GL_FRAMEBUFFER, shadowRender._shadowFbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glViewport(0, 0, WIDTH / 2, HEIGHT/ 2);
-		Building1.Draw(false);
-		Building2.Draw(false);
+		Building1.Draw(newShadowRenderShader, false);
+		Building2.Draw();
 		Building3.Draw(false);
 
 		

@@ -14,6 +14,7 @@ public:
 		_lightProjectionMatrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, near_plane, far_plane);
 		_lightViewProjectionMatrix = _lightProjectionMatrix * _lightViewMatrix;
 		_shadowMapSizePO2 = shadowMapSize;
+		_direction = glm::vec3{1.f};
 	};
 
 
@@ -21,7 +22,7 @@ public:
 	virtual void useLight() = 0;
 	virtual void updateViewProjectionMatrix()
 	{
-		_lightViewMatrix = glm::lookAt(_position,glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		_lightViewMatrix = glm::lookAt(_position,glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		_lightProjectionMatrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, near_plane, far_plane);
 		_lightViewProjectionMatrix = _lightProjectionMatrix * _lightViewMatrix;
 	}
@@ -33,7 +34,7 @@ public:
 	glm::vec3 getSpecular() const { return _specular; }
 	glm::mat4 getShadowViewProjectionMatrix(bool boolRecalculate = false)
 	{
-		if (!boolRecalculate || _lightRecalcNeeded)
+		if (boolRecalculate || _lightRecalcNeeded)
 			updateViewProjectionMatrix();
 
 		return _lightViewProjectionMatrix;
@@ -41,15 +42,6 @@ public:
 
 	float getStrength() { return _strength; };
 
-
-	void setPosition(glm::vec3 pos)
-	{
-		_position = pos;
-		_lightViewMatrix = glm::lookAt(_position,
-			 glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f));
-		_lightRecalcNeeded = true;
-	}
 	void setAmbient(glm::vec3 ambient)
 	{
 		_ambient = ambient;
@@ -67,6 +59,11 @@ public:
 		return _isLightStatic;
 	}
 
+	void setDirection(glm::vec3 dir)
+	{
+		_direction = dir;
+	}
+
 protected:
 	Shader _shader;
 	glm::vec3 _colour;
@@ -79,7 +76,7 @@ protected:
 	glm::vec3 _ambient;
 	glm::vec3  _diffuse;
 	glm::vec3 _specular;
-
+	glm::vec3 _direction;
 	glm::vec3 _position;
 
 

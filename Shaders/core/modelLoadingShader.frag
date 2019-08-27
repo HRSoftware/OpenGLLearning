@@ -21,6 +21,7 @@ struct Light{
   vec3 diffuse;
   vec3 specular;
   float intensity;
+  vec3 direction;
 };
 
 uniform sampler2D shadowMap;
@@ -34,7 +35,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
   // perform perspective divide
   vec3 projCoords=fragPosLightSpace.xyz/fragPosLightSpace.w;
   // transform to [0,1] range
-  //projCoords=projCoords*.5+.5;
+  projCoords=projCoords*.5+.5;
   // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
   float closestDepth=texture(shadowMap, projCoords.xy).r;
   // get depth of current fragment from light's perspective
@@ -57,7 +58,7 @@ void main()
 
 
   // diffuse
-  vec3 lightDir = normalize(light.position - fs_in.FragPos);
+  vec3 lightDir = normalize(light.direction - fs_in.FragPos);
   float diff = max(dot(lightDir , normal), 0.);
   vec3 diffuse = light.diffuse * diff * texture(texture_diffuse1, fs_in.TexCoords).rgb;
 
@@ -72,7 +73,7 @@ void main()
   // calculate shadow
   float shadow = ShadowCalculation(fs_in.FragPosLightSpace);
   vec3 projCoords= fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w;
-  vec3 lighting = (ambient + (1.0-shadow) * (diffuse + specular)) * color;
+  vec3 lighting = (ambient + (1.0-shadow) * (diffuse + specular));
   
   FragColor = vec4(lighting, 1.);
 

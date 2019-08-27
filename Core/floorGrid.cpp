@@ -38,7 +38,7 @@ void FloorGrid::Draw(Shader shdr, bool bTextured)
 	glm::mat4 projection = glm::perspective(_camera->Zoom, (float)_width / (float)_height, 0.01f, 1000.f);
 
 	shdr.use();
-	shdr.setInt("gridTexture", 0);
+	shdr.setInt("texture_diffuse1", gridTextureID);
 	shdr.setMat4("projection", projection);
 	if(shdr.checkAttributeExist("viewPos"))
 		shdr.setVec3("viewPos", _camera->Position);

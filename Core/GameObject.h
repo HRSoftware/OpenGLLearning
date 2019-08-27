@@ -52,6 +52,24 @@ public:
 		_position =+ pos;
 		_isModelMatrixOutdated = true;
 	}
+
+	void moveXBy( float pos)
+	{
+		_position.x = _position.x + pos;
+		_isModelMatrixOutdated = true;
+	}
+
+	void moveYBy( float pos)
+	{
+		_position.y = _position.y + pos;
+		_isModelMatrixOutdated = true;
+	}
+
+	void moveZBy( float pos)
+	{
+		_position.z = _position.z + pos;
+		_isModelMatrixOutdated = true;
+	}
 	
 	void setScale(const glm::vec3 scale)
 	{

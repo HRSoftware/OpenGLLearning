@@ -23,6 +23,7 @@
 #include "Interfaces/IRenderCallbacks.h"
 #include <stb/stb_image.h>
 #include <filesystem>
+#include "../Managers/TextureManager.h"
 
 using namespace std;
 
@@ -57,7 +58,7 @@ public:
 	}
 
 private:
-	
+	TextureManager _textManager;
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 	void loadModel(string const& path)
 	{
@@ -231,7 +232,6 @@ inline unsigned int TextureFromFile(const char* path, const string& directory, b
 
 	filename = directory + "/" + filename;
 	
-		
 	
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
