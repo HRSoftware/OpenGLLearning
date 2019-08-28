@@ -7,8 +7,6 @@
 #include "stb/stb_image.h"
 
 
-
-
 class Skybox
 {
 public:

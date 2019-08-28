@@ -1,14 +1,14 @@
 #include "TextureManager.h"
 
 
-GLuint TextureManager::getTextureByName(std::string texName)
+unsigned int TextureManager::getTextureByName(std::string texName)
 {
 	return _textureMap.find(texName)->second;
 }
 
-GLuint TextureManager::addTexture(std::string texName)
+unsigned int TextureManager::addTexture(std::string texName)
 {
-	GLuint tempID = getNextID();
+	unsigned int tempID = getNextID();
 	_textureMap[texName] = tempID;
 	return tempID;
 }
@@ -20,7 +20,7 @@ void TextureManager::removeTextureByName(std::string textureToDestroy)
 	_textureMap[textureToDestroy] = 0;
 }
 
-void TextureManager::removeTextureByID(GLuint id)
+void TextureManager::removeTextureByID(unsigned int id)
 {
 	for (auto text = _textureMap.begin(); text != _textureMap.end(); ++text) {
 		if (text->second == id) {
@@ -30,9 +30,9 @@ void TextureManager::removeTextureByID(GLuint id)
 	}
 }
 
-GLuint TextureManager::getNextID()
+unsigned int TextureManager::getNextID()
 {
-	GLuint tempIDHolder;
+	unsigned int tempIDHolder;
 	if (!_reusableIDs.empty())
 		return _reusableIDs.front();
 	else

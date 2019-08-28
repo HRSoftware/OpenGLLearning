@@ -1,7 +1,6 @@
 #pragma once
 #include <map>
 #include <string>
-#include <glad/glad.h>
 #include <vector>
 
 class TextureManager
@@ -11,17 +10,17 @@ class TextureManager
 		{
 			
 		}
-	GLuint getTextureByName(std::string texName);
-	GLuint addTexture(std::string);
+		 unsigned int getTextureByName(std::string texName);
+		 unsigned int addTexture(std::string);
 	void removeTextureByName(std::string textureToDestroy);
-	void removeTextureByID(GLuint id);
+	void removeTextureByID(unsigned int id);
 
 private:
-	std::map<std::string, GLuint> _textureMap;
+	std::map<std::string, unsigned int> _textureMap;
 
-	GLuint nextNewID = 1;
-	std::vector<GLuint> _reusableIDs;
+	unsigned int nextNewID = 1;
+	std::vector<unsigned int> _reusableIDs;
 
-	GLuint getNextID();
+	unsigned int getNextID();
 };
 

@@ -2,13 +2,13 @@
 
 #include <vector>
 #include "Shader.h"
-#include "RenderDetails.h"
 #include "GameObject.h"
 
 class FloorGrid : public GameObject
 {
 public:
-	FloorGrid(Shader shdr, RenderDetails rd) : _camera(&rd._cam), _gridShader(shdr), GameObject(NULL, shdr, rd) {
+	FloorGrid() = default;
+	FloorGrid(Shader shdr, RenderDetails rd) : _camera(rd._cam), _gridShader(shdr), GameObject(NULL, shdr, rd) {
 		_width = rd._width;
 		_height = rd._height;
 

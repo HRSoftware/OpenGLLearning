@@ -6,8 +6,8 @@
 class ModelManager
 {
 public:
-	ModelManager();
-	~ModelManager();
+	ModelManager() {}
+	~ModelManager() {}
 
 	bool loadModeltoMemory(const std::string fileName, std::string modelName) //will only search in /Resources/Models/ for the file
 	{
@@ -25,10 +25,3 @@ private:
 	std::map<std::string, Model> modelMap;
 };
 
-ModelManager::ModelManager()
-{
-}
-
-ModelManager::~ModelManager()
-{
-}

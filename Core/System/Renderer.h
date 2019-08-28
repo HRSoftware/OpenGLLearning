@@ -1,11 +1,14 @@
 #pragma once
-#include <glad/glad.h>
 #include "../Camera.h"
-#include "../GameObject.h"
+
 
 struct RenderDetails
 {
-	RenderDetails(Camera& cam, int screenHeight, int screenWidth): _cam(&cam)
+	RenderDetails()
+	{
+		throw "Default RenderDetails Constrcutor used";
+	}
+	RenderDetails(Camera* cam = nullptr, int screenHeight = 768, int screenWidth = 1024): _cam(cam)
 	{
 		_height = screenHeight;
 		_width = screenWidth;
@@ -24,10 +27,9 @@ class Renderer
 
 
 	private:
-	GLuint _framebuffer;
+	int _framebuffer;
 	Camera* _currentCamera;
-	std::vector<GameObject*> _renderables;
-	std::vector<Shader*> _shaders;
+	
 
 
 };

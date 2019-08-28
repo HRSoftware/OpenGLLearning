@@ -1,8 +1,7 @@
 #pragma once
 #include "Model.h"
-#include <glm\common.hpp>
-#include "Shader.h"
-#include "RenderDetails.h"
+
+#include "System/Renderer.h"
 
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
@@ -12,12 +11,13 @@
 class GameObject
 {
 public:
-	GameObject(RenderDetails rd) : _camera(&rd._cam)
+	GameObject() {};
+	GameObject(RenderDetails rd) : _camera(rd._cam)
 	 {
 		 
 	 }
 
-	GameObject(Model* model, Shader shdr, RenderDetails rd) : _model(model), _camera(&rd._cam) {
+	GameObject(Model* model, Shader shdr, RenderDetails rd) : _model(model), _camera(rd._cam) {
 		_height = rd._height;
 		_width = rd._width;
 		_modelShader = shdr;

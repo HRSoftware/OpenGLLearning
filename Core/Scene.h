@@ -1,17 +1,23 @@
 #pragma once
-#include "glfw3.h"
+
 #include "Camera.h"
-#include "../Managers/ModelManager.h"
 #include <string>
-#include "GameObject.h"
-#include "System/Renderer.h"
+#include "../Managers/ModelManager.h"
 #include "Lighting.h"
 #include "floorGrid.h"
 #include "Skybox.h"
+#include "glfw3.h"
+
+
 
 class Scene
 {
 public:
+	Scene(glm::vec2 screenInfo = glm::vec2(1024, 768)) : _currentCamera(Camera(glm::vec3(0.0f, 0.0f, 3.0f)))
+	{
+		_screenDimensions = screenInfo;
+		_renderDetails = RenderDetails(_currentCamera, _screenDimensions.x, _screenDimensions.y);
+	}
 	bool initScene(GLFWwindow& wnd, glm::vec2 screenInfo = glm::vec2(1024, 768));
 	void loadResources();
 	void run();

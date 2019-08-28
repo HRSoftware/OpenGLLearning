@@ -1,4 +1,5 @@
 #include "Cube.h"
+#include <glad/glad.h>
 
 void Cube::setUpBuffers()
 {

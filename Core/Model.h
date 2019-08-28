@@ -1,5 +1,5 @@
 
-
+#pragma once
 #ifndef MODEL_H
 #define MODEL_H
 
@@ -12,7 +12,6 @@
 #include <assimp/postprocess.h>
 
 #include "Mesh.h"
-#include "Shader.h"
 
 #include <string>
 #include <fstream>

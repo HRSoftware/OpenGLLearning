@@ -1,5 +1,4 @@
 #include "Scene.h"
-#include <glm/detail/_noise.hpp>
 
 
 bool Scene::initScene(::GLFWwindow& wnd, glm::vec2 screenInfo)
@@ -31,10 +30,6 @@ bool Scene::initScene(::GLFWwindow& wnd, glm::vec2 screenInfo)
 	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
-	_currentCamera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
-	_screenDimensions = screenInfo;
-	_renderDetails = RenderDetails(_currentCamera, _screenDimensions.x, _screenDimensions.y);
-
 	return true;
 }
 
@@ -54,9 +49,9 @@ void Scene::loadResources()
 	_shaderVec.insert_or_assign("modelLoadingShader" ,Shader("modelLoadingShader", true));
 
 
-	_GOVec.insert_or_assign("Building1", GameObject(_modelManager.getModelByName("Building1"), _shaderVec["modelLoadingShader"], _renderDetails));
-	_GOVec.insert_or_assign("Building2", GameObject(_modelManager.getModelByName("Building1"), _shaderVec["modelLoadingShader"], _renderDetails));
-	_GOVec.insert_or_assign("Building3", GameObject(_modelManager.getModelByName("Building2"), _shaderVec["modelLoadingShader"], _renderDetails));
+	_GOVec.insert_or_assign("Building1", &GameObject(_modelManager.getModelByName("Building1"), _shaderVec["modelLoadingShader"], _renderDetails));
+	_GOVec.insert_or_assign("Building2", &GameObject(_modelManager.getModelByName("Building1"), _shaderVec["modelLoadingShader"], _renderDetails));
+	_GOVec.insert_or_assign("Building3", &GameObject(_modelManager.getModelByName("Building2"), _shaderVec["modelLoadingShader"], _renderDetails));
 
 	_GOVec["Building1"]->setPosition({ 0.1f, 0.f, -0.2f });
 	_GOVec["Building1"]->setScale({ 0.005f, 0.005f, 0.005f }); 
@@ -89,11 +84,11 @@ void Scene::loadResources()
 	//_shaderVec["lightingShader"].setFloat("light.intensity", sunLight.getStrength());
 	_shaderVec["lightingShader"].setVec3("light.specular", _sunLight.getSpecular());
 
-	_floorGrid = FloorGrid(_shaderVec["gridShader"], _renderDetails);
+	//_floorGrid = FloorGrid(_shaderVec["gridShader"], _renderDetails);
 
 	skybox.setShader(_shaderVec["skyboxShader"]);
 
-	_GOVec.insert_or_assign("floorGrid", _floorGrid);
+	//_GOVec.insert_or_assign("floorGrid", _floorGrid);
 
 
 }
