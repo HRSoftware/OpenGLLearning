@@ -3,6 +3,8 @@
 #include <stb\stb_image.h>
 
 
+FloorGrid::FloorGrid(): _camera(nullptr), _height(0), _width(0), gridVAO(0), gridVBO(0), gridEBO(0) {}
+
 void FloorGrid::setShader(Shader shader) {
 	_gridShader = shader;
 }

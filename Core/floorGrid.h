@@ -7,10 +7,10 @@
 class FloorGrid : public GameObject
 {
 public:
-	FloorGrid() = default;
+	FloorGrid();
 	FloorGrid(Shader shdr, RenderDetails rd) : _camera(rd._cam), _gridShader(shdr), GameObject(NULL, shdr, rd) {
-		_width = rd._width;
-		_height = rd._height;
+		_width = rd._screenWidth;
+		_height = rd._screenHeight;
 
 		setUpBuffers();
 		loadTextures();

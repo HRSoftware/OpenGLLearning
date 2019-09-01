@@ -4,17 +4,19 @@
 
 struct RenderDetails
 {
-	RenderDetails()
+	RenderDetails(): _cam(nullptr), _screenHeight(0), _screenWidth(0)
 	{
-		throw "Default RenderDetails Constrcutor used";
+		
 	}
-	RenderDetails(Camera* cam = nullptr, int screenHeight = 768, int screenWidth = 1024): _cam(cam)
+
+	RenderDetails(Camera& cam, int screenHeight = 768, int screenWidth = 1024)
 	{
-		_height = screenHeight;
-		_width = screenWidth;
+		_cam = &cam;
+		_screenHeight = screenHeight;
+		_screenWidth = screenWidth;
 	}
 	Camera* _cam;
-	int _height, _width;
+	int _screenHeight, _screenWidth;
 };
 
 class Renderer

@@ -11,23 +11,22 @@
 class GameObject
 {
 public:
-	GameObject() {};
-	GameObject(RenderDetails rd) : _camera(rd._cam)
-	 {
-		 
-	 }
+	GameObject(): _model(nullptr), _camera(nullptr), _height(0), _width(0), _ModelMatrix() {} ;
+	GameObject(RenderDetails rd) : _model(nullptr), _camera(rd._cam), _height(0), _width(0), _ModelMatrix() { }
 
-	GameObject(Model* model, Shader shdr, RenderDetails rd) : _model(model), _camera(rd._cam) {
-		_height = rd._height;
-		_width = rd._width;
+	GameObject(Model* model, const Shader& shdr, RenderDetails rd) : _model(model), _camera(rd._cam), _ModelMatrix()
+	{
+		_height = rd._screenHeight;
+		_width = rd._screenWidth;
 		_modelShader = shdr;
 		_isModelMatrixOutdated = true;
 	}
+
 	~GameObject() {
 		_isModelNULL = true;
 	}
 
-	GameObject(Model& model)
+	GameObject(Model& model): _camera(nullptr), _height(0), _width(0), _ModelMatrix()
 	{
 		_model = &model;
 		_isModelMatrixOutdated = true;
@@ -133,12 +132,12 @@ public:
 		if (_isModelMatrixOutdated)
 			updateModelMatrix();
 
-		_modelShader.setMat4("projection", _camera->getProjectionMatrix());
+		shdr.setMat4("projection", _camera->getProjectionMatrix());
 
-		_modelShader.setMat4("view", _camera->GetViewMatrix());
-		_modelShader.setVec3("viewPos", _camera->Position);
+		shdr.setMat4("view", _camera->GetViewMatrix());
+		shdr.setVec3("viewPos", _camera->Position);
 
-		_modelShader.setMat4("model", _ModelMatrix);
+		shdr.setMat4("model", _ModelMatrix);
 		_model->Draw(shdr, textured);
 	}
 
@@ -146,6 +145,8 @@ public:
 	{
 		Draw(_modelShader, bTextured);
 	}
+
+
 	bool isModelNULL() { return _model == NULL; };
 
 private:
