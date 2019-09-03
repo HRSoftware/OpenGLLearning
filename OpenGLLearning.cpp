@@ -16,13 +16,16 @@ int main(int argc, char* argv[]) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+
 	GLFWwindow* _window = glfwCreateWindow(1024, 768, "New layout", NULL, NULL);
+   Renderer _renderer;
 
 	// Check for Valid Context
 	if (_window == nullptr) {
 		fprintf(stderr, "Failed to Create OpenGL Context");
 		return false;
-	}
+	} 
 
 	glfwMakeContextCurrent(_window);
 
@@ -35,9 +38,10 @@ int main(int argc, char* argv[]) {
 	fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
 	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	
-	Scene newScene(*_window);
+	Scene newScene(*_window, &_renderer);
 	newScene.initScene({ 1024, 768 });
 	newScene.loadResources();
+
 
 
 	newScene.run();

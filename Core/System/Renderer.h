@@ -1,5 +1,7 @@
 #pragma once
 #include "../Camera.h"
+#include "../Mesh.h"
+#include "../GameObject.h"
 
 
 struct RenderDetails
@@ -22,10 +24,14 @@ struct RenderDetails
 class Renderer
 {
 	public:
-	Renderer(){}
+	Renderer(): _framebuffer(0), _currentCamera(nullptr) {}
 
 	void setCamera(Camera& cam);
-	void renderScene();
+
+   void renderGameObject(GameObject* gameobj, Shader shader);
+   void renderMesh(int VAO , int indiceSize, int framebuffer = 0);
+   void setUpShader(vector<Texture>& textures, Shader shader, bool textured = true);
+   void renderBatch(std::map<string, GameObject*>& renderBatch, Shader shader);
 
 
 	private:

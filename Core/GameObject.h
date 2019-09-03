@@ -1,8 +1,6 @@
 #pragma once
 #include "Model.h"
 
-#include "System/Renderer.h"
-
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
 #include <glm/gtc/bitfield.hpp>
@@ -11,14 +9,10 @@
 class GameObject
 {
 public:
-	GameObject(): _model(nullptr), _camera(nullptr), _height(0), _width(0), _ModelMatrix() {} ;
-	GameObject(RenderDetails rd) : _model(nullptr), _camera(rd._cam), _height(0), _width(0), _ModelMatrix() { }
+	GameObject(): _model(nullptr) {} ;
 
-	GameObject(Model* model, const Shader& shdr, RenderDetails rd) : _model(model), _camera(rd._cam), _ModelMatrix()
+	GameObject(Model* model) : _model(model)
 	{
-		_height = rd._screenHeight;
-		_width = rd._screenWidth;
-		_modelShader = shdr;
 		_isModelMatrixOutdated = true;
 	}
 
@@ -26,16 +20,14 @@ public:
 		_isModelNULL = true;
 	}
 
-	GameObject(Model& model): _camera(nullptr), _height(0), _width(0), _ModelMatrix()
+	GameObject(Model& model): _ModelMatrix()
 	{
 		_model = &model;
 		_isModelMatrixOutdated = true;
 	}
 
-	void setModel(Model& model, Camera& cam, int height = 1920, int width = 1080)
+	void setModel(Model& model)
 	{
-		_height = height;
-		_width = width;
 		_model = &model;
 		_isModelMatrixOutdated = true;
 	}
@@ -102,10 +94,8 @@ public:
 		return _ModelMatrix;
 	}
 
-	void updateModelMatrix()
-	{
-		glm::mat4 projection = glm::perspective(_camera->Zoom, (float)_width / (float)_height, 0.01f, 1000.f);
-
+    void updateModelMatrix()
+    {
 		_ModelMatrix = glm::mat4(1.f);
 		_ModelMatrix = glm::scale(_ModelMatrix, _scale); //scale
 		_ModelMatrix = glm::toMat4(_orientation) * _ModelMatrix; //rotation
@@ -127,25 +117,10 @@ public:
 		return _scale;
 	}
 
-	virtual void Draw(Shader shdr, bool textured = true)
+	std::vector<Mesh>& getMeshes()
 	{
-		if (_isModelMatrixOutdated)
-			updateModelMatrix();
-
-		shdr.setMat4("projection", _camera->getProjectionMatrix());
-
-		shdr.setMat4("view", _camera->GetViewMatrix());
-		shdr.setVec3("viewPos", _camera->Position);
-
-		shdr.setMat4("model", _ModelMatrix);
-		_model->Draw(shdr, textured);
+        return _model->meshes;
 	}
-
-	virtual void Draw(bool bTextured = true)
-	{
-		Draw(_modelShader, bTextured);
-	}
-
 
 	bool isModelNULL() { return _model == NULL; };
 
@@ -155,10 +130,7 @@ private:
 	glm::vec3 _scale = { 1.f, 1.f, 1.f };
 	glm::quat _orientation = {1.f, 0.f, 0.f, 0.f};
 	bool _isModelNULL = false;
-	Shader _modelShader;
 
-	Camera* _camera;
-	int _height, _width;
 	glm::mat4 _ModelMatrix;
 	bool _isModelMatrixOutdated = false;
 };

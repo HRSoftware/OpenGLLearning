@@ -28,16 +28,16 @@ void Scene::loadResources()
 	_shaderVec.emplace("modelLoadingShader" ,Shader("modelLoadingShader", true));
 
 
-	_GOVec.emplace("Building1", new GameObject(_modelManager.getModelByName("Building1"), _shaderVec["modelLoadingShader"], _renderDetails));
-	_GOVec.emplace("Building2", new GameObject(_modelManager.getModelByName("Building1"), _shaderVec["modelLoadingShader"], _renderDetails));
-	_GOVec.emplace("Building3", new GameObject(_modelManager.getModelByName("Building2"), _shaderVec["modelLoadingShader"], _renderDetails));
+	_GOVec.emplace("Building1", new GameObject(_modelManager.getModelByName("Building1")));
+	_GOVec.emplace("Building2", new GameObject(_modelManager.getModelByName("Building1")));
+	_GOVec.emplace("Building3", new GameObject(_modelManager.getModelByName("Building2")));
 
 	_GOVec.at("Building1")->setPosition({ 0.1f, 0.f, -0.2f });
 	_GOVec.at("Building1")->setScale({ 0.005f, 0.005f, 0.005f }); 
-	//				   
-	//_GOVec["Building2"]->setPosition({ 10.f, 0.f, 10.f });
-	//_GOVec["Building2"]->setScale({ 0.005f, 0.005f, 0.005f });
-	//_GOVec["Building2"]->setAngle(90, { 0.0, 1.f, 0.0f });
+					   
+	_GOVec["Building2"]->setPosition({ 10.f, 0.f, 10.f });
+	_GOVec["Building2"]->setScale({ 0.005f, 0.005f, 0.005f });
+	_GOVec["Building2"]->setAngle(90, { 0.0, 1.f, 0.0f });
 					
 	_GOVec.at("Building3")->setPosition({ 25.f, 0.f, 5.f });
 	_GOVec.at("Building3")->setScale({ 0.05f, 0.05f, 0.05f});
@@ -63,7 +63,7 @@ void Scene::loadResources()
 	//_shaderVec.at("lightingShader").setFloat("light.intensity", _sunLight.getStrength());
 	_shaderVec.at("lightingShader").setVec3("light.specular", _sunLight.getSpecular());
 
-	//_floorGrid = FloorGrid(_shaderVec["gridShader"], _renderDetails);
+	_GOVec.emplace("floorGrid", new FloorGrid(_shaderVec["gridShader"]));
 
 	skybox.setShader(_shaderVec["skyboxShader"]);
 
@@ -77,17 +77,20 @@ void Scene::run()
 	
 	glEnable(GL_DEPTH_TEST);
 	InputController::_camera = &_currentCamera;
+    _renderer->setCamera(_currentCamera);
+
+
+	float near_plane = 0.01f, far_plane = 1000.f;
+	glm::mat4 _lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	glm::mat4 _lightView = glm::lookAt(glm::vec3(1.2f, 1.0f, 2.0f), 
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0, 1.0, 0.0));
+	glm::mat4 _lightSpaceMatrix = _lightProjection * _lightView;
+
 
 	while (glfwWindowShouldClose(_window) == false)
 	{
-		float near_plane = 0.01f, far_plane = 1000.f;
-		glm::mat4 _lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-		glm::mat4 _lightView = glm::lookAt(glm::vec3(1.2f, 1.0f, 2.0f), 
-										glm::vec3(0.0f, 0.0f, 0.0f),
-											glm::vec3(0.0, 1.0, 0.0));
-		glm::mat4 _lightSpaceMatrix = _lightProjection * _lightView;
-
-
+		
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -103,17 +106,9 @@ void Scene::run()
 		/*glClear(GL_DEPTH_BUFFER_BIT);
 		glActiveTexture(GL_TEXTURE0);*/
 
-
-		//Building1.Draw(newShadowRenderShader);
-		//Building2.Draw(newShadowRenderShader);
-		//Building3.Draw(newShadowRenderShader);
-
-		
-
-
 		//shadowRender.castShadows(buildings);
 
-
+        
 
 		glViewport(0, 0, WIDTH, HEIGHT);
 
@@ -130,38 +125,17 @@ void Scene::run()
 		if (glfwGetKey(_window, GLFW_KEY_R) == GLFW_PRESS)
 			_GOVec["Building1"]->rotateBy(0.1f, { 0, 1, 0 });
 
-		/*if (glfwGetKey(_window, GLFW_KEY_DOWN) == GLFW_PRESS)
-			_GOVec["Building2"]->moveXBy(0.1f);
-
-		if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
-			_GOVec["Building2"]->moveXBy(-0.1f);
-
-		if (glfwGetKey(_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			_GOVec["Building2"]->moveZBy(0.1f);
-
-		if (glfwGetKey(_window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			_GOVec["Building2"]->moveZBy(-0.1f);*/
-		_shaderVec.at("modelLoadingShader").setMat4("projection", projection);
-		Scene::_GOVec.at("Building1")->Draw(_shaderVec.at("modelLoadingShader"));
-		/*Scene::_GOVec["Building2"]->Draw(_shaderVec["lightingShader"]);
-		Scene::_GOVec["Building2"]->Draw(_shaderVec["newShadowRenderShader"]);*/
-		//Scene::_GOVec["floorGrid"]->Draw();
-
-		//skybox.Draw(view, projection);
-
-		glfwPollEvents();
 		
+        _shaderVec.at("modelLoadingShader").setMat4("projection", projection);
 
-		//glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		//glViewport(0, 0, WIDTH / 2, HEIGHT/ 2);
-		//Building1.Draw(newShadowRenderShader, false);
-		//Building2.Draw();
-		//Building3.Draw(false);
+        _renderer->renderBatch(_GOVec, _shaderVec.at("modelLoadingShader"));
+      //_renderer->renderGameObject(Scene::_GOVec["Building2"], _shaderVec.at("modelLoadingShader"));
 
+		skybox.Draw(view, projection);
 
 		glfwSwapBuffers(_window);		// Flip Buffers and Draw
+		glfwPollEvents();
 	}
-	glfwTerminate();
 }
 void Scene::stop()
 {

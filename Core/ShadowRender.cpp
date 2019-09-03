@@ -23,8 +23,6 @@ void ShadowRender::castShadows(std::vector<GameObject*> &renderableObjects)
 		{
 			if (!renderable->isModelNULL()) 
 				_shadowShader.setMat4("model", renderable->getModelMatrix());
-			renderable->Draw(_shadowShader, false);//render untextured
-			
 		}
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

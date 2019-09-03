@@ -2,9 +2,6 @@
 #include "floorGrid.h"
 #include <stb\stb_image.h>
 
-
-FloorGrid::FloorGrid(): _camera(nullptr), _height(0), _width(0), gridVAO(0), gridVBO(0), gridEBO(0) {}
-
 void FloorGrid::setShader(Shader shader) {
 	_gridShader = shader;
 }
@@ -28,34 +25,6 @@ void FloorGrid::setUpBuffers() {
 
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat),  (void*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
-}
-
-void FloorGrid::Draw(bool bTextured)
-{
-	Draw(_gridShader, bTextured);
-}
-
-void FloorGrid::Draw(Shader shdr, bool bTextured)
-{
-	glm::mat4 projection = glm::perspective(_camera->Zoom, (float)_width / (float)_height, 0.01f, 1000.f);
-
-	shdr.use();
-	shdr.setInt("texture_diffuse1", gridTextureID);
-	shdr.setMat4("projection", projection);
-	if(shdr.checkAttributeExist("viewPos"))
-		shdr.setVec3("viewPos", _camera->Position);
-	shdr.setMat4("view", _camera->GetViewMatrix());
-	shdr.setMat4("model", glm::mat4(1.f));
-
-	if(bTextured)
-		glBindTexture(GL_TEXTURE_2D, gridTextureID);
-
-	glBindVertexArray(gridVAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-
-	glActiveTexture(GL_TEXTURE0);
-
 }
 
 void FloorGrid::loadTextures()

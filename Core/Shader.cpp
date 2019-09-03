@@ -25,8 +25,6 @@ Shader::Shader(std::string filename, bool bCore )
 			std::cout << "ERROR::SHADER::FRAGMENT_FILE_NOT_SUCCESFULLY_READ --> " << filename << std::endl;
 		}
 
-
-
 		vShaderFile.open(filePath + ".vert");
 		fShaderFile.open(filePath + ".frag");
 
@@ -41,9 +39,6 @@ Shader::Shader(std::string filename, bool bCore )
 
 		vertexCode = vShaderStream.str();
 		fragCode = fShaderStream.str();
-
-
-
 	}
 	catch (std::ifstream::failure e)
 	{

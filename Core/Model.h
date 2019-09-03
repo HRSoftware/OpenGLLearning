@@ -3,8 +3,6 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <assimp/Importer.hpp>
@@ -51,9 +49,7 @@ public:
 	// draws the model, and thus all its meshes
 	void Draw(Shader& shader,bool bTexture = true)
 	{
-		for (unsigned int i = 0; i < meshes.size(); i++) {
-			meshes[i].Draw(shader, bTexture);
-		}
+		
 	}
 
 private:

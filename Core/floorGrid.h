@@ -7,11 +7,12 @@
 class FloorGrid : public GameObject
 {
 public:
-	FloorGrid();
-	FloorGrid(Shader shdr, RenderDetails rd) : _camera(rd._cam), _gridShader(shdr), GameObject(NULL, shdr, rd) {
-		_width = rd._screenWidth;
-		_height = rd._screenHeight;
-
+	FloorGrid()
+	{
+        setUpBuffers();
+        loadTextures();
+	}
+	FloorGrid(Shader shdr) : GameObject(NULL), _gridShader(shdr) {
 		setUpBuffers();
 		loadTextures();
 	}
@@ -26,7 +27,6 @@ private:
 	void setUpBuffers();
 	void loadTextures();
 	Shader _gridShader;
-	Camera* _camera;
 	int _height, _width;
 
 	const char* _gridTexture = "./Resources/Textures/Grid3.jpg";

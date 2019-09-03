@@ -8,14 +8,16 @@
 #include "Skybox.h"
 #include "glfw3.h"
 #include "System/InputController.h"
+#include "System/Renderer.h"
 
 
 class Scene
 {
 public:
-	Scene(GLFWwindow& wnd) : _currentCamera(Camera(glm::vec3(0.0f, 0.0f, 3.0f))), _window(&wnd)
+	Scene(GLFWwindow& wnd, Renderer* renderer) : _currentCamera(Camera(glm::vec3(0.0f, 0.0f, 3.0f))), _window(&wnd), _renderer(renderer)
 	{
 		_screenDimensions = { 1.f, 1.f };
+      _renderer->setCamera(_currentCamera);
 	}
 	bool initScene(glm::vec2 screenInfo = glm::vec2(1024, 768), Camera cam = Camera({ 1.f, 1.f, 1.f }, {0.f, 1.f, 0.f}));
 	void loadResources();
@@ -31,6 +33,7 @@ public:
 	TextureManager _textureManager;
 	GLFWwindow* _window;
 	InputController* _inputController;
+   Renderer* _renderer;
 
 	std::map<string, Shader> _shaderVec;
 	std::map<string, GameObject*> _GOVec;
