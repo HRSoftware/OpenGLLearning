@@ -8,14 +8,16 @@ bool Scene::initScene(glm::vec2 screenInfo, Camera cam)
 	InputController::_camera = &cam;
 	_renderDetails = RenderDetails(_currentCamera, _screenDimensions.x, _screenDimensions.y);
 	glfwSetCursorPosCallback(_window, mouse_callback);
+    _modelManager.setTextureManager(&_textureManager);
 	
 	return true;
 }
 
 void Scene::loadResources()
 {
+
 	_modelManager.loadModeltoMemory("House/house_obj.obj", "Building1");
-	_modelManager.loadModeltoMemory("Old_House/Old House.obj", "Building3");
+	_modelManager.loadModeltoMemory("Old_House/Old House.obj", "Building2");
 
 	_shaderVec.emplace("BasicShader", Shader("basicShader"));
 	_shaderVec.emplace("shadowMapShaderShader" ,Shader("shadowMapShader", true));
@@ -77,20 +79,19 @@ void Scene::run()
 	
 	glEnable(GL_DEPTH_TEST);
 	InputController::_camera = &_currentCamera;
-    _renderer->setCamera(_currentCamera);
+   _renderer->setCamera(_currentCamera);
 
 
 	float near_plane = 0.01f, far_plane = 1000.f;
 	glm::mat4 _lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-	glm::mat4 _lightView = glm::lookAt(glm::vec3(1.2f, 1.0f, 2.0f), 
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0, 1.0, 0.0));
+	glm::mat4 _lightView = glm::lookAt( glm::vec3(1.2f, 1.0f, 2.0f), 
+												glm::vec3(0.0f, 0.0f, 0.0f),
+													glm::vec3(0.0, 1.0, 0.0));
 	glm::mat4 _lightSpaceMatrix = _lightProjection * _lightView;
 
 
 	while (glfwWindowShouldClose(_window) == false)
 	{
-		
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;

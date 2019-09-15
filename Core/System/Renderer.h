@@ -1,6 +1,6 @@
 #pragma once
 #include "../Camera.h"
-#include "../Mesh.h"
+#include "../Shader.h"
 #include "../GameObject.h"
 
 
@@ -30,7 +30,7 @@ class Renderer
 
    void renderGameObject(GameObject* gameobj, Shader shader);
    void renderMesh(int VAO , int indiceSize, int framebuffer = 0);
-   void setUpShader(vector<Texture>& textures, Shader shader, bool textured = true);
+   void setUpShader(map<int, string> textures, Shader shader, bool textured = true);
    void renderBatch(std::map<string, GameObject*>& renderBatch, Shader shader);
 
 
