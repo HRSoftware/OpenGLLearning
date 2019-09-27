@@ -6,18 +6,18 @@
 #include <glad/glad.h>
 
 
-Texture* TextureManager::getTextureByID(unsigned int ID)
+auto TextureManager::getTextureByID(unsigned int ID) -> Texture*
 {
-
     for ( Texture& _texture : _textureMap )
     {
         if (_texture.ID == ID)
             return &_texture;
     }
 
+    return nullptr;
 }
 
-unsigned int TextureManager::addTexture(Texture newTexture)
+auto TextureManager::addTexture(Texture newTexture) -> unsigned int
 {
     if (checkTextureExistsByPath(newTexture.path) == -1) {
         _textureMap.push_back(newTexture);
@@ -26,7 +26,7 @@ unsigned int TextureManager::addTexture(Texture newTexture)
     return 0;
 }
 
-int TextureManager::checkTextureExistsByPath(std::string path)
+auto TextureManager::checkTextureExistsByPath(std::string path) -> int
 {
  
     for ( Texture _texture : _textureMap )
@@ -44,7 +44,7 @@ void TextureManager::removeTextureByID(unsigned int id)
     _reusableIDs.push_back(id);
 }
 
-unsigned int TextureManager::getNextID()
+auto TextureManager::getNextID() -> unsigned int
 {
 	unsigned int tempIDHolder = nextNewID;
 
@@ -55,7 +55,7 @@ unsigned int TextureManager::getNextID()
 	return tempIDHolder;
 }
 
-std::map<int, std::string> TextureManager::loadMaterialTextures(aiMaterial* mat, std::string directory)
+auto TextureManager::loadMaterialTextures(aiMaterial* mat, std::string directory) -> std::map<int, std::string>
 {
     
     std::map<int, std::string> textureHandles;
@@ -91,7 +91,7 @@ std::map<int, std::string> TextureManager::loadMaterialTextures(aiMaterial* mat,
 
             if (_textureID == -1) {
                 Texture texture;
-                texture.ID = TextureFromFile(str.C_Str(), directory);
+                texture.ID = textureFromFile(str.C_Str(), directory);
                 texture.type = _typeString;
                 texture.path = directory + "/" + str.C_Str();
                 addTexture(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
@@ -105,8 +105,7 @@ std::map<int, std::string> TextureManager::loadMaterialTextures(aiMaterial* mat,
     return textureHandles;
 };
 
-
-unsigned int TextureManager::TextureFromFile(const char* path, const std::string& directory, bool gamma)
+auto TextureManager::textureFromFile(const char* path, const std::string& directory, bool gamma) const -> unsigned int
 {
     std::string filename = std::string(path);
     namespace fs = std::filesystem;

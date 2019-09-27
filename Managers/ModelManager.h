@@ -6,25 +6,25 @@
 class ModelManager
 {
 public:
-	ModelManager(){}
-	~ModelManager() {}
+    ModelManager() {}
+    ~ModelManager() {}
 
-	bool loadModeltoMemory(const std::string fileName, std::string modelName) //will only search in /Resources/Models/ for the file
-	{
-		modelMap[modelName] = Model("Resources/Models/" + fileName, _textureManager, true);
-		return true;
-	}
+    bool addModel(const std::string fileName, std::string modelName) //will only search in /Resources/Models/ for the file
+    {
+        modelMap[modelName] = Model("Resources/Models/" + fileName, _textureManager, true);
+        return true;
+    }
 
-	Model* getModelByName(std::string name)
-	{
-		return &modelMap[name];
-	}
+    Model* getModelByName(std::string name)
+    {
+        return &modelMap[name];
+    }
 
     void setTextureManager(TextureManager*);
 
 
 private:
-	std::map<std::string, Model> modelMap;
+    std::map<std::string, Model> modelMap;
     TextureManager* _textureManager;
 };
 

@@ -1,147 +1,168 @@
 #include "Scene.h"
 
 
-bool Scene::initScene(glm::vec2 screenInfo, Camera cam)
+bool Scene::initScene(Camera cam)
 {
-	_screenDimensions = screenInfo;
-	_currentCamera = cam;
-	InputController::_camera = &cam;
-	_renderDetails = RenderDetails(_currentCamera, _screenDimensions.x, _screenDimensions.y);
-	glfwSetCursorPosCallback(_window, mouse_callback);
+    glfwGetWindowSize(_window, &_screenWidth, &_screenHeight);
+    lastX = _screenWidth / 2;
+    lastY = _screenHeight / 2;
+
+
+    _currentCamera = cam;
+    InputController::_camera = &cam;
+
+    _renderDetails = RenderDetails(_currentCamera, _screenWidth, _screenHeight);
+    glfwSetCursorPosCallback(_window, mouse_callback);
     _modelManager.setTextureManager(&_textureManager);
-	
-	return true;
+
+    _renderer->initDepthRender();
+    _renderer->setCamera(_currentCamera);
+
+    return true;
 }
 
 void Scene::loadResources()
 {
+    _modelManager.addModel("House/house_obj.obj", "Building1");
+    _modelManager.addModel("Old_House/Old House.obj", "Building2");
 
-	_modelManager.loadModeltoMemory("House/house_obj.obj", "Building1");
-	_modelManager.loadModeltoMemory("Old_House/Old House.obj", "Building2");
-
-	_shaderVec.emplace("BasicShader", Shader("basicShader"));
-	_shaderVec.emplace("shadowMapShaderShader" ,Shader("shadowMapShader", true));
-	_shaderVec.emplace("materialShader" ,Shader("materialShader"));
-	_shaderVec.emplace("skyboxShader" ,Shader("skyboxShader", true));
-	_shaderVec.emplace("gridShader" ,Shader("gridShader", true));
-	_shaderVec.emplace("debugDepth" ,Shader("debugDepth"));
-	_shaderVec.emplace("framebufferShader" ,Shader("framebufferShader"));
-	_shaderVec.emplace("lightingShader" ,Shader("basicLighting"));
-	_shaderVec.emplace("modelLoadingShader" ,Shader("modelLoadingShader", true));
-
-
-	_GOVec.emplace("Building1", new GameObject(_modelManager.getModelByName("Building1")));
-	_GOVec.emplace("Building2", new GameObject(_modelManager.getModelByName("Building1")));
-	_GOVec.emplace("Building3", new GameObject(_modelManager.getModelByName("Building2")));
-
-	_GOVec.at("Building1")->setPosition({ 0.1f, 0.f, -0.2f });
-	_GOVec.at("Building1")->setScale({ 0.005f, 0.005f, 0.005f }); 
-					   
-	_GOVec["Building2"]->setPosition({ 10.f, 0.f, 10.f });
-	_GOVec["Building2"]->setScale({ 0.005f, 0.005f, 0.005f });
-	_GOVec["Building2"]->setAngle(90, { 0.0, 1.f, 0.0f });
-					
-	_GOVec.at("Building3")->setPosition({ 25.f, 0.f, 5.f });
-	_GOVec.at("Building3")->setScale({ 0.05f, 0.05f, 0.05f});
+    _shaderManager.addShader("basicShader");
+    _shaderManager.addShader("shadowMapShader", true);
+    _shaderManager.addShader("materialShader");
+    _shaderManager.addShader("skyboxShader", true);
+    _shaderManager.addShader("gridShader", true);
+    _shaderManager.addShader("framebufferShader");
+    _shaderManager.addShader("lightingShader", false, "basicLighting");
+    _shaderManager.addShader("modelLoadingShader", true);
+    _shaderManager.addShader("debugDepthShader", false);
 
 
-	_sunLight = DirectionalLight(glm::vec3(.2f, 0.2f, 0.2f), 4.f, { 10.f, 15.f, 4.f });
-	_sunLight.setAmbient({ 0.2f, 0.2f, 0.2f });
-	_sunLight.setDiffuse({ 0.5f, 0.5f, 0.5f}); 
-	_sunLight.setSpecular({ 0.1f,0.1f, 0.1f });
-	_sunLight.setDirection({ -0.2f, -1.0f, -0.3f });
+    /*_shaderVec.emplace("BasicShader", Shader("basicShader"));
+    _shaderVec.emplace("shadowMapShaderShader" ,Shader("shadowMapShader", true));
+    _shaderVec.emplace("materialShader" ,Shader("materialShader"));
+    _shaderVec.emplace("skyboxShader" ,Shader("skyboxShader", true));
+    _shaderVec.emplace("gridShader" ,Shader("gridShader", true));
+    _shaderVec.emplace("debugDepth" ,Shader("debugDepth"));
+    _shaderVec.emplace("framebufferShader" ,Shader("framebufferShader"));
+    _shaderVec.emplace("lightingShader" ,Shader("basicLighting"));
+    _shaderVec.emplace("modelLoadingShader" ,Shader("modelLoadingShader", true));*/
 
-	_shaderVec.at("modelLoadingShader").setFloat("shininess", 10.0f);
-	_shaderVec.at("modelLoadingShader").setVec3("light.position", _sunLight.getPosition());
-	_shaderVec.at("modelLoadingShader").setVec3("light.ambient", _sunLight.getAmbient());
-	_shaderVec.at("modelLoadingShader").setVec3("light.diffuse", _sunLight.getDiffuse());
-	_shaderVec.at("modelLoadingShader").setFloat("light.intensity", _sunLight.getStrength());
-	_shaderVec.at("modelLoadingShader").setVec3("light.specular", _sunLight.getSpecular());
 
-	_shaderVec.at("lightingShader").setFloat("shininess", 10.f);
-	_shaderVec.at("lightingShader").setVec3("light.position", _sunLight.getPosition());
-	_shaderVec.at("lightingShader").setVec3("light.ambient", _sunLight.getAmbient());
-	_shaderVec.at("lightingShader").setVec3("light.diffuse", _sunLight.getDiffuse());
-	//_shaderVec.at("lightingShader").setFloat("light.intensity", _sunLight.getStrength());
-	_shaderVec.at("lightingShader").setVec3("light.specular", _sunLight.getSpecular());
+    _GOVec.emplace("Building1", new GameObject(_modelManager.getModelByName("Building1")));
+    _GOVec.emplace("Building2", new GameObject(_modelManager.getModelByName("Building1")));
+    _GOVec.emplace("Building3", new GameObject(_modelManager.getModelByName("Building2")));
 
-	_GOVec.emplace("floorGrid", new FloorGrid(_shaderVec["gridShader"]));
+    _GOVec.at("Building1")->setPosition({ 0.1f, 0.f, -0.2f });
+    _GOVec.at("Building1")->setScale({ 0.005f, 0.005f, 0.005f });
 
-	skybox.setShader(_shaderVec["skyboxShader"]);
+    _GOVec["Building2"]->setPosition({ 10.f, 0.f, 10.f });
+    _GOVec["Building2"]->setScale({ 0.005f, 0.005f, 0.005f });
+    _GOVec["Building2"]->setAngle(90, { 0.0, 1.f, 0.0f });
 
-	//_GOVec.insert_or_assign("floorGrid", _floorGrid);
+    _GOVec.at("Building3")->setPosition({ 25.f, 0.f, 5.f });
+    _GOVec.at("Building3")->setScale({ 0.05f, 0.05f, 0.05f });
+
+
+    _sunLight = DirectionalLight(glm::vec3(.2f, 0.2f, 0.2f), 4.f, { 10.f, 15.f, 4.f });
+    _sunLight.setAmbient({ 0.2f, 0.2f, 0.2f });
+    _sunLight.setDiffuse({ 0.5f, 0.5f, 0.5f });
+    _sunLight.setSpecular({ 0.1f,0.1f, 0.1f });
+    _sunLight.setDirection({ -0.2f, -1.0f, -0.3f });
+
+    _shaderManager.getShader("modelLoadingShader").setFloat("shininess", 10.0f);
+    _shaderManager.getShader("modelLoadingShader").setVec3("light.position", _sunLight.getPosition());
+    _shaderManager.getShader("modelLoadingShader").setVec3("light.ambient", _sunLight.getAmbient());
+    _shaderManager.getShader("modelLoadingShader").setVec3("light.diffuse", _sunLight.getDiffuse());
+    _shaderManager.getShader("modelLoadingShader").setFloat("light.intensity", _sunLight.getStrength());
+    _shaderManager.getShader("modelLoadingShader").setVec3("light.specular", _sunLight.getSpecular());
+
+    _shaderManager.getShader("lightingShader").setFloat("shininess", 10.f);
+    _shaderManager.getShader("lightingShader").setVec3("light.position", _sunLight.getPosition());
+    _shaderManager.getShader("lightingShader").setVec3("light.ambient", _sunLight.getAmbient());
+    _shaderManager.getShader("lightingShader").setVec3("light.diffuse", _sunLight.getDiffuse());
+    //_shaderVec.at("lightingShader").setFloat("light.intensity", _sunLight.getStrength());
+    _shaderManager.getShader("lightingShader").setVec3("light.specular", _sunLight.getSpecular());
+
+    _GOVec.emplace("floorGrid", new FloorGrid(_shaderManager.getShader("gridShader")));
+
+    skybox.setShader(_shaderManager.getShader("skyboxShader"));
+
+    //_GOVec.insert_or_assign("floorGrid", _floorGrid);
 
 
 }
 
 void Scene::run()
 {
-	
-	glEnable(GL_DEPTH_TEST);
-	InputController::_camera = &_currentCamera;
-   _renderer->setCamera(_currentCamera);
+    glEnable(GL_DEPTH_TEST);
+    InputController::_camera = &_currentCamera;
+    _renderer->setCamera(_currentCamera);
 
 
-	float near_plane = 0.01f, far_plane = 1000.f;
-	glm::mat4 _lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-	glm::mat4 _lightView = glm::lookAt( glm::vec3(1.2f, 1.0f, 2.0f), 
-												glm::vec3(0.0f, 0.0f, 0.0f),
-													glm::vec3(0.0, 1.0, 0.0));
-	glm::mat4 _lightSpaceMatrix = _lightProjection * _lightView;
+    const float near_plane = 0.01f;
+    const float far_plane = 1000.f;
 
 
-	while (glfwWindowShouldClose(_window) == false)
-	{
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
 
-		processInput(_window, deltaTime);
-		
-		// render scene from light's point of view
-		_shaderVec.at("modelLoadingShader").use();
-		_shaderVec.at("modelLoadingShader").setMat4("lightSpaceMatrix", _lightSpaceMatrix);
+    std::vector<IBaseLight*> lightVec;
+    lightVec.push_back(&_sunLight);
+    _renderer->addLightToScene(&_sunLight);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    while (glfwWindowShouldClose(_window) == false) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
-		//glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		//glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		/*glClear(GL_DEPTH_BUFFER_BIT);
-		glActiveTexture(GL_TEXTURE0);*/
+        processInput(_window, deltaTime);
+        
+        _shaderManager.getShader("debugDepthShader").use();
+        _renderer->renderBatch_ToDepthBuffer(_GOVec, _shaderManager.getShader("debugDepthShader"));
 
-		//shadowRender.castShadows(buildings);
+        _shaderManager.getShader("modelLoadingShader").use();
+        _shaderManager.getShader("modelLoadingShader").setMat4("lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
+
+
+        glViewport(0, 0, _screenWidth, _screenHeight);
+
+        glClearColor(0.25f, 0.25f, 0.5f, 1.0f);		// Background Fill Color
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glm::mat4 projection = glm::perspective(_currentCamera.Zoom, (float)_screenWidth / (float)_screenHeight, 0.01f, 1000.f);
+        glm::mat4 view = _currentCamera.GetViewMatrix();
+
+        if (glfwGetKey(_window, GLFW_KEY_T) == GLFW_PRESS)
+            //sunLight.setPosition(camera.Position);
+            _currentCamera.Position = _sunLight.getPosition();
+
+        if (glfwGetKey(_window, GLFW_KEY_R) == GLFW_PRESS)
+            _GOVec["Building1"]->rotateBy(0.1f, { 0, 1, 0 });
 
         
+        
+        
+        _shaderManager.getShader("modelLoadingShader").setMat4("projection", projection);
+        _renderer->renderBatch(_GOVec, _shaderManager.getShader("modelLoadingShader"));
 
-		glViewport(0, 0, WIDTH, HEIGHT);
 
-		glClearColor(0.25f, 0.25f, 0.5f, 1.0f);		// Background Fill Color
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        skybox.Draw(view, projection);
 
-		glm::mat4 projection = glm::perspective(_currentCamera.Zoom, (float)WIDTH / (float)HEIGHT, 0.01f, 1000.f);
-		glm::mat4 view = _currentCamera.GetViewMatrix();
-
-		if (glfwGetKey(_window, GLFW_KEY_T) == GLFW_PRESS)
-			//sunLight.setPosition(camera.Position);
-			_currentCamera.Position = _sunLight.getPosition();
-
-		if (glfwGetKey(_window, GLFW_KEY_R) == GLFW_PRESS)
-			_GOVec["Building1"]->rotateBy(0.1f, { 0, 1, 0 });
-
-		
-        _shaderVec.at("modelLoadingShader").setMat4("projection", projection);
-
-        _renderer->renderBatch(_GOVec, _shaderVec.at("modelLoadingShader"));
-      //_renderer->renderGameObject(Scene::_GOVec["Building2"], _shaderVec.at("modelLoadingShader"));
-
-		skybox.Draw(view, projection);
-
-		glfwSwapBuffers(_window);		// Flip Buffers and Draw
-		glfwPollEvents();
-	}
+       
+        
+        //_renderer->renderGameObject_ToDepthBuffer(lightVec, _GOVec["Building1"], _shaderManager.getShader("lightingShader"));
+        
+        
+ 
+        glfwSwapBuffers(_window);		// Flip Buffers and Draw
+        glfwPollEvents();
+    }
 }
+
 void Scene::stop()
 {
 	
 }
+
 void Scene::save()
 {
 	

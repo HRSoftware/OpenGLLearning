@@ -35,9 +35,12 @@ public:
 	glm::mat4 getShadowViewProjectionMatrix(bool boolRecalculate = false)
 	{
 		if (boolRecalculate || _lightRecalcNeeded)
+		{
 			updateViewProjectionMatrix();
-
-		return _lightViewProjectionMatrix;
+         _shadowLightViewProjectionMatrix = _shadowBiasMatrix * _lightViewProjectionMatrix;
+		}
+			
+      return _shadowLightViewProjectionMatrix;
 	}
 
 	float getStrength() { return _strength; };
@@ -84,6 +87,14 @@ protected:
 	glm::mat4 _lightViewMatrix;
 	glm::mat4 _lightProjectionMatrix;
 	glm::mat4 _lightViewProjectionMatrix;
+   glm::mat4 _shadowLightViewProjectionMatrix;
+
+   glm::mat4 _shadowBiasMatrix={
+      0.5, 0.0, 0.0, 0.0,
+      0.0, 0.5, 0.0, 0.0,
+      0.0, 0.0, 0.5, 0.0,
+      0.5, 0.5, 0.5, 1.0
+   };
 
 	float near_plane = 0.1f, far_plane = 1000.f;
 

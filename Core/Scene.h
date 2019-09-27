@@ -8,18 +8,19 @@
 #include "Skybox.h"
 #include "glfw3.h"
 #include "System/InputController.h"
+
+#include "../Managers/ShaderManager.h"
 #include "System/Renderer.h"
 
 
 class Scene
 {
 public:
-	Scene(GLFWwindow& wnd, Renderer* renderer) : _currentCamera(Camera(glm::vec3(0.0f, 0.0f, 3.0f))), _window(&wnd), _renderer(renderer)
+	Scene(GLFWwindow& wnd, Renderer* renderer) : _window(&wnd)
 	{
-		_screenDimensions = { 1.f, 1.f };
-      _renderer->setCamera(_currentCamera);
+      _renderer = renderer;
 	}
-	bool initScene(glm::vec2 screenInfo = glm::vec2(1024, 768), Camera cam = Camera({ 1.f, 1.f, 1.f }, {0.f, 1.f, 0.f}));
+	bool initScene(Camera cam = Camera({ 1.f, 1.f, 1.f }, {0.f, 1.f, 0.f}));
 	void loadResources();
 	void run();
 	void stop();
@@ -28,9 +29,10 @@ public:
 
 
 	private:
-	Camera _currentCamera;
+	Camera _currentCamera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 	ModelManager _modelManager;
 	TextureManager _textureManager;
+   ShaderManager _shaderManager;
 	GLFWwindow* _window;
 	InputController* _inputController;
    Renderer* _renderer;
@@ -48,12 +50,11 @@ public:
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 
-	const int HEIGHT = 720;
-	const int WIDTH = 1024;
+   int _screenWidth = 0;
+   int _screenHeight = 0;
 
-
-	float lastX = WIDTH / 2.f;
-	float lastY = HEIGHT / 2.f;
+	float lastX = 0;
+	float lastY = 0;
 	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
 };

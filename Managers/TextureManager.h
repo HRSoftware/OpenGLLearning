@@ -24,7 +24,7 @@ private:
     unsigned int nextNewID = 1;
     std::vector<unsigned int> _reusableIDs;
     int checkTextureExistsByPath(std::string path);
-    unsigned TextureFromFile(const char* path, const std::string& directory, bool gamma = true);
+    unsigned textureFromFile(const char* path, const std::string& directory, bool gamma = true) const;
     unsigned int getNextID();
 
 };
