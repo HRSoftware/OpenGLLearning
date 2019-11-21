@@ -1,5 +1,6 @@
-#include "PickingTextures.h"
+
 #include <cstdio>
+#include "../../include/Core/PickingTextures.h"
 
 bool PickingTexture::Init(unsigned windowWidth, unsigned windowHeight)
 {

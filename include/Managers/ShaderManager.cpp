@@ -1,4 +1,4 @@
-﻿#include "ShaderManager.h"
+﻿#include "../../include/Managers/ShaderManager.h"
 
 void ShaderManager::addShader(std::string refName, bool core, std::string fileName)
 {

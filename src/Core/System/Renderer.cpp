@@ -1,23 +1,34 @@
-#include "Renderer.h"
+
+#include "../../../include/Core/System/Renderer.h"
 
 
+std::shared_ptr<Model> Renderable::getModel(std::string modelName)
+{
+    return std::make_shared<Model>(Renderable::RenerableModels.at(modelName));
+}
+
+std::shared_ptr<Model> Renderable::addModel(std::string fileName)
+{
+    std::shared_ptr<Model> model = Renderable::getModel(fileName);
+    return model != nullptr ? model : Renderable::getModel(fileName);
+}
 
 void Renderer::setCamera(Camera& cam)
 {
     _currentCamera = &cam;
 }
 
-void Renderer::renderGameObject(GameObject* gameobj, Shader shader, bool texture)
-{
 
-    for ( auto m : gameobj->getMeshes() )
+void Renderer::renderGameObject(GameObject gameobj, Shader shader, bool texture)
+{
+    for ( auto m : gameobj.getMeshes() )
     {
         if(texture)
             setUpShader(m.textureHandles, shader, texture);
 
         shader.setMat4("view", _currentCamera->GetViewMatrix());
-        shader.setMat4("model", gameobj->getModelMatrix());
-        renderMesh(m.VAO, m.indices.size());
+        shader.setMat4("model", gameobj.getModelMatrix());
+        renderMesh(m.getVAO(), m.getIndices().size());
     }
 }
 
@@ -67,7 +78,6 @@ void Renderer::initDepthRender()
       std::cout << "Framebuffer is complete!" << std::endl;
 
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 }
 
 void Renderer::renderMesh(int VAO, int indiceCount)
@@ -81,6 +91,7 @@ void Renderer::renderMesh(int VAO, int indiceCount)
 
 void Renderer::setUpShader(map<int, string> textures, Shader shader, bool textured)
 {
+    activeShader = shader;
     if (textured) {
         // bind appropriate textures
         unsigned int diffuseNr = 1;
@@ -105,7 +116,7 @@ void Renderer::setUpShader(map<int, string> textures, Shader shader, bool textur
             else if (name == "texture_height")
                 number = std::to_string(heightNr++); // transfer unsigned int to stream
 
-            shader.setInt((name + number).c_str(), _textureIndex);
+            activeShader.setInt((name + number).c_str(), _textureIndex);
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, _texture.first);
 
@@ -141,7 +152,7 @@ void Renderer::renderGameObject_ToDepthBuffer(GameObject* gameobj)
 {
     for ( auto mesh : gameobj->getMeshes())
     {
-       renderMesh(mesh.VAO, mesh.indices.size());
+       renderMesh(mesh.getVAO(), mesh.getIndices().size());
     }
 }
 
@@ -159,23 +170,18 @@ void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject*>& renderBa
       shader.setMat4("lightSpaceMatrix", _light->getShadowViewProjectionMatrix(true));
 
       for (auto GO : renderBatch) {
-         if (GO.second->isModelNULL() == false)
-         {
-            shader.setMat4("modelMatrix", GO.second->getModelMatrix());
-            renderGameObject_ToDepthBuffer(GO.second);
-         }
+        shader.setMat4("modelMatrix", GO.second->getModelMatrix());
+        renderGameObject_ToDepthBuffer(GO.second);
+         
       }
    }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::renderBatch(std::map<string, GameObject*>& renderBatch, Shader shader, bool textured)
+void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, Shader shader, bool textured)
 {
    shader.use();
     for ( auto GO : renderBatch )
-    {
-        if(GO.second->isModelNULL() == false)
-            renderGameObject(GO.second, shader, textured);
-    }
+       renderGameObject(GO.second, shader, textured);
 }

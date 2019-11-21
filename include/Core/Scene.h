@@ -31,14 +31,13 @@ public:
 	private:
 	Camera _currentCamera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 	ModelManager _modelManager;
-	TextureManager _textureManager;
-   ShaderManager _shaderManager;
+	ShaderManager _shaderManager;
 	GLFWwindow* _window;
 	InputController* _inputController;
-   Renderer* _renderer;
+	Renderer* _renderer;
 
 	std::map<string, Shader> _shaderVec;
-	std::map<string, GameObject*> _GOVec;
+	std::map<string, GameObject> _GOVec;
 	RenderDetails _renderDetails;
 
 	glm::vec2 _screenDimensions;

@@ -1,4 +1,5 @@
-#include "Scene.h"
+#include "../../include/Core/Primitive_Shapes/Cube.h"
+#include "../../include/Core/Scene.h"
 
 
 bool Scene::initScene(Camera cam)
@@ -13,7 +14,6 @@ bool Scene::initScene(Camera cam)
 
     _renderDetails = RenderDetails(_currentCamera, _screenWidth, _screenHeight);
     glfwSetCursorPosCallback(_window, mouse_callback);
-    _modelManager.setTextureManager(&_textureManager);
 
     _renderer->initDepthRender();
     _renderer->setCamera(_currentCamera);
@@ -24,7 +24,7 @@ bool Scene::initScene(Camera cam)
 void Scene::loadResources()
 {
     _modelManager.addModel("House/house_obj.obj", "Building1");
-    _modelManager.addModel("Old_House/Old House.obj", "Building2");
+    _modelManager.addModel("HighRise/Residential Buildings 001.obj ", "Building2");
 
     _shaderManager.addShader("basicShader");
     _shaderManager.addShader("shadowMapShader", true);
@@ -48,19 +48,20 @@ void Scene::loadResources()
     _shaderVec.emplace("modelLoadingShader" ,Shader("modelLoadingShader", true));*/
 
 
-    _GOVec.emplace("Building1", new GameObject(_modelManager.getModelByName("Building1")));
-    _GOVec.emplace("Building2", new GameObject(_modelManager.getModelByName("Building1")));
-    _GOVec.emplace("Building3", new GameObject(_modelManager.getModelByName("Building2")));
+    _GOVec.emplace("Building1", GameObject(_modelManager.getModelByName("Building1")->meshes));
+    _GOVec.emplace("Building2", GameObject(_modelManager.getModelByName("Building1")->meshes));
+    _GOVec.emplace("Building3", GameObject(_modelManager.getModelByName("Building2")->meshes));
+    _GOVec.emplace("gridFloor",  GameObject(_floorGrid));
 
-    _GOVec.at("Building1")->setPosition({ 0.1f, 0.f, -0.2f });
-    _GOVec.at("Building1")->setScale({ 0.005f, 0.005f, 0.005f });
+    _GOVec.at("Building1").setPosition({ 0.1f, 0.f, -0.2f });
+    _GOVec.at("Building1").setScale({ 0.005f, 0.005f, 0.005f });
 
-    _GOVec["Building2"]->setPosition({ 10.f, 0.f, 10.f });
-    _GOVec["Building2"]->setScale({ 0.005f, 0.005f, 0.005f });
-    _GOVec["Building2"]->setAngle(90, { 0.0, 1.f, 0.0f });
+    _GOVec["Building2"].setPosition({ 10.f, 0.f, 10.f });
+    _GOVec["Building2"].setScale({ 0.005f, 0.005f, 0.005f });
+    _GOVec["Building2"].setAngle(90, { 0.0, 1.f, 0.0f });
 
-    _GOVec.at("Building3")->setPosition({ 25.f, 0.f, 5.f });
-    _GOVec.at("Building3")->setScale({ 0.05f, 0.05f, 0.05f });
+    _GOVec.at("Building3").setPosition({ 25.f, 0.f, 5.f });
+    _GOVec.at("Building3").setScale({ 0.05f, 0.05f, 0.05f });
 
 
     _sunLight = DirectionalLight(glm::vec3(.2f, 0.2f, 0.2f), 4.f, { 10.f, 15.f, 4.f });
@@ -83,14 +84,12 @@ void Scene::loadResources()
     //_shaderVec.at("lightingShader").setFloat("light.intensity", _sunLight.getStrength());
     _shaderManager.getShader("lightingShader").setVec3("light.specular", _sunLight.getSpecular());
 
-    _GOVec.emplace("floorGrid", new FloorGrid(_shaderManager.getShader("gridShader")));
+    
 
     skybox.setShader(_shaderManager.getShader("skyboxShader"));
-
-    //_GOVec.insert_or_assign("floorGrid", _floorGrid);
-
-
-}
+    
+    
+};
 
 void Scene::run()
 {
@@ -109,6 +108,9 @@ void Scene::run()
     _renderer->addLightToScene(&_sunLight);
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    Cube testCube;
+    
     while (glfwWindowShouldClose(_window) == false) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -117,7 +119,7 @@ void Scene::run()
         processInput(_window, deltaTime);
         
         _shaderManager.getShader("debugDepthShader").use();
-        _renderer->renderBatch_ToDepthBuffer(_GOVec, _shaderManager.getShader("debugDepthShader"));
+       /// _renderer->renderBatch_ToDepthBuffer(_GOVec, _shaderManager.getShader("debugDepthShader"));
 
         _shaderManager.getShader("modelLoadingShader").use();
         _shaderManager.getShader("modelLoadingShader").setMat4("lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
@@ -136,7 +138,7 @@ void Scene::run()
             _currentCamera.Position = _sunLight.getPosition();
 
         if (glfwGetKey(_window, GLFW_KEY_R) == GLFW_PRESS)
-            _GOVec["Building1"]->rotateBy(0.1f, { 0, 1, 0 });
+            _GOVec["Building1"].rotateBy(0.1f, { 0, 1, 0 });
 
         
         
@@ -144,7 +146,7 @@ void Scene::run()
         _shaderManager.getShader("modelLoadingShader").setMat4("projection", projection);
         _renderer->renderBatch(_GOVec, _shaderManager.getShader("modelLoadingShader"));
 
-
+        testCube.draw();
         skybox.Draw(view, projection);
 
        

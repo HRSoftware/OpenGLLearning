@@ -1,5 +1,5 @@
 #pragma once
-#include "InputController.h"
+#include "../../../include/Core/System/InputController.h"
 
 
 Camera* InputController::_camera = nullptr;

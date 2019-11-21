@@ -3,7 +3,19 @@
 
 #include "../GameObject.h"
 #include "../Lighting.h"
+
 #include <string>
+
+class Renderable
+{
+   private:
+   std::map<std::string, Model> RenerableModels;
+   
+   public:
+      std::shared_ptr<Model> getModel(std::string modelName);
+      std::shared_ptr<Model> addModel(std::string fileName);
+ 
+};
 
 
 struct RenderDetails
@@ -37,12 +49,12 @@ class Renderer
 
         void setCamera(Camera& cam);
 
-        void renderGameObject(GameObject* gameobj, Shader shader, bool texture = true);
+        void renderGameObject(GameObject gameobj, Shader shader, bool texture = true);
         void renderGameObject_ToDepthBuffer(GameObject* gameobj);
         void renderMesh(int VAO, int indiceCount);
         void setUpShader(map<int, string> textures, Shader shader, bool textured = true);
         void renderBatch_ToDepthBuffer(std::map<string, GameObject*>& renderBatch, Shader shader);
-        void renderBatch(std::map<string, GameObject*>& renderBatch, Shader shader, bool textured = true);
+        void renderBatch(std::map<string, GameObject>& renderBatch, Shader shader, bool textured = true);
         void addLightToScene(IBaseLight* light);
         void initDepthRender();
 
@@ -61,6 +73,7 @@ class Renderer
         GLuint _screenWidth;
         GLuint _screenHeight;
         GLuint _shadowWidth, _shadowHeight;
+        Shader activeShader;
         
 
 

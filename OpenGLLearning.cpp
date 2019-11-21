@@ -2,9 +2,9 @@
 
 #include <iostream>
 #include <filesystem>
-#include "Core/Scene.h"
+#include "include/Core/Scene.h"
 //#include "Bullet/btBulletDynamicsCommon.h"
-#include "Core/LoadTextures.h"
+#include "include/Core/LoadTextures.h"
 //unsigned int loadTexture(char const* path);
 //void renderQuad();
 

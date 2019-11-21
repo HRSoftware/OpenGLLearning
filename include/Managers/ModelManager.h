@@ -11,8 +11,13 @@ public:
 
     bool addModel(const std::string fileName, std::string modelName) //will only search in /Resources/Models/ for the file
     {
-        modelMap[modelName] = Model("Resources/Models/" + fileName, _textureManager, true);
+        modelMap[modelName] = Model("Resources/Models/" + fileName, true);
         return true;
+    }
+
+    void addModel(std::string modelName, Model newModel)
+    {
+        modelMap[modelName] = newModel;
     }
 
     Model* getModelByName(std::string name)
@@ -20,15 +25,10 @@ public:
         return &modelMap[name];
     }
 
-    void setTextureManager(TextureManager*);
+
 
 
 private:
     std::map<std::string, Model> modelMap;
-    TextureManager* _textureManager;
-};
 
-inline void ModelManager::setTextureManager(TextureManager* textManager)
-{
-    _textureManager = textManager;
-}
+};

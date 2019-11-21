@@ -1,4 +1,4 @@
-#include "TextureManager.h"
+#include "../../include/Managers/TextureManager.h"
 #include <assimp/material.h>
 #include <filesystem>
 #include <stb/stb_image.h>
@@ -19,14 +19,14 @@ auto TextureManager::getTextureByID(unsigned int ID) -> Texture*
 
 auto TextureManager::addTexture(Texture newTexture) -> unsigned int
 {
-    if (checkTextureExistsByPath(newTexture.path) == -1) {
+    if (checkIfTextureAlreadyLoadedByPath(newTexture.path) == -1) {
         _textureMap.push_back(newTexture);
         return newTexture.ID;
     }
     return 0;
 }
 
-auto TextureManager::checkTextureExistsByPath(std::string path) -> int
+auto TextureManager::checkIfTextureAlreadyLoadedByPath(std::string path) -> int
 {
  
     for ( Texture _texture : _textureMap )
@@ -87,7 +87,7 @@ auto TextureManager::loadMaterialTextures(aiMaterial* mat, std::string directory
             mat->GetTexture(_type, i, &str);
             // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
             bool skip = false;
-            int _textureID = checkTextureExistsByPath(directory + "/" + str.data);
+            int _textureID = checkIfTextureAlreadyLoadedByPath(directory + "/" + str.data);
 
             if (_textureID == -1) {
                 Texture texture;
@@ -105,21 +105,25 @@ auto TextureManager::loadMaterialTextures(aiMaterial* mat, std::string directory
     return textureHandles;
 };
 
-auto TextureManager::textureFromFile(const char* path, const std::string& directory, bool gamma) const -> unsigned int
+auto TextureManager::textureFromFile(const char* path, const std::string& directory, bool gamma) -> unsigned int
 {
-    std::string filename = std::string(path);
+    std::string fullFilePath;
     namespace fs = std::filesystem;
-    if ( fs::exists(directory + "/textures/"))
-        filename = "textures/" + filename;
 
-    filename = directory + "/" + filename;
+    fullFilePath = directory == "" ? std::string(path) : std::string(directory + "/" + path);
 
+    if (!fs::exists(fullFilePath))
+    {
+        std::cout << "Could not find texture file at " << fullFilePath << std::endl;
+        return -1;
+    }
+        
 
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
-    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    unsigned char* data = stbi_load(fullFilePath.c_str(), &width, &height, &nrComponents, 0);
     if (data)
     {
         GLenum format;

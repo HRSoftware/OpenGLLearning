@@ -1,5 +1,5 @@
-#include "ShadowRender.h"
 
+#include "../../include/Core/ShadowRender.h"
 
 
 void ShadowRender::castShadows(std::vector<GameObject*> &renderableObjects)
@@ -21,8 +21,7 @@ void ShadowRender::castShadows(std::vector<GameObject*> &renderableObjects)
       _shadowShader.setMat4("lightSpaceMatrix", _shadowMatrixWithBias);
       for ( auto renderable : renderableObjects )
       {
-         if (!renderable->isModelNULL()) 
-            _shadowShader.setMat4("model", renderable->getModelMatrix());
+         _shadowShader.setMat4("model", renderable->getModelMatrix());
       }
    }
    glBindFramebuffer(GL_FRAMEBUFFER, 0);

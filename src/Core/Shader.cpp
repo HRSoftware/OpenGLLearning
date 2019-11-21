@@ -1,4 +1,5 @@
-#include "Shader.h"
+
+#include "../../include/Core/Shader.h"
 
 Shader::Shader(std::string filename, bool bCore )
 {

@@ -1,4 +1,5 @@
-#include "Lighting.h"
+
+#include "../../include/Core/Lighting.h"
 
 
 void DirectionalLight::useLight()
