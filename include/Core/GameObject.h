@@ -2,12 +2,11 @@
 
 #include "floorGrid.h"
 #include "Model.h"
-
+#include "Material.h"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
 #include <glm/gtc/bitfield.hpp>
 #include <utility>
-
 
 
 class GameObject
@@ -16,9 +15,11 @@ public:
 	GameObject()
 	= default;
 
-	GameObject(FloorGrid floor);
+    GameObject(FloorGrid floor);
 	GameObject(std::vector<Mesh> meshes);
 	GameObject(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices);
+    void setMaterial(Material mat);
+    Material getMaterial();
 	~GameObject();
 
 	void setModel(Model& model);
@@ -40,8 +41,9 @@ public:
 protected:
 
     std::vector<Mesh> _meshes;
+	Material material;
 
-private:
+	private:
 	glm::vec3 _position = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 _scale = { 1.f, 1.f, 1.f };
 	glm::quat _orientation = {1.f, 0.f, 0.f, 0.f};

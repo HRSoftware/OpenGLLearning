@@ -1,11 +1,12 @@
 ﻿#pragma once
 #include <string>
+#include <assimp/material.h>
 
 
 struct Texture
 {
-    unsigned int ID = 0;
-    std::string type;
+    int ID = 0;
+    aiTextureType type = aiTextureType_UNKNOWN;
     std::string path;
 
     Texture() = default;

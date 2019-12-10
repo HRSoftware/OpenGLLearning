@@ -4,7 +4,8 @@
 GameObject::GameObject(FloorGrid floor)
 {
     _isModelMatrixOutdated = true;
-    _meshes = { Mesh(floor._vertices, floor._indices, {{floor.gridTextureID, "gridTexture"}}, true) };
+    _meshes = { Mesh(floor._vertices, floor._indices, {"floorGrid",{floor.gridTextureID}}, true) };
+   // material = Material("floorGridMaterial", "Textures/Grid2.png");
 }
 
 GameObject::GameObject(std::vector<Mesh> meshes): _meshes(std::move(meshes))
@@ -16,6 +17,16 @@ GameObject::GameObject(std::vector<Vertex> _vertices, std::vector<unsigned> _ind
 {
     _isModelMatrixOutdated = true;
     _meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
+}
+
+void GameObject::setMaterial(Material mat)
+{
+    material = mat;
+}
+
+Material GameObject::getMaterial()
+{
+    return material;
 }
 
 GameObject::~GameObject()

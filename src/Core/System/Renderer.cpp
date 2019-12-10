@@ -1,5 +1,6 @@
 
 #include "../../../include/Core/System/Renderer.h"
+#include "../../../include/Core/Material.h"
 
 
 std::shared_ptr<Model> Renderable::getModel(std::string modelName)
@@ -19,18 +20,7 @@ void Renderer::setCamera(Camera& cam)
 }
 
 
-void Renderer::renderGameObject(GameObject gameobj, Shader shader, bool texture)
-{
-    for ( auto m : gameobj.getMeshes() )
-    {
-        if(texture)
-            setUpShader(m.textureHandles, shader, texture);
 
-        shader.setMat4("view", _currentCamera->GetViewMatrix());
-        shader.setMat4("model", gameobj.getModelMatrix());
-        renderMesh(m.getVAO(), m.getIndices().size());
-    }
-}
 
 
 void Renderer::addLightToScene(IBaseLight* light)
@@ -89,9 +79,10 @@ void Renderer::renderMesh(int VAO, int indiceCount)
     glActiveTexture(GL_TEXTURE0);
 }
 
-void Renderer::setUpShader(map<int, string> textures, Shader shader, bool textured)
+void Renderer::setUpShader(Material material, bool textured)
 {
-    activeShader = shader;
+    activeShader = material.getShader();
+    activeShader.use();
     if (textured) {
         // bind appropriate textures
         unsigned int diffuseNr = 1;
@@ -100,63 +91,45 @@ void Renderer::setUpShader(map<int, string> textures, Shader shader, bool textur
         unsigned int heightNr = 1;
 
         int _textureIndex = 0;
-        for ( auto _texture : textures )
+        for ( auto _texture : material.getAllTextures() )
         {
             glActiveTexture(GL_TEXTURE0 + _textureIndex);
-            std::string number;
-            std::string name = _texture.second;
 
+            switch ( _texture.second )
+            {
+            case aiTextureType_DIFFUSE:
+                activeShader.setInt(("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
+                break;
+            case aiTextureType_SPECULAR:
+                activeShader.setInt(("texture_specular" + std::to_string(specularNr++)), _textureIndex);
+                break;
+            case aiTextureType_NORMALS:
+                activeShader.setInt(("texture_normal" + std::to_string(normalNr++)), _textureIndex);
+                break;
+            case aiTextureType_HEIGHT:
+                activeShader.setInt(("texture_height" + std::to_string(heightNr++)), _textureIndex);
+                break;
+            default:
+                break;
+            }
 
-            if (name == "texture_diffuse")
-                number = std::to_string(diffuseNr++);
-            else if (name == "texture_specular")
-                number = std::to_string(specularNr++); // transfer unsigned int to stream
-            else if (name == "texture_normal")
-                number = std::to_string(normalNr++); // transfer unsigned int to stream
-            else if (name == "texture_height")
-                number = std::to_string(heightNr++); // transfer unsigned int to stream
-
-            activeShader.setInt((name + number).c_str(), _textureIndex);
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, _texture.first);
-
+            
             _textureIndex++;
         }
-
-
-        //for (unsigned int i = 0; i < textures.size(); i++) {
-        //    glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-        //                                      // retrieve texture number (the N in diffuse_textureN)
-        //    std::string number;
-        //    std::string name = textures[i]->type;
-
-        //    if (name == "texture_diffuse")
-        //        number = std::to_string(diffuseNr++);
-        //    else if (name == "texture_specular")
-        //        number = std::to_string(specularNr++); // transfer unsigned int to stream
-        //    else if (name == "texture_normal")
-        //        number = std::to_string(normalNr++); // transfer unsigned int to stream
-        //    else if (name == "texture_height")
-        //        number = std::to_string(heightNr++); // transfer unsigned int to stream
-
-        //                                             // now set the sampler to the correct texture unit
-
-        //    shader.setInt((name + number).c_str(), i);
-        //    // and finally bind the texture
-        //    glBindTexture(GL_TEXTURE_2D, textures[i]->ID);
-        //}
     }
 }
 
-void Renderer::renderGameObject_ToDepthBuffer(GameObject* gameobj)
+void Renderer::renderGameObject_ToDepthBuffer(GameObject gameobj)
 {
-    for ( auto mesh : gameobj->getMeshes())
+    for ( auto mesh : gameobj.getMeshes())
     {
        renderMesh(mesh.getVAO(), mesh.getIndices().size());
     }
 }
 
-void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject*>& renderBatch, Shader shader)
+void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBatch, Shader shader)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, _framebufferDepth);
     shader.use();
@@ -170,7 +143,7 @@ void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject*>& renderBa
       shader.setMat4("lightSpaceMatrix", _light->getShadowViewProjectionMatrix(true));
 
       for (auto GO : renderBatch) {
-        shader.setMat4("modelMatrix", GO.second->getModelMatrix());
+        shader.setMat4("modelMatrix", GO.second.getModelMatrix());
         renderGameObject_ToDepthBuffer(GO.second);
          
       }
@@ -179,9 +152,28 @@ void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject*>& renderBa
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, Shader shader, bool textured)
+void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, bool textured)
 {
-   shader.use();
-    for ( auto GO : renderBatch )
-       renderGameObject(GO.second, shader, textured);
+
+    for (auto GO : renderBatch) {
+        if (GO.second.getMaterial().getName() != activeMaterial.getName()) {
+            activeMaterial = GO.second.getMaterial();
+            setUpShader(activeMaterial, textured);
+            activeMaterial.Use();
+        }
+        renderGameObject(GO.second, textured, false);
+    }
+}
+
+void Renderer::renderGameObject(GameObject gameObj, bool texture = true, bool requiredShaderSetUp = false)
+{
+    if(requiredShaderSetUp)
+        setUpShader(gameObj.getMaterial(), texture);
+
+    gameObj.getMaterial().getShader().setMat4("view", _currentCamera->GetViewMatrix());
+    gameObj.getMaterial().getShader().setMat4("model", gameObj.getModelMatrix());
+    for ( auto m : gameObj.getMeshes() )
+    {
+        renderMesh(m.getVAO(), m.getIndices().size());
+    }
 }

@@ -5,6 +5,7 @@
 #include "../Lighting.h"
 
 #include <string>
+#include "../Material.h"
 
 class Renderable
 {
@@ -14,7 +15,6 @@ class Renderable
    public:
       std::shared_ptr<Model> getModel(std::string modelName);
       std::shared_ptr<Model> addModel(std::string fileName);
- 
 };
 
 
@@ -48,13 +48,13 @@ class Renderer
         }
 
         void setCamera(Camera& cam);
-
-        void renderGameObject(GameObject gameobj, Shader shader, bool texture = true);
-        void renderGameObject_ToDepthBuffer(GameObject* gameobj);
+        void renderGameObject(GameObject gameObj, bool texture, bool requiredShaderSetUp);
+        void renderGameObject_ToDepthBuffer(GameObject gameobj);
         void renderMesh(int VAO, int indiceCount);
-        void setUpShader(map<int, string> textures, Shader shader, bool textured = true);
-        void renderBatch_ToDepthBuffer(std::map<string, GameObject*>& renderBatch, Shader shader);
-        void renderBatch(std::map<string, GameObject>& renderBatch, Shader shader, bool textured = true);
+        void setUpShader(Material, bool = true);
+        void renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBatch, Shader shader);
+        void renderBatch(std::map<string, GameObject>& renderBatch, bool textured = true);
+        void renderGameObject(GameObject gameobj, bool texture);
         void addLightToScene(IBaseLight* light);
         void initDepthRender();
 
@@ -74,7 +74,7 @@ class Renderer
         GLuint _screenHeight;
         GLuint _shadowWidth, _shadowHeight;
         Shader activeShader;
-        
+        Material activeMaterial;
 
 
 };

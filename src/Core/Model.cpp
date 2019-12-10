@@ -26,7 +26,13 @@ void Model::processNode(aiNode* node, const aiScene* scene)
         // the node object only contains _indices to index the actual objects in the scene. 
         // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(mesh, scene));
+        Mesh newMesh = processMesh(mesh, scene);
+        for ( auto textureHandleID : newMesh.getAllTextures())
+        {
+            if (std::find(textureHandlesCollection.begin(), textureHandlesCollection.end(), textureHandleID.second) == textureHandlesCollection.end())
+                textureHandlesCollection.push_back(textureHandleID.first); 
+        }
+        meshes.push_back(newMesh);
     }
     // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
     for ( unsigned int i = 0; i < node->mNumChildren; i++ )
@@ -56,7 +62,6 @@ Mesh Model::processMesh(std::vector<glm::vec3> pos, std::vector<unsigned> _indic
 
     indices = _indices;
 
-
     return Mesh(vertices, indices, true);
 }
 
@@ -64,7 +69,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    map<int, string> _texturesHandles;
+    std::vector<int> _texturesHandles;
 
     for ( unsigned int i = 0; i < mesh->mNumVertices; i++ )
     {
@@ -126,7 +131,9 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     // process materials
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-    _texturesHandles = TextureManager::loadMaterialTextures(material, directory);
+    _texturesHandles = TextureManager::loadTextures(material, directory);
+    Material newMaterial(directory + "Material", _texturesHandles);
+    
 
-    return Mesh(vertices, indices, _texturesHandles);
+    return Mesh(vertices, indices, newMaterial);
 }

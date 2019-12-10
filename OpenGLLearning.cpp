@@ -5,15 +5,15 @@
 #include "include/Core/Scene.h"
 //#include "Bullet/btBulletDynamicsCommon.h"
 #include "include/Core/LoadTextures.h"
-//unsigned int loadTexture(char const* path);
-//void renderQuad();
+
+
 
 
 
 int main(int argc, char* argv[]) {
 
-    int width = 1366;
-    int height = 768;
+    int width = 1920;
+    int height = 1080;
 	glfwInit();
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -39,6 +39,15 @@ int main(int argc, char* argv[]) {
 		return false;
 	}
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(_window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 	fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
 	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	

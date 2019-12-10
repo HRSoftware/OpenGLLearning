@@ -23,10 +23,11 @@
 
 using namespace std;
 
+
 class Model
 {
 public:
-
+    vector<int> textureHandlesCollection;
     vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;

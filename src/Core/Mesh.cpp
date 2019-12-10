@@ -10,6 +10,11 @@
      return _indices;
  }
 
+ std::unordered_map<int, aiTextureType> Mesh::getAllTextures()
+ {
+     return _material.getAllTextures();
+ }
+
  unsigned Mesh::getVAO()
  {
      return VAO;

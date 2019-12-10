@@ -11,7 +11,9 @@
 
 #include "../Managers/ShaderManager.h"
 #include "System/Renderer.h"
-
+#include "imgui.h"
+#include "examples/imgui_impl_glfw.h"
+#include "examples/imgui_impl_opengl3.h"
 
 class Scene
 {
@@ -39,6 +41,11 @@ public:
 	std::map<string, Shader> _shaderVec;
 	std::map<string, GameObject> _GOVec;
 	RenderDetails _renderDetails;
+
+    Material building1Material = Material("Building1Material");
+    Material building2Material = Material("Building2Material");
+    Material gridFloorMaterial = Material("gridFloorMaterial");
+
 
 	glm::vec2 _screenDimensions;
 

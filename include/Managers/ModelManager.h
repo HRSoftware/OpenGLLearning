@@ -9,10 +9,11 @@ public:
     ModelManager() {}
     ~ModelManager() {}
 
-    bool addModel(const std::string fileName, std::string modelName) //will only search in /Resources/Models/ for the file
+    std::vector<int> addModel(const std::string fileName, std::string modelName) //will only search in /Resources/Models/ for the file
     {
         modelMap[modelName] = Model("Resources/Models/" + fileName, true);
-        return true;
+        
+        return modelMap[modelName].textureHandlesCollection;
     }
 
     void addModel(std::string modelName, Model newModel)

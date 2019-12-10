@@ -14,6 +14,7 @@ bool Scene::initScene(Camera cam)
 
     _renderDetails = RenderDetails(_currentCamera, _screenWidth, _screenHeight);
     glfwSetCursorPosCallback(_window, mouse_callback);
+    
 
     _renderer->initDepthRender();
     _renderer->setCamera(_currentCamera);
@@ -23,8 +24,9 @@ bool Scene::initScene(Camera cam)
 
 void Scene::loadResources()
 {
-    _modelManager.addModel("House/house_obj.obj", "Building1");
-    _modelManager.addModel("HighRise/Residential Buildings 001.obj ", "Building2");
+    building1Material.setTexture(_modelManager.addModel("House/house_obj.obj", "Building1"));
+    building2Material.setTexture(_modelManager.addModel("HighRise/Residential Buildings 007.obj", "Building2"));
+    gridFloorMaterial.setTexture("Resources/Textures/Grid3.jpg", aiTextureType_DIFFUSE);
 
     _shaderManager.addShader("basicShader");
     _shaderManager.addShader("shadowMapShader", true);
@@ -36,7 +38,7 @@ void Scene::loadResources()
     _shaderManager.addShader("modelLoadingShader", true);
     _shaderManager.addShader("debugDepthShader", false);
 
-
+   
     /*_shaderVec.emplace("BasicShader", Shader("basicShader"));
     _shaderVec.emplace("shadowMapShaderShader" ,Shader("shadowMapShader", true));
     _shaderVec.emplace("materialShader" ,Shader("materialShader"));
@@ -63,7 +65,6 @@ void Scene::loadResources()
     _GOVec.at("Building3").setPosition({ 25.f, 0.f, 5.f });
     _GOVec.at("Building3").setScale({ 0.05f, 0.05f, 0.05f });
 
-
     _sunLight = DirectionalLight(glm::vec3(.2f, 0.2f, 0.2f), 4.f, { 10.f, 15.f, 4.f });
     _sunLight.setAmbient({ 0.2f, 0.2f, 0.2f });
     _sunLight.setDiffuse({ 0.5f, 0.5f, 0.5f });
@@ -84,11 +85,16 @@ void Scene::loadResources()
     //_shaderVec.at("lightingShader").setFloat("light.intensity", _sunLight.getStrength());
     _shaderManager.getShader("lightingShader").setVec3("light.specular", _sunLight.getSpecular());
 
-    
-
     skybox.setShader(_shaderManager.getShader("skyboxShader"));
-    
-    
+
+    building1Material.setShader(_shaderManager.getShader("modelLoadingShader"));
+    building2Material.setShader(_shaderManager.getShader("modelLoadingShader"));
+    gridFloorMaterial.setShader(_shaderManager.getShader("modelLoadingShader"));
+
+    _GOVec.at("Building1").setMaterial(building1Material);
+    _GOVec.at("Building2").setMaterial(building1Material);
+    _GOVec.at("Building3").setMaterial(building2Material);
+    _GOVec.at("gridFloor").setMaterial(gridFloorMaterial);
 };
 
 void Scene::run()
@@ -97,11 +103,8 @@ void Scene::run()
     InputController::_camera = &_currentCamera;
     _renderer->setCamera(_currentCamera);
 
-
     const float near_plane = 0.01f;
     const float far_plane = 1000.f;
-
-
 
     std::vector<IBaseLight*> lightVec;
     lightVec.push_back(&_sunLight);
@@ -110,16 +113,27 @@ void Scene::run()
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     Cube testCube;
-    
+
+    bool show_demo_window = true;
+
     while (glfwWindowShouldClose(_window) == false) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        
+        
+
+        ImGui::Render();
+
+
         processInput(_window, deltaTime);
         
         _shaderManager.getShader("debugDepthShader").use();
-       /// _renderer->renderBatch_ToDepthBuffer(_GOVec, _shaderManager.getShader("debugDepthShader"));
+        _renderer->renderBatch_ToDepthBuffer(_GOVec, _shaderManager.getShader("debugDepthShader"));
 
         _shaderManager.getShader("modelLoadingShader").use();
         _shaderManager.getShader("modelLoadingShader").setMat4("lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
@@ -140,21 +154,17 @@ void Scene::run()
         if (glfwGetKey(_window, GLFW_KEY_R) == GLFW_PRESS)
             _GOVec["Building1"].rotateBy(0.1f, { 0, 1, 0 });
 
-        
-        
-        
         _shaderManager.getShader("modelLoadingShader").setMat4("projection", projection);
-        _renderer->renderBatch(_GOVec, _shaderManager.getShader("modelLoadingShader"));
+        _renderer->renderBatch(_GOVec);
+        //_renderer->renderGameObject()
 
         testCube.draw();
         skybox.Draw(view, projection);
 
-       
-        
         //_renderer->renderGameObject_ToDepthBuffer(lightVec, _GOVec["Building1"], _shaderManager.getShader("lightingShader"));
         
         
- 
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(_window);		// Flip Buffers and Draw
         glfwPollEvents();
     }

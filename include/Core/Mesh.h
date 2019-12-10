@@ -10,53 +10,46 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <utility>
 #include <vector>
 #include <glad/glad.h>
 #include "Texture.h"
 #include <map>
+#include "Material.h"
 
 using namespace std;
 
 struct Vertex {
-	// position
 	glm::vec3 Position;
-	// normal
 	glm::vec3 Normal;
-	// texCoords
 	glm::vec2 TexCoords;
-	// tangent
 	glm::vec3 Tangent;
-	// bitangent
 	glm::vec3 Bitangent;
 };
 
 class Mesh {
 
 public:
-	/*  Mesh Data */
-	
     Mesh* parentMeshNode;
     std::vector<Mesh> childrenMeshNodes;
     vector<Vertex> getVertices();
     vector<unsigned int> getIndices();
-    map<int, string> textureHandles;
+    std::unordered_map<int, aiTextureType> getAllTextures();
     unsigned int getVAO();
 
-	/*  Functions  */
-	// constructor
 	Mesh(){}
-	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, map<int, string> textures, bool root = false)
+	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material newMaterial, bool root = false)
 	{
-		this->_vertices = vertices;
-		this->_indices = indices;
-		this->textureHandles = textures;
+		_vertices = std::move(vertices);
+		_indices = std::move(indices);
+        _material = std::move(newMaterial);
 		Mesh::setUpBuffers();
 	}
 
 	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, bool root = false)
 	{
-        this->_vertices = vertices;
-        this->_indices = indices;
+        _vertices = std::move(vertices);
+        _indices = std::move(indices);
         Mesh::setUpBuffers();
 	}
 
@@ -72,6 +65,7 @@ protected:
     unsigned int VAO, VBO, EBO;
 	void updateChildNodesWithNewParent();
 	virtual void setUpBuffers();
+	Material _material;
 };
 #endif
 

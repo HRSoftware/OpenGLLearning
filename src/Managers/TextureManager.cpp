@@ -4,63 +4,88 @@
 #include <stb/stb_image.h>
 #include <iostream>
 #include <glad/glad.h>
+#include <regex>
 
 
-auto TextureManager::getTextureByID(unsigned int ID) -> Texture*
+auto TextureManager::getTextureByID(unsigned ID) -> Texture*
 {
-    for ( Texture& _texture : _textureMap )
-    {
-        if (_texture.ID == ID)
-            return &_texture;
-    }
+    auto result = _textureMap.find(ID);
+    if(result != _textureMap.end())
+        return &result->second;
 
-    return nullptr;
+   return nullptr;
 }
 
-auto TextureManager::addTexture(Texture newTexture) -> unsigned int
+aiTextureType TextureManager::getTextureType(unsigned ID)
 {
-    if (checkIfTextureAlreadyLoadedByPath(newTexture.path) == -1) {
-        _textureMap.push_back(newTexture);
-        return newTexture.ID;
-    }
-    return 0;
+    auto type = TextureManager::getTextureByID(ID);
+    if (type == nullptr)
+        return aiTextureType_UNKNOWN;
+
+   return type->type;
 }
 
-auto TextureManager::checkIfTextureAlreadyLoadedByPath(std::string path) -> int
+auto TextureManager::addTextures(aiMaterial* mat, std::string directory) -> std::vector<int>
 {
- 
-    for ( Texture _texture : _textureMap )
+    std::vector<int> textureIDCollection;
+    for ( auto texture : _textureMap )
     {
-        if (_texture.path == path)
-            return _texture.ID;
+        if (texture.second.path == directory)
+            textureIDCollection.push_back(texture.first);
     }
-	
-    return -1;
+
+    if(textureIDCollection.size() == 0)
+        textureIDCollection = loadTextures(mat, directory);
+
+    return textureIDCollection;
+}
+
+void TextureManager::addTexture(Texture texture) //make private later(should not be called directly)
+{
+    _textureMap[texture.ID] = texture;
+}
+
+Texture TextureManager::createTexture(std::string path, aiTextureType _type)
+{
+   Texture newTexture;
+   int _textureID = checkIfTextureExists(path);
+
+    if (_textureID == -1) {
+        newTexture.ID = textureFromFile(path.c_str(),"");
+        newTexture.type = _type;
+        newTexture.path = path;
+        addTexture(newTexture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+    }
+    else
+    {
+        newTexture = *getTextureByID(_textureID);
+    }
+
+    return newTexture;
+}
+
+auto TextureManager::checkIfTextureExists(std::string path) -> int
+{
+    int id = -1;
+    for ( auto _texture : _textureMap )
+    {
+        if (_texture.second.path == path)
+            id = _texture.first;
+    }
+
+    return id;
 }
 
 void TextureManager::removeTextureByID(unsigned int id)
 {
-    _textureMap.erase(_textureMap.begin() + (id - 1));
-    _reusableIDs.push_back(id);
+    _textureMap.erase(id);
 }
 
-auto TextureManager::getNextID() -> unsigned int
+auto TextureManager::loadTextures(aiMaterial* mat, std::string directory) -> std::vector<int>
 {
-	unsigned int tempIDHolder = nextNewID;
-
-	if (!_reusableIDs.empty())
-        tempIDHolder = _reusableIDs.front();
-	
-	nextNewID++;
-	return tempIDHolder;
-}
-
-auto TextureManager::loadMaterialTextures(aiMaterial* mat, std::string directory) -> std::map<int, std::string>
-{
-    
-    std::map<int, std::string> textureHandles;
+    std::vector<int> textureIds;
     aiTextureType _type;
-
+    int _textureID = 0;
     std::vector<std::string> types = {
         "texture_diffuse",
         "texture_normal",
@@ -81,58 +106,77 @@ auto TextureManager::loadMaterialTextures(aiMaterial* mat, std::string directory
 
         if (_typeString == "texture_height")
             _type = aiTextureType_HEIGHT;
-
+        
         for (unsigned int i = 0; i < mat->GetTextureCount(_type); i++) {
             aiString str;
             mat->GetTexture(_type, i, &str);
             // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
             bool skip = false;
-            int _textureID = checkIfTextureAlreadyLoadedByPath(directory + "/" + str.data);
+            _textureID = checkIfTextureExists(directory + "/" + str.data);
 
             if (_textureID == -1) {
-                Texture texture;
-                texture.ID = textureFromFile(str.C_Str(), directory);
-                texture.type = _typeString;
-                texture.path = directory + "/" + str.C_Str();
+                std::string path = directory + "/" + str.C_Str();
+                path = std::regex_replace(path, std::regex("//"), "/");
+                Texture texture = createTexture(path, _type);
+                
                 addTexture(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
 
                 _textureID = texture.ID;
             }
 
-            textureHandles.emplace(_textureID, _typeString); //return ID of already loaded texture
+            textureIds.push_back(_textureID);
         }
     }
-    return textureHandles;
+    return textureIds;
 };
 
-auto TextureManager::textureFromFile(const char* path, const std::string& directory, bool gamma) -> unsigned int
+auto TextureManager::textureFromFile(const char* path, const std::string& directory, bool gamma) -> int
 {
-    std::string fullFilePath;
     namespace fs = std::filesystem;
-
-    fullFilePath = directory == "" ? std::string(path) : std::string(directory + "/" + path);
+    fs::path filePath = path;
+    std::string fullFilePath;
+    std::string fullbackFilePath = std::string(filePath.parent_path().string() + "/textures/" + filePath.filename().string());
+   
+    
+    fullFilePath = directory == "" ? filePath.string() : directory + "/" + filePath.string();
+    fullFilePath = std::regex_replace(fullFilePath, std::regex("//"), "/");
+    fullbackFilePath = std::regex_replace(fullbackFilePath, std::regex("//"), "/");
 
     if (!fs::exists(fullFilePath))
     {
-        std::cout << "Could not find texture file at " << fullFilePath << std::endl;
-        return -1;
-    }
-        
+        fullFilePath = fullbackFilePath;
+        if(!fs::exists(fullFilePath))
+        {
+            std::cout << "\tTexture not found for " << filePath.parent_path() << filePath.filename() << std::endl;
+            return -1;
+        }
 
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
+        std::cout << "texture file found!" << std::endl;
+    }
+
+    int textureID;
+    glGenTextures(1, reinterpret_cast<GLuint*>(&textureID));
 
     int width, height, nrComponents;
     unsigned char* data = stbi_load(fullFilePath.c_str(), &width, &height, &nrComponents, 0);
     if (data)
     {
         GLenum format;
-        if (nrComponents == 1)
+        switch ( nrComponents )
+        {
+        case 1:
             format = GL_RED;
-        else if (nrComponents == 3)
+            break;
+        case 3:
             format = GL_RGB;
-        else if (nrComponents == 4)
+            break;
+        case 4: 
             format = GL_RGBA;
+            break;
+        default:
+            break;
+
+        }
 
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
