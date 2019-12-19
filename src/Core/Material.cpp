@@ -2,21 +2,22 @@
 #include "../../include/Core/Material.h"
 #include "../../include/Managers/TextureManager.h"
 
-Material::Material(std::string name, std::vector<int> textures)
+Material::Material(std::string name, std::vector<int> _textures, Shader& shdr)
 {
     materialName = name;
-    setTexture(textures);
+    textureIDs = _textures;
+    shader = &shdr;
 }
 
 Material::Material(std::string name, Texture texture)
 {
     materialName = name;
-    setTexture(texture.ID);
 }
 
 Material::Material(std::string name)
 {
     materialName = name;
+
 }
 
 std::string Material::getName()
@@ -123,19 +124,24 @@ std::unordered_map<int, aiTextureType> Material::getAllTextures()
     return textureMap;
 }
 
+std::vector<int> Material::getAllTextureHandles()
+{
+    return textureIDs;
+}
+
 Shader& Material::getShader()
 {
-    return shader;
+    return *shader;
 }
-void Material::setShader(Shader newShader)
+void Material::setShader(Shader& newShader)
 {
-    shader = newShader;
+    shader = &newShader;
     setUpShader();
 }
 
 void Material::Use()
 {
-    shader.use();
+    shader->use();
 }
 
 void Material::setUpShader()
@@ -156,16 +162,16 @@ void Material::setUpShader()
             switch ( type )
             {
             case aiTextureType_DIFFUSE:
-                shader.setInt(("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
+                shader->setInt(("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
                 break;
             case aiTextureType_SPECULAR:
-                shader.setInt(("texture_specular" + std::to_string(specularNr++)), _textureIndex);
+                shader->setInt(("texture_specular" + std::to_string(specularNr++)), _textureIndex);
                 break;
             case aiTextureType_NORMALS:
-                shader.setInt(("texture_normal" + std::to_string(normalNr++)), _textureIndex);
+                shader->setInt(("texture_normal" + std::to_string(normalNr++)), _textureIndex);
                 break;
             case aiTextureType_HEIGHT:
-                shader.setInt(("texture_height" + std::to_string(heightNr++)), _textureIndex);
+                shader->setInt(("texture_height" + std::to_string(heightNr++)), _textureIndex);
                 break;
             default:
                 break;

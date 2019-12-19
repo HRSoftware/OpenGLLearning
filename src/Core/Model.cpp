@@ -1,4 +1,5 @@
 #include "../../include/Core/Model.h"
+#include "../../include/Builders/MaterialBuilder.h"
 
 void Model::loadModel(string const& path)
 {
@@ -130,10 +131,20 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     }
     // process materials
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
-    _texturesHandles = TextureManager::loadTextures(material, directory);
-    Material newMaterial(directory + "Material", _texturesHandles);
     
+    aiString MaterialName;
+    material->Get(AI_MATKEY_NAME, MaterialName);
 
-    return Mesh(vertices, indices, newMaterial);
+    Material* mat = MaterialCache::findMaterial(MaterialName.C_Str());
+
+    if(mat == nullptr)
+    {
+        _texturesHandles = TextureManager::loadTextures(material, directory);
+        Material newMaterial(MaterialName.C_Str(), _texturesHandles);
+        
+        mat = &newMaterial;
+    }
+
+    return Mesh(vertices, indices, mat);
 }
+

@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     ImGui_ImplGlfw_InitForOpenGL(_window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 	fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
-	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	
 	Scene newScene(*_window, &_renderer);
 	newScene.initScene();

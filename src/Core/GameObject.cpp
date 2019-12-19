@@ -1,15 +1,12 @@
 
 #include "../../include/Core/GameObject.h"
 
-GameObject::GameObject(FloorGrid floor)
-{
-    _isModelMatrixOutdated = true;
-    _meshes = { Mesh(floor._vertices, floor._indices, {"floorGrid",{floor.gridTextureID}}, true) };
-   // material = Material("floorGridMaterial", "Textures/Grid2.png");
-}
 
-GameObject::GameObject(std::vector<Mesh> meshes): _meshes(std::move(meshes))
+
+GameObject::GameObject(std::string name,std::vector<Mesh> meshes, Material& mat): _meshes(std::move(meshes))
 {
+    material = mat;
+    GOName = name;
     _isModelMatrixOutdated = true;
 }
 
@@ -38,6 +35,15 @@ void GameObject::setModel(Model& model)
 {
     _meshes = model.meshes;
     _isModelMatrixOutdated = true;
+}
+
+void GameObject::setName(std::string name)
+{
+    GOName = name;
+}
+std::string GameObject::getName(std::string name)
+{
+    return GOName;
 }
 
 void GameObject::setPosition(glm::vec3 pos)

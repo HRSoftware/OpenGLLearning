@@ -16,13 +16,14 @@ public:
 	= default;
 
     GameObject(FloorGrid floor);
-	GameObject(std::vector<Mesh> meshes);
+	GameObject(std::string name, std::vector<Mesh> meshes, Material& mat);
 	GameObject(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices);
-    void setMaterial(Material mat);
-    Material getMaterial();
 	~GameObject();
 
-	void setModel(Model& model);
+
+	void setMaterial(Material mat);
+    void setModel(Model& model);
+    void setName(std::string name);
 	void setPosition(glm::vec3 pos);
 	void moveBy(glm::vec3 pos);
 	void moveXBy(float pos);
@@ -32,10 +33,14 @@ public:
 	void scaleBy(const glm::vec3 scale);
 	void setAngle(float angle, const glm::vec3 axis);
 	void rotateBy(float angle, const glm::vec3 axis);
-	glm::mat4 getModelMatrix();
 	void updateModelMatrix();
+
+
+	Material getMaterial();
+	std::string getName(std::string name);
 	glm::vec3 getPosition() const;
 	glm::vec3 getScale() const;
+	glm::mat4 getModelMatrix();
 	std::vector<Mesh>& getMeshes();
 
 protected:
@@ -44,6 +49,7 @@ protected:
 	Material material;
 
 	private:
+        std::string GOName;
 	glm::vec3 _position = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 _scale = { 1.f, 1.f, 1.f };
 	glm::quat _orientation = {1.f, 0.f, 0.f, 0.f};

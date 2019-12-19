@@ -20,6 +20,7 @@
 #include "Interfaces/IRenderCallbacks.h"
 #include <filesystem>
 #include "../Managers/TextureManager.h"
+#include "../Builders/MaterialBuilder.h"
 
 using namespace std;
 
@@ -58,6 +59,7 @@ private:
     void processNode(aiNode* node, const aiScene* scene);
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 };
+
 
 #endif
 

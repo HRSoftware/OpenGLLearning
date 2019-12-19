@@ -42,7 +42,7 @@ public:
 	{
 		_vertices = std::move(vertices);
 		_indices = std::move(indices);
-        _material = std::move(newMaterial);
+        _material = &newMaterial;
 		Mesh::setUpBuffers();
 	}
 
@@ -65,7 +65,7 @@ protected:
     unsigned int VAO, VBO, EBO;
 	void updateChildNodesWithNewParent();
 	virtual void setUpBuffers();
-	Material _material;
+	Material* _material;
 };
 #endif
 

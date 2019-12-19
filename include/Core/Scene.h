@@ -9,11 +9,15 @@
 #include "glfw3.h"
 #include "System/InputController.h"
 
-#include "../Managers/ShaderManager.h"
+
 #include "System/Renderer.h"
+#include "UI/UI.h"
 #include "imgui.h"
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
+#include "../Builders/MaterialBuilder.h"
+#include "../Builders/ShaderBuilder.h"
+#include "../Builders/GameObjectBuilder.h"
 
 class Scene
 {
@@ -33,7 +37,6 @@ public:
 	private:
 	Camera _currentCamera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 	ModelManager _modelManager;
-	ShaderManager _shaderManager;
 	GLFWwindow* _window;
 	InputController* _inputController;
 	Renderer* _renderer;
@@ -42,9 +45,14 @@ public:
 	std::map<string, GameObject> _GOVec;
 	RenderDetails _renderDetails;
 
-    Material building1Material = Material("Building1Material");
-    Material building2Material = Material("Building2Material");
-    Material gridFloorMaterial = Material("gridFloorMaterial");
+    ResourceCache resourceCache;
+    ShaderFactory shaderFactory = ShaderFactory(resourceCache);
+    MaterialFactory materialFactory = MaterialFactory(resourceCache);
+    ModelFactory modelFactory = ModelFactory(resourceCache);
+
+    GameObjectBuilder GOBuilder;
+
+    
 
 
 	glm::vec2 _screenDimensions;

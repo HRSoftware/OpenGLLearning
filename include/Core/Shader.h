@@ -14,13 +14,11 @@ class Shader
 {
 public:
 	Shader() {}
-	~Shader() {}
-	Shader(std::string filename, bool bCore = false);
+    Shader(std::string name, std::map<std::string, int>& _uniformLocations, int id = 0);
+    ~Shader() {}
 	void reloadShaderFromFile(const char* fileName, bool isCoreShader);
 
 	unsigned int ID;
-
-
 
 	void use()
 	{
@@ -28,65 +26,31 @@ public:
 	}
 	// utility uniform functions
 	// ------------------------------------------------------------------------
-	void setBool(const std::string& name, bool value) const
-	{
-		glProgramUniform1i(ID, getLocation(name), (int)value);
-	}
+	void setBool(const std::string& name, bool value) const;
 	// ------------------------------------------------------------------------
-	void setInt(const std::string& name, int value) const
-	{
-		glProgramUniform1i(ID, getLocation(name), value);
-	}
+	void setInt(const std::string& name, int value) const;
 	// ------------------------------------------------------------------------
-	void setFloat(const std::string& name, float value) const
-	{
-		glProgramUniform1f(ID, getLocation(name), value);
-	}
+	void setFloat(const std::string& name, float value) const;
 	// ------------------------------------------------------------------------
-	void setVec2(const std::string& name, const glm::vec2& value) const
-	{
-		glProgramUniform2fv(ID, getLocation(name), 1,  glm::value_ptr(value));
-	}
-	void setVec2(const std::string& name, float x, float y) const
-	{
-		glProgramUniform2f(ID, getLocation(name), x, y);
-	}
-	// ------------------------------------------------------------------------
-	void setVec3(const std::string& name, const glm::vec3& value) const
-	{
-		glProgramUniform3fv(ID, getLocation(name), 1,  glm::value_ptr(value));
-	}
-	void setVec3(const std::string& name, float x, float y, float z) const
-	{
-		glProgramUniform3f(ID, getLocation(name), x, y, z);
-	}
-	// ------------------------------------------------------------------------
-	void setVec4(const std::string& name, const glm::vec4& value) const
-	{
-		glProgramUniform4fv(ID, getLocation(name), 1,  glm::value_ptr(value));
-	}
-	void setVec4(const std::string& name, float x, float y, float z, float w)
-	{
-		glProgramUniform4f(ID, getLocation(name), x, y, z, w);
+	void setVec2(const std::string& name, const glm::vec2& value) const;
 
-	}
+	void setVec2(const std::string& name, float x, float y) const;
 	// ------------------------------------------------------------------------
-	void setMat2(const std::string& name, const glm::mat2& mat) const
-	{
-		glProgramUniformMatrix2fv(ID, getLocation(name), 1,GL_FALSE,  glm::value_ptr(mat));
-	}
-	// ------------------------------------------------------------------------
-	void setMat3(const std::string& name, const glm::mat3& mat) const
-	{
-		glProgramUniformMatrix3fv(ID, getLocation(name), 1, GL_FALSE, glm::value_ptr(mat));
-	}
-	// ------------------------------------------------------------------------
-	void setMat4(const std::string& name, const glm::mat4& mat) const
-	{
-		glProgramUniformMatrix4fv(ID, getLocation(name), 1, GL_FALSE, glm::value_ptr(mat));
-	}
+	void setVec3(const std::string& name, const glm::vec3& value) const;
 
-	bool checkAttributeExist(const std::string& name) const {  return _uniformLocations.find(name) != _uniformLocations.end(); }
+	void setVec3(const std::string& name, float x, float y, float z) const;
+	// ------------------------------------------------------------------------
+	void setVec4(const std::string& name, const glm::vec4& value) const;
+
+	void setVec4(const std::string& name, float x, float y, float z, float w) const;
+	// ------------------------------------------------------------------------
+	void setMat2(const std::string& name, const glm::mat2& mat) const;
+	// ------------------------------------------------------------------------
+	void setMat3(const std::string& name, const glm::mat3& mat) const;
+	// ------------------------------------------------------------------------
+	void setMat4(const std::string& name, const glm::mat4& mat) const;
+
+	bool checkAttributeExist(const std::string& name) const;
 
 private:
 	std::map<std::string, int> _uniformLocations;

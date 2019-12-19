@@ -132,8 +132,7 @@ auto TextureManager::loadTextures(aiMaterial* mat, std::string directory) -> std
 
 auto TextureManager::textureFromFile(const char* path, const std::string& directory, bool gamma) -> int
 {
-    namespace fs = std::filesystem;
-    fs::path filePath = path;
+    std::filesystem::path filePath = path;
     std::string fullFilePath;
     std::string fullbackFilePath = std::string(filePath.parent_path().string() + "/textures/" + filePath.filename().string());
    
@@ -142,12 +141,12 @@ auto TextureManager::textureFromFile(const char* path, const std::string& direct
     fullFilePath = std::regex_replace(fullFilePath, std::regex("//"), "/");
     fullbackFilePath = std::regex_replace(fullbackFilePath, std::regex("//"), "/");
 
-    if (!fs::exists(fullFilePath))
+    if (!std::filesystem::exists(fullFilePath))
     {
         fullFilePath = fullbackFilePath;
-        if(!fs::exists(fullFilePath))
+        if(!std::filesystem::exists(fullFilePath))
         {
-            std::cout << "\tTexture not found for " << filePath.parent_path() << filePath.filename() << std::endl;
+            std::cout << "\tTexture not found for " << filePath.parent_path() << "\t" <<filePath.filename() << std::endl;
             return -1;
         }
 

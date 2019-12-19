@@ -160,14 +160,14 @@ void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, bool textu
             activeMaterial = GO.second.getMaterial();
             setUpShader(activeMaterial, textured);
             activeMaterial.Use();
-        }
+        } 
         renderGameObject(GO.second, textured, false);
     }
 }
 
 void Renderer::renderGameObject(GameObject gameObj, bool texture = true, bool requiredShaderSetUp = false)
 {
-    if(requiredShaderSetUp)
+    //if(requiredShaderSetUp)
         setUpShader(gameObj.getMaterial(), texture);
 
     gameObj.getMaterial().getShader().setMat4("view", _currentCamera->GetViewMatrix());

@@ -1,149 +1,91 @@
 
 #include "../../include/Core/Shader.h"
 
-Shader::Shader(std::string filename, bool bCore )
+
+
+Shader::Shader(std::string name, std::map<std::string, int>& uniformLocations, int id)
 {
-	if (bCore)
-		filename = "core/" + filename;
-	std::string filePath = "./Shaders/" + filename;
-	std::string vertexCode;
-	std::string fragCode;
-	std::ifstream vShaderFile;
-	std::ifstream fShaderFile;
-
-	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	try
-	{
-
-		if (!vShaderFile.good())
-		{
-			std::cout << "ERROR::SHADER::VERTEX_FILE_NOT_SUCCESFULLY_READ --> " << filename << std::endl;
-		}
-
-		if (!fShaderFile.good())
-		{
-			std::cout << "ERROR::SHADER::FRAGMENT_FILE_NOT_SUCCESFULLY_READ --> " << filename << std::endl;
-		}
-
-		vShaderFile.open(filePath + ".vert");
-		fShaderFile.open(filePath + ".frag");
-
-		std::stringstream vShaderStream, fShaderStream;
-
-
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
-
-		vShaderFile.close();
-		fShaderFile.close();
-
-		vertexCode = vShaderStream.str();
-		fragCode = fShaderStream.str();
-	}
-	catch (std::ifstream::failure e)
-	{
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ --> " << filename << std::endl;
-	}
-
-	const char* vShaderCode = vertexCode.c_str();
-	const char* fShaderCode = fragCode.c_str();
-
-	unsigned int vertex, frag;
-	int success;
-	char infoLog[512];
-
-	vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, &vShaderCode, NULL);
-	glCompileShader(vertex);
-	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\t" << filename << "\n\t" << infoLog << std::endl;
-	};
-
-	frag = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(frag, 1, &fShaderCode, NULL);
-	glCompileShader(frag);
-	glGetShaderiv(frag, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(frag, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAG::COMPILATION_FAILED\t" << filename << "\n\t" << infoLog << std::endl;
-	};
-
-
-	ID = glCreateProgram();
-	glAttachShader(ID, vertex);
-	glAttachShader(ID, frag);
-	glLinkProgram(ID);
-
-	glGetProgramiv(ID, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(ID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\t" << filename << "\n\t" << infoLog << std::endl;
-	}
-
-	findUniformLocations();
-	_shaderName = filename;
-	glDeleteShader(vertex);
-	glDeleteShader(frag);
+    _shaderName = name;
+    ID = id;
+    _uniformLocations = std::move(uniformLocations);
 }
+
+
 
 void Shader::reloadShaderFromFile(const char* fileName, bool isCoreShader = false)
 {
-	assert(fileName);
-	GLuint reloadedProgram = Shader(fileName, isCoreShader).ID;
+	/*assert(fileName);
+	GLuint reloadedProgram = .ID;
 
 	if (reloadedProgram) {
 		glDeleteProgram(ID);
 		ID = reloadedProgram;
-	}
+	}*/
 }
 
-void Shader::findUniformLocations()
+void Shader::setBool(const std::string& name, bool value) const
 {
-	_uniformLocations.clear();
+	glProgramUniform1i(ID, getLocation(name), (int)value);
+}
 
-	GLint numUniforms = 0;
-#ifdef __APPLE__
-	// For OpenGL 4.1, use glGetActiveUniform
-	GLint maxLen;
-	GLchar *name;
+void Shader::setInt(const std::string& name, int value) const
+{
+	glProgramUniform1i(ID, getLocation(name), value);
+}
 
-	glGetProgramiv(handle, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLen);
-	glGetProgramiv(handle, GL_ACTIVE_UNIFORMS, &numUniforms);
+void Shader::setFloat(const std::string& name, float value) const
+{
+	glProgramUniform1f(ID, getLocation(name), value);
+}
 
-	name = new GLchar[maxLen];
-	for (GLuint i = 0; i < numUniforms; ++i) {
-		GLint size;
-		GLenum type;
-		GLsizei written;
-		glGetActiveUniform(handle, i, maxLen, &written, &size, &type, name);
-		GLint location = glGetUniformLocation(handle, name);
-		uniformLocations[name] = glGetUniformLocation(handle, name);
-	}
-	delete[] name;
-#else
-	// For OpenGL 4.3 and above, use glGetProgramResource
-	glGetProgramInterfaceiv( ID, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms);
+void Shader::setVec2(const std::string& name, const glm::vec2& value) const
+{
+	glProgramUniform2fv(ID, getLocation(name), 1, glm::value_ptr(value));
+}
 
-	GLenum properties[] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX};
+void Shader::setVec2(const std::string& name, float x, float y) const
+{
+	glProgramUniform2f(ID, getLocation(name), x, y);
+}
 
-	for( GLint i = 0; i < numUniforms; ++i ) {
-		GLint results[4];
-		glGetProgramResourceiv(ID, GL_UNIFORM, i, 4, properties, 4, NULL, results);
+void Shader::setVec3(const std::string& name, const glm::vec3& value) const
+{
+	glProgramUniform3fv(ID, getLocation(name), 1, glm::value_ptr(value));
+}
 
-		if( results[3] != -1 ) continue;  // Skip uniforms in blocks
-		GLint nameBufSize = results[0] + 1;
-		char * name = new char[nameBufSize];
-		glGetProgramResourceName(ID, GL_UNIFORM, i, nameBufSize, NULL, name);
-		_uniformLocations[name] = results[2];
-		delete [] name;
-	}
-#endif
+void Shader::setVec3(const std::string& name, float x, float y, float z) const
+{
+	glProgramUniform3f(ID, getLocation(name), x, y, z);
+}
+
+void Shader::setVec4(const std::string& name, const glm::vec4& value) const
+{
+	glProgramUniform4fv(ID, getLocation(name), 1, glm::value_ptr(value));
+}
+
+void Shader::setVec4(const std::string& name, float x, float y, float z, float w) const
+{
+	glProgramUniform4f(ID, getLocation(name), x, y, z, w);
+}
+
+void Shader::setMat2(const std::string& name, const glm::mat2& mat) const
+{
+	glProgramUniformMatrix2fv(ID, getLocation(name), 1,GL_FALSE, glm::value_ptr(mat));
+}
+
+void Shader::setMat3(const std::string& name, const glm::mat3& mat) const
+{
+	glProgramUniformMatrix3fv(ID, getLocation(name), 1, GL_FALSE, glm::value_ptr(mat));
+}
+
+void Shader::setMat4(const std::string& name, const glm::mat4& mat) const
+{
+	glProgramUniformMatrix4fv(ID, getLocation(name), 1, GL_FALSE, glm::value_ptr(mat));
+}
+
+bool Shader::checkAttributeExist(const std::string& name) const
+{
+	return _uniformLocations.find(name) != _uniformLocations.end();
 }
 
 GLint Shader::getLocation(const std::string& name) const

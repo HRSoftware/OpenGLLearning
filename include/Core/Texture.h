@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include <assimp/material.h>
-
+#include <map>
 
 struct Texture
 {
@@ -16,4 +16,7 @@ struct Texture
         path = text.path;
     }
 };
+
+
+
 
