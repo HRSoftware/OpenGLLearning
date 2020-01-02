@@ -36,17 +36,18 @@ public:
     vector<unsigned int> getIndices();
     std::unordered_map<int, aiTextureType> getAllTextures();
     unsigned int getVAO();
+    Material getMaterial();
+    void setMaterial(MaterialHandle);
 
-	Mesh(){}
-	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material newMaterial, bool root = false)
+    Mesh() : _material(-1, nullptr, RT_Material){}
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, MaterialHandle newMaterial, bool root = false) :  _material(newMaterial)
 	{
 		_vertices = std::move(vertices);
 		_indices = std::move(indices);
-        _material = &newMaterial;
 		Mesh::setUpBuffers();
 	}
 
-	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, bool root = false)
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, bool root = false) : _material(-1, nullptr, RT_Material)
 	{
         _vertices = std::move(vertices);
         _indices = std::move(indices);
@@ -65,7 +66,7 @@ protected:
     unsigned int VAO, VBO, EBO;
 	void updateChildNodesWithNewParent();
 	virtual void setUpBuffers();
-	Material* _material;
+	MaterialHandle _material;
 };
 #endif
 

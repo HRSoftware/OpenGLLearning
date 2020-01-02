@@ -1,15 +1,15 @@
 #pragma once
 #include "../Core/Model.h"
+#include <string>
+#include <map>
+#include "Cache.h"
 
 
-class ModelCache
+class ModelCache : Cache<Model>
 {
 public:
     ModelCache() {};
-    void addModel(string, Model);
-    Model* findModel(string);
-
 private:
-    std::map<string, Model> modelMap;
+    std::map<std::string, Model> modelMap;
     //MaterialCache& materialCache;
 };

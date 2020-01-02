@@ -1,21 +1,20 @@
 #pragma once
 #include "../Core/Texture.h"
+#include <regex>
+#include <iostream>
+#include <filesystem>
+#include <glad/glad.h>
+#include <stb/stb_image.h>
+#include "Cache.h"
+#include "../Loaders/TextureLoader.h"
 
-class TextureCache
+
+class TextureCache : Cache<Texture>
 {
 public:
-    void addTexture(std::string name, Texture tex)
-    {
-        textureCache[name] = tex;
-    }
-
-    Texture* findTexture(std::string name)
-    {
-        return &textureCache[name];
-    }
-
-    Texture* findTextureByID(unsigned id);
-
-private:
-    std::map<std::string, Texture>  textureCache;
+    TextureHandle findTexture(std::string name);
+    Texture findTextureByID(int id);
 };
+
+
+

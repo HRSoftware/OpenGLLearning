@@ -154,24 +154,31 @@ void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBat
 
 void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, bool textured)
 {
-
     for (auto GO : renderBatch) {
-        if (GO.second.getMaterial().getName() != activeMaterial.getName()) {
-            activeMaterial = GO.second.getMaterial();
-            setUpShader(activeMaterial, textured);
-            activeMaterial.Use();
-        } 
-        renderGameObject(GO.second, textured, false);
+        for(auto mesh : GO.second.getMeshes())
+        {
+            if (mesh.getMaterial().getName() != activeMaterial->getName()) {
+                *activeMaterial = mesh.getMaterial();
+                setUpShader(*activeMaterial, textured);
+                activeMaterial->Use();
+            } 
+            renderGameObject(GO.second, textured, false);
+        }
     }
 }
 
 void Renderer::renderGameObject(GameObject gameObj, bool texture = true, bool requiredShaderSetUp = false)
 {
     //if(requiredShaderSetUp)
-        setUpShader(gameObj.getMaterial(), texture);
+    for(Mesh mesh : gameObj.getMeshes())
+    {
+        setUpShader(mesh.getMaterial(), texture);
+       mesh.getMaterial().getShader().setMat4("view", _currentCamera->GetViewMatrix());
+       mesh.getMaterial().getShader().setMat4("model", gameObj.getModelMatrix());
+    }
+        
 
-    gameObj.getMaterial().getShader().setMat4("view", _currentCamera->GetViewMatrix());
-    gameObj.getMaterial().getShader().setMat4("model", gameObj.getModelMatrix());
+    
     for ( auto m : gameObj.getMeshes() )
     {
         renderMesh(m.getVAO(), m.getIndices().size());

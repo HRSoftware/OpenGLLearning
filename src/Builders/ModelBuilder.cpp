@@ -7,13 +7,15 @@ ModelBuilder& ModelBuilder::create(std::string name)
     modelName = name;
     meshes.clear();
     textureHandleCollection.clear();
+    return *this;
 }
 
 ModelBuilder& ModelBuilder::loadFromPath(std::string path)
 {
+    std::string fullPath = "Resources/Models/" + path;
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
-        path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+        fullPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
     if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) // if is Not Zero
     {
@@ -21,7 +23,7 @@ ModelBuilder& ModelBuilder::loadFromPath(std::string path)
         return *this;
     }
 
-    directory = path.substr(0, path.find_last_of('/'));
+    directory = path.substr(0, fullPath.find_last_of('/'));
 
     processNode(scene->mRootNode, scene);
     return *this;
@@ -35,13 +37,7 @@ void ModelBuilder::processNode(aiNode* node, const aiScene* scene)
         // the node object only contains _indices to index the actual objects in the scene. 
         // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        Mesh newMesh = processMesh(mesh, scene);
-        for ( auto textureHandleID : newMesh.getAllTextures())
-        {
-            if (std::find(textureHandleCollection.begin(), textureHandleCollection.end(), textureHandleID.second) == textureHandleCollection.end())
-                textureHandleCollection.push_back(textureHandleID.first); 
-        }
-        meshes.push_back(newMesh);
+        meshes.push_back(processMesh(mesh, scene));
     }
     // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
     for ( unsigned int i = 0; i < node->mNumChildren; i++ )
@@ -71,7 +67,6 @@ Mesh ModelBuilder::processMesh(std::vector<glm::vec3> pos, std::vector<unsigned>
 
     indices = _indices;
 
-   
     return Mesh(vertices, indices, true);
 }
 
@@ -79,7 +74,7 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    std::vector<int> _texturesHandles;
+    std::vector<Texture> _texturesHandles;
 
     for ( unsigned int i = 0; i < mesh->mNumVertices; i++ )
     {
@@ -144,14 +139,14 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
     aiString MaterialName;
     material->Get(AI_MATKEY_NAME, MaterialName);
 
-    Material* mat = materialCache.findMaterial(MaterialName.C_Str());
+    MaterialHandle mat = materialCache.find(MaterialName.C_Str());
 
-    if(mat == nullptr)
+    if(mat.getResourcePointer() == nullptr)
     {
-        _texturesHandles = textureCache.create(material, directory);
-        Material newMaterial(MaterialName.C_Str(), _texturesHandles);
-
-        mat = &newMaterial;
+        _texturesHandles = ResourceC;
+        ResourceLoader<Material>::loadNewResource()
+        materialCache.addNew(MaterialName.C_Str(), Material(MaterialName.C_Str(), _texturesHandles));
+        mat = materialCache.find(MaterialName.C_Str());
     }
     return Mesh(vertices, indices, mat);
 }
@@ -166,25 +161,19 @@ Model ModelBuilder::build()
     return newModel;
 }
 
-void ModelCache::addModel(string name, Model model)
-{
-    modelMap.insert_or_assign(name, model);
-}
-
-Model* ModelCache::findModel(string modelName)
-{
-    return &modelMap.find(modelName)->second;
-}
-
-
 Model* ModelFactory::create(std::string name, string path)
 {
-    Model newModel = modelBuilder.create(name)
-        .loadFromPath(path)
-        .build();
+    Model* model = resourceCache.modelCache.findModel(name);
+    if(model == nullptr)
+    {
+        Model newModel = modelBuilder.create(name)
+            .loadFromPath(path)
+            .build();
 
-    modelCache.addModel(name, newModel);
-    return modelCache.findModel(name);
+        resourceCache.modelCache.addModel(name, newModel);
+        model = resourceCache.modelCache.findModel(name);
+    }
+    return model;
 }
 
 

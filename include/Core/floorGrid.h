@@ -24,13 +24,18 @@ public:
 	FloorGrid();
 	FloorGrid(Shader shdr);
 	~FloorGrid();
+	
+	std::string getName();
+    Mesh getMesh();
 
 	private:
-
+        std::string name = "FloorGrid";
 	void setUpBuffers();
 	void loadTextures();
 	Shader _gridShader;
 	int _height, _width = 250;
+    Mesh floorMesh;
+    
 
 	const char* _gridTexture = "Resources/Textures/Grid3.jpg";
 

@@ -6,13 +6,13 @@
 FloorGrid::FloorGrid()
 {
 	FloorGrid::setUpBuffers();
-    gridTextureID = TextureManager::textureFromFile(_gridTexture);
+    //gridTextureID = TextureManager::textureFromFile(_gridTexture);
 }
 
 FloorGrid::FloorGrid(Shader shdr): _gridShader(shdr)
 {
 	FloorGrid::setUpBuffers();
-    gridTextureID = TextureManager::textureFromFile(_gridTexture);
+    //gridTextureID = TextureManager::textureFromFile(_gridTexture);
 }
 
 FloorGrid::~FloorGrid() {}
@@ -40,7 +40,17 @@ void FloorGrid::setUpBuffers() {
 
 void FloorGrid::loadTextures()
 {
-    gridTextureID = TextureManager::textureFromFile(_gridTexture);
+   //gridTextureID = TextureManager::textureFromFile(_gridTexture);
+}
+
+std::string FloorGrid::getName()
+{
+    return name;
+}
+
+Mesh FloorGrid::getMesh()
+{
+    return floorMesh;
 }
 
 	

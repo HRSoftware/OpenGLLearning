@@ -18,6 +18,8 @@
 #include "../Builders/MaterialBuilder.h"
 #include "../Builders/ShaderBuilder.h"
 #include "../Builders/GameObjectBuilder.h"
+#include "../Builders/ModelBuilder.h"
+#include "../Managers/ResourceMangager.h"
 
 class Scene
 {
@@ -46,15 +48,8 @@ public:
 	RenderDetails _renderDetails;
 
     ResourceCache resourceCache;
-    ShaderFactory shaderFactory = ShaderFactory(resourceCache);
-    MaterialFactory materialFactory = MaterialFactory(resourceCache);
-    ModelFactory modelFactory = ModelFactory(resourceCache);
-
-    GameObjectBuilder GOBuilder;
-
+    ResourceManager resourceManager = ResourceManager(resourceCache);
     
-
-
 	glm::vec2 _screenDimensions;
 
 	DirectionalLight _sunLight;

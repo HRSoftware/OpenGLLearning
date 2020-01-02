@@ -1,7 +1,8 @@
 #pragma once
 #include "../Core/Shader.h"
+#include "Cache.h"
 
-class ShaderCache {
+class ShaderCache : Cache<Shader> {
     friend class ShaderBuilder;
 public:
     Shader* findShader(std::string refName);

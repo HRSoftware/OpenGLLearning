@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "../Core/Mesh.h"
 #include "../Core/Model.h"
 #include "../Cache/ResourceCache.h"
 
@@ -24,17 +23,17 @@ class ModelBuilder
         std::string directory;
         std::vector<int>textureHandleCollection;
 
-        MaterialCache& materialCache;
-        TextureCache& textureCache;
+        Cache<Material>& materialCache;
+        Cache<Texture>& textureCache;
 };
 
 class ModelFactory
 {
     public:
-        ModelFactory(ResourceCache& resCache) : resourceCache(resCache), modelBuilder(ModelBuilder(resCache))
+        ModelFactory(ResourceCache& resCache) : modelBuilder(ModelBuilder(resCache)), resourceCache(resCache)
         {
         };
-        Model* create(std::string, string);
+        Model* create(std::string name, string path);
     private:
         ModelBuilder modelBuilder;
         string modelName;

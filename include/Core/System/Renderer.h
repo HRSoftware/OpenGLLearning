@@ -74,7 +74,7 @@ class Renderer
         GLuint _screenHeight;
         GLuint _shadowWidth, _shadowHeight;
         Shader activeShader;
-        Material activeMaterial;
+        Material* activeMaterial;
 
 
 };

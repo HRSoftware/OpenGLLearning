@@ -1,45 +1,43 @@
 #pragma once
 #include <vector>
+#include <utility>
 #include "../Core/Material.h"
-#include "ShaderBuilder.h"
-#include "../Cache/ResourceCache.h"
 
 
 class MaterialBuilder
 {
     public:
+        MaterialBuilder() { };
     ~MaterialBuilder();
-    MaterialBuilder& create(std::string name = "DefaultTexture");
-    MaterialBuilder& addTextures(std::vector<int>& textures);
-    MaterialBuilder& addTexture(int texture);
-    MaterialBuilder& addShader(Shader& shader);
+    MaterialBuilder& create(const int id, std::string name = "DefaultTexture");
+    MaterialBuilder& addTextures(std::vector<TextureHandle>& _textures);
+    MaterialBuilder& addTexture(TextureHandle texture);
+    MaterialBuilder& addShader(ShaderHandle _shader);
     Material build();
 
     private:
 
-
-        void loadTextures(aiMaterial*, std::string);
+    std::vector<Texture> loadTextures(aiMaterial*, std::string);
         std::string materialName;
-        std::vector<int> textures;
-        Shader* shader;
+        std::vector<TextureHandle> textures;
+        ShaderHandle shader;
+        int resID;
 };
 
 
 class MaterialFactory
 {
 public:
-    MaterialFactory(ResourceCache& cache) : matCache(cache.materialCache){};
+    MaterialFactory() {};
 
-    void createBasicMaterial(const std::string name, Shader& shdr)
+    Material createBasicMaterial(const int id, const std::string name, ShaderHandle shdr)
     {
-        Material newMaterial = builder.create(name)
+        Material newMaterial = builder.create(id, name)
             .addShader(shdr)
             .build();
-        matCache.addMaterial(name, newMaterial);
+        return newMaterial;
     }
 private:
-    MaterialCache& matCache; 
     MaterialBuilder builder;
-
 };
 

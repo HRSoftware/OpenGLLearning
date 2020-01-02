@@ -2,23 +2,11 @@
 #include "../Core/Shader.h"
 #include <utility>
 #include <vector>
-#include "../Cache/ResourceCache.h"
 
-
-class ShaderBuilder{
+class ShaderBuilder {
     public:
-    
-    enum ShaderType
-    {
-        VERTEX = GL_VERTEX_SHADER,
-        FRAGMENT = GL_FRAGMENT_SHADER,
-        GEOMETRY = GL_GEOMETRY_SHADER,
-        COMPUTE = GL_COMPUTE_SHADER,
-        TESS_CONTROL = GL_TESS_CONTROL_SHADER,
-        TESS_EVAL = GL_TESS_EVALUATION_SHADER
-    };
 
-        ShaderBuilder& createShader(std::string refName, std::string fileName = "", bool core = false);
+        ShaderBuilder& createShader(int id, std::string refName, std::string fileName = "", bool core = false);
         ShaderBuilder& addShader(ShaderType shaderType, std::string fileName = "");
         Shader build();
     std::map<std::string, int> findUniformLocations();
@@ -27,24 +15,25 @@ class ShaderBuilder{
         std::string shaderProgramName;
         std::string shaderFileName;
         std::vector<int> shadersIDs;
-        int programID;
+        
         std::map<std::string, int> _uniformLocations;
-    };
+        int programID = -1;
+        int resID = -1;
+};
 
 class ShaderFactory
 {
     public:
-        ShaderFactory(ResourceCache& cache) : shaderCache(cache.shaderCache){};
+        ShaderFactory() {};
    
-    void createBasicShader(const std::string refName, std::string filename = "")
+   static Shader createBasicShader(int id,const std::string refName, std::string filename = "")
     {
-        Shader newShader = builder.createShader(refName, filename)
-            .addShader(ShaderBuilder::VERTEX, filename)
-            .addShader(ShaderBuilder::FRAGMENT, filename)
+        Shader newShader = builder.createShader(id, refName, filename)
+            .addShader(VERTEX, filename)
+            .addShader(FRAGMENT, filename)
             .build();
-        shaderCache.addShader(refName, newShader);
+        return newShader;
     }
     private:
-        ShaderCache& shaderCache; 
-        ShaderBuilder builder;
+        static ShaderBuilder builder;
 };

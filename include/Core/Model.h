@@ -19,48 +19,48 @@
 #include <vector>
 #include "Interfaces/IRenderCallbacks.h"
 #include <filesystem>
-#include "../Managers/TextureManager.h"
-#include "../Builders/MaterialBuilder.h"
+
 
 using namespace std;
 
 
-class Model
+class Model : Resource<Model>
 {
 public:
-    vector<int> textureHandlesCollection;
+    vector<int> textureHandlesCollection; //redundant??
     vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
 
-    Model()
+    Model(int id) : Resource<Model>(id, RT_Model)
     {
 
     }
 
-    Model(string const& path, bool gamma = false) : gammaCorrection(gamma)
+    Model(int id, string const& path, bool gamma = false) : gammaCorrection(gamma), Resource<Model>(id, RT_Model)
     {
-        loadModel(path);
+        //loadModel(path);
     }
 
-    Model(std::vector<glm::vec3> pos, std::vector<unsigned int> _indices)
+    Model(int id, std::vector<glm::vec3> pos, std::vector<unsigned int> _indices) : Resource<Model>(id, RT_Model)
     {
-        meshes.push_back(processMesh(pos, _indices));
+        //meshes.push_back(processMesh(pos, _indices));
     }
 
-    Mesh processMesh(std::vector<glm::vec3> pos, std::vector<unsigned int> _indices);
+    void setMaterial(MaterialHandle material);
+    //Mesh processMesh(std::vector<glm::vec3> pos, std::vector<unsigned int> _indices);
 
 private:
     
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
-    void loadModel(string const& path);
+    //void loadModel(string const& path);
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
-    void processNode(aiNode* node, const aiScene* scene);
-    Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+    //void processNode(aiNode* node, const aiScene* scene);
+    //Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 };
 
 
 #endif
 
-#pragma once
+

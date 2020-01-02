@@ -3,27 +3,17 @@
 
 
 
-GameObject::GameObject(std::string name,std::vector<Mesh> meshes, Material& mat): _meshes(std::move(meshes))
+GameObject::GameObject(std::string name, Model model)
 {
-    material = mat;
     GOName = name;
+    _model = model;
     _isModelMatrixOutdated = true;
 }
 
 GameObject::GameObject(std::vector<Vertex> _vertices, std::vector<unsigned> _indices)
 {
     _isModelMatrixOutdated = true;
-    _meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
-}
-
-void GameObject::setMaterial(Material mat)
-{
-    material = mat;
-}
-
-Material GameObject::getMaterial()
-{
-    return material;
+    _model.meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
 }
 
 GameObject::~GameObject()
@@ -31,9 +21,9 @@ GameObject::~GameObject()
     _isModelNULL = true;
 }
 
-void GameObject::setModel(Model& model)
+void GameObject::setModel(Model model)
 {
-    _meshes = model.meshes;
+    _model = model;
     _isModelMatrixOutdated = true;
 }
 
@@ -41,7 +31,7 @@ void GameObject::setName(std::string name)
 {
     GOName = name;
 }
-std::string GameObject::getName(std::string name)
+std::string GameObject::getName()
 {
     return GOName;
 }
@@ -133,5 +123,5 @@ glm::vec3 GameObject::getScale() const
 
 std::vector<Mesh>& GameObject::getMeshes()
 {
-    return _meshes;
+    return _model.meshes;
 }

@@ -2,18 +2,9 @@
 #include <filesystem>
 
 
-Shader* ShaderCache::findShader(std::string refName)
+ShaderBuilder& ShaderBuilder::createShader(int id, std::string refName , std::string fileName, bool core)
 {
-    return &_shaderMap.at(refName);
-}
-
-void ShaderCache::addShader(const std::string& refName, Shader shader)
-{
-    _shaderMap.insert(std::pair<std::string, Shader>(refName, shader));
-}
-
-ShaderBuilder& ShaderBuilder::createShader(std::string refName , std::string fileName, bool core)
-{
+    resID = id;
     shaderFileName = fileName;
     shaderProgramName = refName;
     programID = 0;
@@ -124,7 +115,7 @@ Shader ShaderBuilder::build()
         glDeleteShader(shaderID);
     }
     
-    return Shader(shaderProgramName, uniforms, programID);
+    return Shader(resID, shaderProgramName, uniforms, programID);
 }
 
 std::map<std::string, int> ShaderBuilder::findUniformLocations()

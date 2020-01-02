@@ -9,20 +9,31 @@
 #include <sstream>
 #include <iostream>
 #include <map>
+#include "Resource.h"
 
-class Shader
+enum ShaderType
+{
+    VERTEX = GL_VERTEX_SHADER,
+    FRAGMENT = GL_FRAGMENT_SHADER,
+    GEOMETRY = GL_GEOMETRY_SHADER,
+    COMPUTE = GL_COMPUTE_SHADER,
+    TESS_CONTROL = GL_TESS_CONTROL_SHADER,
+    TESS_EVAL = GL_TESS_EVALUATION_SHADER
+};
+
+class Shader : Resource<Shader>
 {
 public:
-	Shader() {}
-    Shader(std::string name, std::map<std::string, int>& _uniformLocations, int id = 0);
+	Shader(int id): Resource(id, RT_Shader) {}
+    Shader(int id, std::string name, std::map<std::string, int>& _uniformLocations);
     ~Shader() {}
 	void reloadShaderFromFile(const char* fileName, bool isCoreShader);
 
-	unsigned int ID;
+	unsigned int shaderID;
 
 	void use()
 	{
-		glUseProgram(ID);
+		glUseProgram(shaderID);
 	}
 	// utility uniform functions
 	// ------------------------------------------------------------------------
@@ -61,3 +72,9 @@ private:
 
 };
 
+struct ShaderHandle : ResourceHandle<Shader>
+{
+public:
+    ShaderHandle(int id = -1, Resource<Shader>* ptr = nullptr, ResourceType resType = RT_Shader) : ResourceHandle(id, ptr, RT_Shader) {};
+    ShaderHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
+};

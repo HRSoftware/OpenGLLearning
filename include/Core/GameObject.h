@@ -2,7 +2,6 @@
 
 #include "floorGrid.h"
 #include "Model.h"
-#include "Material.h"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
 #include <glm/gtc/bitfield.hpp>
@@ -16,13 +15,12 @@ public:
 	= default;
 
     GameObject(FloorGrid floor);
-	GameObject(std::string name, std::vector<Mesh> meshes, Material& mat);
+	GameObject(std::string name, Model model);
 	GameObject(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices);
 	~GameObject();
 
 
-	void setMaterial(Material mat);
-    void setModel(Model& model);
+    void setModel(Model _model);
     void setName(std::string name);
 	void setPosition(glm::vec3 pos);
 	void moveBy(glm::vec3 pos);
@@ -35,9 +33,7 @@ public:
 	void rotateBy(float angle, const glm::vec3 axis);
 	void updateModelMatrix();
 
-
-	Material getMaterial();
-	std::string getName(std::string name);
+	std::string getName();
 	glm::vec3 getPosition() const;
 	glm::vec3 getScale() const;
 	glm::mat4 getModelMatrix();
@@ -45,9 +41,7 @@ public:
 
 protected:
 
-    std::vector<Mesh> _meshes;
-	Material material;
-
+    Model _model;
 	private:
         std::string GOName;
 	glm::vec3 _position = { 0.0f, 0.0f, 0.0f };
@@ -58,5 +52,4 @@ protected:
     glm::mat4 _modelMatrix = {};
 	bool _isModelMatrixOutdated = false;
 };
-
 

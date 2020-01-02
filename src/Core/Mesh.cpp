@@ -12,12 +12,22 @@
 
  std::unordered_map<int, aiTextureType> Mesh::getAllTextures()
  {
-     return _material->getAllTextures();
+     return _material.getResourcePointer<Material>()->getAllTextures();
  }
 
  unsigned Mesh::getVAO()
  {
      return VAO;
+ }
+
+ Material Mesh::getMaterial()
+ {
+     return *_material.getResourcePointer<Material>();
+ }
+
+ void Mesh::setMaterial(MaterialHandle material)
+ {
+     _material = material;
  }
 
  void Mesh::deleteMesh(bool deleteChildMesh)

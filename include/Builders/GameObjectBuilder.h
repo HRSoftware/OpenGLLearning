@@ -1,46 +1,41 @@
 #pragma once
 #include <string>
-#include "../../include/Core/Material.h"
-#include "../../include/Core/Mesh.h"
 #include "../../include/Core/GameObject.h"
-#include "MaterialBuilder.h"
+#include "../Cache/ModelCache.h"
 #include "ModelBuilder.h"
+
+//#include "ModelBuilder.h"
 
 class GameObjectBuilder
 {
     public:
+        GameObjectBuilder(ResourceCache& cache) : modelFactory(cache) {};
         GameObjectBuilder& create(std::string name);
-        GameObjectBuilder& addMaterial(Material& mat);
         GameObjectBuilder& addMeshes(std::vector<Mesh> _meshes);
+        GameObjectBuilder& addModel(std::string, std::string name);
         GameObject build();
         
     private:
-        std::string goName;
-        Material material;
-        std::vector<Mesh> meshes;
+        std::string _goName;
+        Model _model;
+        ModelFactory modelFactory;
 };
 
 
 class GameObjectFactory
 {
     public:
-        GameObjectFactory(std::map<string, GameObject>& goMapRef, MaterialCache& matCacheRef, ModelCache& modelMapRef) : goMap(goMapRef),
-                                                                                                                                      matCache(matCacheRef), 
-            modelCache(modelMapRef){};
-        GameObject* create(string gameObjectName, string materialName, string modelName)
-        {
-            GameObject newObject;
-            GOBuilder.create(gameObjectName)
-                .addMaterial(*matCache.findMaterial(materialName))
-                .addMeshes(modelCache.findModel(modelName)->meshes)
-                .build();
-            goMap.insert_or_assign(gameObjectName, newObject);
+        GameObjectFactory(ResourceCache& cache) : GOBuilder(GameObjectBuilder(cache)), 
+                                                  goMap(cache.gameObjectCache),
+                                                  modelCache(cache.modelCache){};
+        GameObject* create(string gameObjectName);
 
-            return &goMap.find(gameObjectName)->second;
-        };
-    private:
+        GameObject* createFloorGrid(FloorGrid);
+        GameObject* createWithModel(std::string name, string modelPath);
+
+    protected:
         GameObjectBuilder GOBuilder;
-        std::map<string, GameObject>& goMap;
-        MaterialCache& matCache;
-        ModelCache& modelCache;
+       
+        Cache<GameObject>& goMap;
+        Cache<Model>& modelCache;
 };

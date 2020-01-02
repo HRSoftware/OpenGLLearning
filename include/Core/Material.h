@@ -4,36 +4,45 @@
 #include <assimp/material.h>
 #include <unordered_map>
 #include "Shader.h"
+#include "Resource.h"
 #include "Texture.h"
 
 
-class Material 
+
+class Material : public Resource<Material>
 {
   public:
-    Material(std::string name, std::vector<int> textures, Shader&);
-    Material(std::string name, Texture);
-    Material(std::string name = "defaultMaterial");
+    Material(int id, std::string name, std::vector<TextureHandle>, ShaderHandle);
+    Material(int id, std::string name, std::vector<TextureHandle> texture);
+    Material(int id, std::string name, TextureHandle );
     std::string getName();
     void setName(std::string);
-    void setTexture(std::string path, aiTextureType type);
-    void setTexture(unsigned id);
-    void setTexture(std::vector<int> Ids);
-    int getTextureID(aiTextureType);
+    void setTexture(TextureHandle texture);
+    void setTextures(std::vector<TextureHandle> textures);
+    int getTextureIDForType(aiTextureType);
 
     std::unordered_map<int, aiTextureType> getAllTextures();
-    std::vector<int> getAllTextureHandles();
-    Shader& getShader();
-    void setShader(Shader& newShader);
+    std::vector<TextureHandle> getAllTextureHandles();
+    ShaderHandle getShader();
+    void setShader(ShaderHandle& newShader);
     void Use();
 
+
   private:
-    std::vector<int> textureIDs;
+    std::vector<TextureHandle> textureHandles;
     std::string materialName; 
-    Shader* shader;
+    ShaderHandle shader;
     void setUpShader(); 
 
     int diffTexture; 
     int specTexture;
     int heightTexture;
     int normTexture; 
+};
+
+struct MaterialHandle : ResourceHandle<Material>
+{
+public:
+    MaterialHandle(int id, Resource<Material>* ptr, ResourceType resType) : ResourceHandle(id, ptr, RT_Material) {};
+    MaterialHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
 };
