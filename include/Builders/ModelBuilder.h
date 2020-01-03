@@ -2,13 +2,14 @@
 #include <string>
 #include "../Core/Model.h"
 #include "../Cache/ResourceCache.h"
+#include "MaterialBuilder.h"
 
 
 class ModelBuilder
 {
     public:
-        ModelBuilder(ResourceCache& cache) : materialCache(cache.materialCache), textureCache(cache.textureCache) {};
-        ModelBuilder& create(std::string);
+        ModelBuilder(ResourceCache& cache) : materialCache(cache.materialCache), textureCache(cache.textureCache), materialBuilder(cache.textureCache) {};
+        ModelBuilder& create(int id, std::string);
         ModelBuilder& loadFromPath(std::string);
         Model build();
 
@@ -21,10 +22,11 @@ class ModelBuilder
         std::string modelName;
         std::vector<Mesh> meshes;
         std::string directory;
-        std::vector<int>textureHandleCollection;
+        std::vector<TextureHandle> _textureHandles;
 
-        Cache<Material>& materialCache;
-        Cache<Texture>& textureCache;
+        MaterialCache& materialCache;
+        TextureCache& textureCache;
+        MaterialBuilder materialBuilder;
 };
 
 class ModelFactory
@@ -33,11 +35,11 @@ class ModelFactory
         ModelFactory(ResourceCache& resCache) : modelBuilder(ModelBuilder(resCache)), resourceCache(resCache)
         {
         };
-        Model* create(std::string name, string path);
+        ModelHandle create(std::string name, string path);
+
     private:
         ModelBuilder modelBuilder;
         string modelName;
-        ResourceCache& resourceCache;
-        
+        ResourceCache& resourceCache;       
 };
 

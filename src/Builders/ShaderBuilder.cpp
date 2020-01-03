@@ -1,5 +1,4 @@
 #include "../../include/Builders/ShaderBuilder.h"
-#include <filesystem>
 
 
 ShaderBuilder& ShaderBuilder::createShader(int id, std::string refName , std::string fileName, bool core)
@@ -115,7 +114,7 @@ Shader ShaderBuilder::build()
         glDeleteShader(shaderID);
     }
     
-    return Shader(resID, shaderProgramName, uniforms, programID);
+    return Shader(programID, shaderProgramName, uniforms);
 }
 
 std::map<std::string, int> ShaderBuilder::findUniformLocations()

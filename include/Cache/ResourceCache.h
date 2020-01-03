@@ -8,11 +8,11 @@
 
 struct ResourceCache
 {
-    Cache<Material> materialCache;
-    Cache<Texture> textureCache;
-    Cache<Model> modelCache;
-    Cache<Shader> shaderCache;
-    Cache<GameObject> gameObjectCache;
+    MaterialCache materialCache;
+    TextureCache textureCache;
+    ModelCache modelCache;
+    ShaderCache shaderCache;
+    GameObjectCache gameObjectCache;
 };
 
 

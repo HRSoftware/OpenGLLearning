@@ -2,33 +2,36 @@
 #include <vector>
 #include <utility>
 #include "../Core/Material.h"
+#include "../Cache/ResourceCache.h"
 
 
 class MaterialBuilder
 {
     public:
-        MaterialBuilder() { };
-    ~MaterialBuilder();
-    MaterialBuilder& create(const int id, std::string name = "DefaultTexture");
-    MaterialBuilder& addTextures(std::vector<TextureHandle>& _textures);
-    MaterialBuilder& addTexture(TextureHandle texture);
-    MaterialBuilder& addShader(ShaderHandle _shader);
-    Material build();
+        MaterialBuilder(TextureCache& cache) : textureCache(cache){ };
+        ~MaterialBuilder();
+        MaterialBuilder& create(const int id, std::string name = "DefaultTexture");
+        MaterialBuilder& addTextures(std::vector<TextureHandle>& _textures);
+        MaterialBuilder& addTexture(TextureHandle texture);
+        void loadTexturesFromAIMaterial(aiMaterial* mat, std::string directory);
+        MaterialBuilder& addShader(ShaderHandle _shader);
+        Material build();
 
     private:
-
-    std::vector<Texture> loadTextures(aiMaterial*, std::string);
+        
         std::string materialName;
-        std::vector<TextureHandle> textures;
+        std::vector<TextureHandle> textureHandles;
         ShaderHandle shader;
-        int resID;
+
+        TextureCache& textureCache;
+        int resID = -1;
 };
 
 
 class MaterialFactory
 {
 public:
-    MaterialFactory() {};
+    MaterialFactory(TextureCache& cache) : builder(cache){};
 
     Material createBasicMaterial(const int id, const std::string name, ShaderHandle shdr)
     {

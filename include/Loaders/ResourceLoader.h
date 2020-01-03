@@ -2,19 +2,17 @@
 #include "../Builders/ShaderBuilder.h"
 #include "../Builders/MaterialBuilder.h"
 #include "../Helpers/GUIDAllocator.h"
-#include "../Cache/ResourceCache.h"
+#include "../Builders/ModelBuilder.h"
 
 template<class T>
 class ResourceLoader
 {
 public:
 
-    template<class T>
     T loadNewResource(int id, std::string pathToFile)
     {
         throw;
     }
-
 };
 
 template<>
@@ -109,18 +107,11 @@ template<>
 class ResourceLoader<Material>
 {
     public:
-        ResourceLoader(ResourceCache& _cache) : textureCache(_cache.textureCache){};
-        Material loadNewResource(int id, std::string matName, aiMaterial* mat)
-        {
-
-            MaterialBuilder new Material;
-            newMaterial.create(id, matName)
-                .addTextures(loadTexturesFromMaterial(mat, matName));
-            return createTexture(id, matName, type);
-        }
+    explicit ResourceLoader(TextureCache& textureCache)
+        : textureCache(textureCache) {}
 
     private:
-    std::vector<TextureHandle> loadTexturesFromMaterial(aiMaterial* mat, std::string directory)
+    /*std::vector<TextureHandle> loadTexturesFromMaterial(aiMaterial* mat, std::string directory)
     {
         std::vector<std::string> types = {
             "texture_diffuse",
@@ -149,24 +140,44 @@ class ResourceLoader<Material>
                 aiString str;
                 mat->GetTexture(_type, i, &str);
 
-                TextureHandle textureHandle = textureCache.find(str.C_Str());
+                TextureHandle textureHandle = textureCache.findTexture(str.C_Str());
                 if (textureHandle.getResourceID() == -1)
                     textures.push_back(loadTextureFromMaterial(str, _type, directory));
                 else
                     textures.push_back(textureHandle);
             }
         }
-        return textures;
-    }
-    auto loadTextureFromMaterial(aiString str, aiTextureType type, std::string directory) -> TextureHandle
+        return textures;*/
+
+    //}
+   /* auto loadTextureFromMaterial(aiString str, aiTextureType type, std::string directory) -> std::vector<TextureHandle>
     {
         std::string path = directory + "/" + str.C_Str();
         path = std::regex_replace(path, std::regex("//"), "/");
 
-        return textureCache.add(path, ResourceLoader<Texture>::loadNewResource(GUID_Allocator::getNewUniqueGUID(), path, type));
+        return textureCache.add(path, ::loadTextureFromMaterial())
+    }*/
 
-    }
-    
-    Cache<Texture>& textureCache;
+    private:
+        TextureCache& textureCache;
 };
 
+
+template<>
+class ResourceLoader<Model>
+{
+public:
+    explicit ResourceLoader(ResourceCache& cache)
+        : resourceCache(cache) {}
+
+    Model loadNewResource(int id, std::string name, string path)
+    {
+        ModelBuilder model(resourceCache);
+        return model.create(id, name)
+                    .loadFromPath(path)
+                    .build();
+    }
+  
+    private:
+    ResourceCache& resourceCache;
+};

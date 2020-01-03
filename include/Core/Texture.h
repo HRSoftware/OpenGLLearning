@@ -4,7 +4,6 @@
 #include <map>
 #include "Resource.h"
 
-
 class Texture : Resource<Texture>
 {
     public:
@@ -29,6 +28,11 @@ class Texture : Resource<Texture>
         return resourceID;
     }
 
+    ResourceType getResourceType()
+    {
+        return resourceType;
+    }
+
     Texture& operator=(Texture newTexture)
     {
         _textureType = newTexture._textureType;
@@ -45,14 +49,13 @@ class Texture : Resource<Texture>
 struct TextureHandle : ResourceHandle<Texture>
 {
     TextureHandle() : ResourceHandle(-1, nullptr, RT_Texture) {};
-    TextureHandle(int id, Resource<Texture>* ptr, ResourceType resType) : ResourceHandle(id, ptr, RT_Shader) {};
+    TextureHandle(int id, Texture* ptr, ResourceType resType) : ResourceHandle(id, ptr, RT_Shader) {};
     TextureHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
 
     auto getTextureType()
     {
         return ptr_Resource->getTextureType();
     }
-
 
     auto getTextureID()
     {

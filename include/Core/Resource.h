@@ -1,7 +1,7 @@
 #pragma once
-#include "Shader.h"
-
-
+#include <string>
+#include <unordered_map>
+#include <map>
 enum ResourceType
   {
       RT_None = 0,
@@ -12,7 +12,8 @@ enum ResourceType
       RT_Material,
       RT_Audio,
       RT_Shader,
-      RT_Model
+      RT_Model,
+      RT_GameObject
   };
 
 template<class T>
@@ -26,7 +27,7 @@ class Resource
         return resourceID;
     }
 
-    const ResourceType getResourceType()
+    ResourceType getResourceType()
     {
         return resourceType;
     }
@@ -43,12 +44,13 @@ template<class T>
 class ResourceHandle
 {
 public:
-    ResourceHandle(int id = -1, Resource<T> * ptr = nullptr, ResourceType resType = RT_INVALID) : resourceID(id), ptr_Resource(ptr), resourceType(resType) {};
+    ResourceHandle();
+    ResourceHandle(int id = -1, T * ptr = nullptr, ResourceType resType = RT_INVALID);
     ResourceHandle(const ResourceHandle& resHndl) : resourceID(resHndl.resourceID), ptr_Resource(resHndl.ptr_Resource), resourceType(resHndl.resourceType) {};
 
     int getResourceID();
 
-    template<class T>
+    
     T* getResourcePointer()
     {
         return ptr_Resource;
@@ -63,6 +65,12 @@ public:
 };
 
 template <class T>
+ResourceHandle<T>::ResourceHandle() : resourceID(-1), ptr_Resource(nullptr), resourceType(RT_INVALID){}
+
+template <class T>
+ResourceHandle<T>::ResourceHandle(int id, T* ptr, ResourceType resType) : resourceID(id), ptr_Resource(ptr), resourceType(resType) {}
+
+template <class T>
 int ResourceHandle<T>::getResourceID()
 {
     return resourceID;
@@ -74,6 +82,5 @@ ResourceType ResourceHandle<T>::getResourceType()
 {
     return resourceType;
 }
-
 
 

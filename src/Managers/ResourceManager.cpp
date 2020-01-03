@@ -7,11 +7,11 @@ ResourceHandle<T> ResourceManager::loadNewResource(ResourceType type, std::strin
     switch ( type )
     {
     case RT_Shader:
-        return resourceCache.shaderCache.addNew(referenceName,shaderLoader.loadNewResource<Shader>(GUID_Allocator::getNewUniqueGUID(), "Shaders/" + pathToFile));
+        return resourceCache.shaderCache.addShader(referenceName,shaderLoader.loadNewResource(GUID_Allocator::getNewUniqueGUID(), "Shaders/" + pathToFile));
     case RT_Model:
-        return resourceCache.modelCache.addNew(referenceName,modelLoader.loadNewResource<Model>(GUID_Allocator::getNewUniqueGUID(), pathToFile));
+        return resourceCache.modelCache.addModel(referenceName,modelLoader.loadNewResource(GUID_Allocator::getNewUniqueGUID(), pathToFile));
     default:
-        return ResourceHandle(-1, nullptr , RT_INVALID);
+        return ResourceHandle<T>();
     }
 }
 
@@ -21,13 +21,13 @@ ResourceHandle<T> ResourceManager::getHandleForResource(Resource<T>* res, std::s
     switch ( res->getResourceType())
     {
     case RT_Shader:
-        return resourceCache.shaderCache.find(name);
+        return resourceCache.shaderCache.findShader(name);
     case RT_Texture:
-        return resourceCache.textureCache.find(name);
+        return resourceCache.textureCache.findTexture(name);
     case RT_Model:
-        return resourceCache.modelCache.find(name);
+        return resourceCache.modelCache.findModel(name);
     case RT_Material:
-        return resourceCache.materialCache.find(name);
+        return resourceCache.materialCache.findMaterial(name);
     default:
         return;
     }

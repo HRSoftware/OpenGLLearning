@@ -3,12 +3,6 @@
 #include <glad\glad.h>
 #include <glm\glm.hpp>
 #include <glm\ext.hpp>
-
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <map>
 #include "Resource.h"
 
 enum ShaderType
@@ -24,12 +18,26 @@ enum ShaderType
 class Shader : Resource<Shader>
 {
 public:
-	Shader(int id): Resource(id, RT_Shader) {}
+    Shader() : Resource<Shader>(-1, RT_Shader){};
+	Shader(int id): Resource<Shader>(id, RT_Shader) {}
     Shader(int id, std::string name, std::map<std::string, int>& _uniformLocations);
     ~Shader() {}
 	void reloadShaderFromFile(const char* fileName, bool isCoreShader);
 
-	unsigned int shaderID;
+	int getShaderID()
+	{
+        return shaderID;
+	}
+
+	int getResourceID()
+	{
+        return resourceID;
+	}
+
+	ResourceType getResourceType() 
+	{
+        return resourceType;
+	}
 
 	void use()
 	{
@@ -63,18 +71,26 @@ public:
 
 	bool checkAttributeExist(const std::string& name) const;
 
-private:
-	std::map<std::string, int> _uniformLocations;
+	Shader& operator= (const Shader& shader)
+	{
+        _uniformLocations = shader._uniformLocations;
+        _shaderName = shader._shaderName;
+        shaderID = shader.shaderID;
+        return *this;
+	}
 
-	void findUniformLocations();
+	private:
 	GLint getLocation(const std::string& name) const;
+	
+	std::map<std::string, int> _uniformLocations;
 	std::string _shaderName;
+    unsigned int shaderID;
 
 };
 
 struct ShaderHandle : ResourceHandle<Shader>
 {
 public:
-    ShaderHandle(int id = -1, Resource<Shader>* ptr = nullptr, ResourceType resType = RT_Shader) : ResourceHandle(id, ptr, RT_Shader) {};
+    ShaderHandle(int id = -1, Shader* ptr = nullptr, ResourceType resType = RT_Shader) : ResourceHandle(id, ptr, RT_Shader) {};
     ShaderHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
 };

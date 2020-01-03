@@ -1,30 +1,44 @@
 
 #include "../../include/Core/GameObject.h"
+#include "../../include/Helpers/GUIDAllocator.h"
 
-
-
-GameObject::GameObject(std::string name, Model model)
+GameObject::GameObject() : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
 {
+    _isModelNULL = true;
+}
+
+GameObject::GameObject(FloorGrid floor) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
+{
+    _isModelNULL = false;
+    GOName = floor.getName();
+    _isModelMatrixOutdated = true;
+    _model.getResourcePointer()->meshes = {floor.getMesh()};
+}
+
+
+GameObject::GameObject(std::string name, ModelHandle model) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
+{
+    _isModelNULL = false;
     GOName = name;
     _model = model;
     _isModelMatrixOutdated = true;
 }
 
-GameObject::GameObject(std::vector<Vertex> _vertices, std::vector<unsigned> _indices)
+GameObject::GameObject(std::vector<Vertex> _vertices, std::vector<unsigned> _indices) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
 {
     _isModelMatrixOutdated = true;
-    _model.meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
+    _model.getResourcePointer()->meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
 }
 
 GameObject::~GameObject()
 {
-    _isModelNULL = true;
 }
 
-void GameObject::setModel(Model model)
+void GameObject::setModel(ModelHandle model)
 {
     _model = model;
     _isModelMatrixOutdated = true;
+    _isModelNULL = false;
 }
 
 void GameObject::setName(std::string name)
@@ -123,5 +137,5 @@ glm::vec3 GameObject::getScale() const
 
 std::vector<Mesh>& GameObject::getMeshes()
 {
-    return _model.meshes;
+    return _model.getResourcePointer()->meshes;
 }

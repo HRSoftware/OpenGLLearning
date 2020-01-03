@@ -1,5 +1,6 @@
 
 #include "../../include/Core/Skybox.h"
+#include <iostream>
 
 void Skybox::Draw(glm::mat4 view, glm::mat4 projection)
 {

@@ -1,10 +1,6 @@
 #pragma once
-#include <vector>
-#include <string>
 #include <assimp/material.h>
-#include <unordered_map>
 #include "Shader.h"
-#include "Resource.h"
 #include "Texture.h"
 
 
@@ -12,6 +8,7 @@
 class Material : public Resource<Material>
 {
   public:
+      Material();
     Material(int id, std::string name, std::vector<TextureHandle>, ShaderHandle);
     Material(int id, std::string name, std::vector<TextureHandle> texture);
     Material(int id, std::string name, TextureHandle );
@@ -24,8 +21,24 @@ class Material : public Resource<Material>
     std::unordered_map<int, aiTextureType> getAllTextures();
     std::vector<TextureHandle> getAllTextureHandles();
     ShaderHandle getShader();
+
     void setShader(ShaderHandle& newShader);
     void Use();
+    void setTextureToType(int id, aiTextureType textType);
+
+
+    Material& operator = (const Material& mat)
+    {
+        textureHandles = mat.textureHandles;
+        materialName = mat.materialName;
+        shader = mat.shader;
+
+        diffTexture = mat.diffTexture;
+        specTexture = mat.specTexture;
+        heightTexture = mat.heightTexture;
+        normTexture = mat.normTexture;
+        return *this;
+    }
 
 
   private:
@@ -43,6 +56,6 @@ class Material : public Resource<Material>
 struct MaterialHandle : ResourceHandle<Material>
 {
 public:
-    MaterialHandle(int id, Resource<Material>* ptr, ResourceType resType) : ResourceHandle(id, ptr, RT_Material) {};
+    MaterialHandle(int id = -1, Material* ptr = nullptr, ResourceType resType = RT_Material) : ResourceHandle(id, ptr, resType) {};
     MaterialHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
 };

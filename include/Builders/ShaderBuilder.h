@@ -2,6 +2,11 @@
 #include "../Core/Shader.h"
 #include <utility>
 #include <vector>
+#include <iostream>
+#include <bitset>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
 
 class ShaderBuilder {
     public:

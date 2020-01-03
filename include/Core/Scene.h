@@ -24,7 +24,7 @@
 class Scene
 {
 public:
-	Scene(GLFWwindow& wnd, Renderer* renderer) : _window(&wnd)
+	Scene(GLFWwindow& wnd, Renderer* renderer) : _window(&wnd), resourceManager(resourceCache)
 	{
       _renderer = renderer;
 	}
@@ -38,7 +38,6 @@ public:
 
 	private:
 	Camera _currentCamera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
-	ModelManager _modelManager;
 	GLFWwindow* _window;
 	InputController* _inputController;
 	Renderer* _renderer;
@@ -48,7 +47,7 @@ public:
 	RenderDetails _renderDetails;
 
     ResourceCache resourceCache;
-    ResourceManager resourceManager = ResourceManager(resourceCache);
+    ResourceManager resourceManager;
     
 	glm::vec2 _screenDimensions;
 

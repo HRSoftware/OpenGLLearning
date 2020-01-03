@@ -3,25 +3,26 @@
 
 TextureHandle TextureCache::addTexture(std::string name, Texture tex)
 {
-  
-    cacheMap.insert_or_assign(name, tex);
+    texture_map.insert_or_assign(name, tex);
     return findTexture(name);
 }
 
 
 TextureHandle TextureCache::findTexture(std::string name)
 {
-    Texture textHndl = cacheMap[name];
-    return TextureHandle(textHndl.getResourceID(), &cacheMap[name], RT_Texture) ;
+    auto textHndl = texture_map[name];
+    return TextureHandle(textHndl.getResourceID(), &texture_map[name], RT_Texture) ;
 }
 
-Texture TextureCache::findTextureByID(int id)
+TextureHandle TextureCache::findTextureByID(int id)
 {
-    for ( auto T : cacheMap )
+    for ( auto _texture : texture_map )
     {
-        if(T.second.getTextureID() == id)
+        if(_texture.second.getResourceID() == id)
         {
-            return T.second;
+            return TextureHandle(_texture.second.getResourceID(), &_texture.second, _texture.second.getResourceType());
         }
     }
+
+    return TextureHandle(); //return default invalid textureHandle
 }

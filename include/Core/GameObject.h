@@ -8,19 +8,18 @@
 #include <utility>
 
 
-class GameObject
+class GameObject : Resource<GameObject>
 {
 public:
-	GameObject()
-	= default;
+    GameObject() ;
 
-    GameObject(FloorGrid floor);
-	GameObject(std::string name, Model model);
+    GameObject(FloorGrid floor) ;
+	GameObject(std::string name, ModelHandle model);
 	GameObject(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices);
 	~GameObject();
 
 
-    void setModel(Model _model);
+    void setModel(ModelHandle _model);
     void setName(std::string name);
 	void setPosition(glm::vec3 pos);
 	void moveBy(glm::vec3 pos);
@@ -38,10 +37,35 @@ public:
 	glm::vec3 getScale() const;
 	glm::mat4 getModelMatrix();
 	std::vector<Mesh>& getMeshes();
+    int getResourceID()
+    {
+        return resourceID;
+    }
 
-protected:
+    ResourceType getResourceType()
+    {
+        return resourceType;
+    }
 
-    Model _model;
+    GameObject& operator= (const GameObject& gameObject)
+    {
+        _model = gameObject._model;
+        GOName = gameObject.GOName;
+        _position = gameObject._position;
+        _scale = gameObject._scale;
+        _orientation = gameObject._orientation;
+        _isModelNULL = gameObject._isModelNULL;
+        _isModelMatrixOutdated = gameObject._isModelMatrixOutdated;
+
+        _modelMatrix = gameObject._modelMatrix;
+
+        return *this;
+    }
+
+	protected:
+
+    ModelHandle _model;
+
 	private:
         std::string GOName;
 	glm::vec3 _position = { 0.0f, 0.0f, 0.0f };
@@ -53,3 +77,9 @@ protected:
 	bool _isModelMatrixOutdated = false;
 };
 
+
+struct GameObjectHandle : ResourceHandle<GameObject>
+{
+    GameObjectHandle(int id = -1, GameObject* ptr = nullptr, ResourceType resType = RT_GameObject) : ResourceHandle(id, ptr, RT_GameObject) {};
+    GameObjectHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
+};

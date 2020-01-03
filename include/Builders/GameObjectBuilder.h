@@ -17,7 +17,7 @@ class GameObjectBuilder
         
     private:
         std::string _goName;
-        Model _model;
+        ModelHandle _model;
         ModelFactory modelFactory;
 };
 
@@ -28,14 +28,14 @@ class GameObjectFactory
         GameObjectFactory(ResourceCache& cache) : GOBuilder(GameObjectBuilder(cache)), 
                                                   goMap(cache.gameObjectCache),
                                                   modelCache(cache.modelCache){};
-        GameObject* create(string gameObjectName);
+        GameObjectHandle create(string gameObjectName);
 
-        GameObject* createFloorGrid(FloorGrid);
-        GameObject* createWithModel(std::string name, string modelPath);
+        GameObjectHandle createFloorGrid(std::string name, FloorGrid);
+        GameObjectHandle createWithModel(std::string name, string modelPath);
 
     protected:
         GameObjectBuilder GOBuilder;
        
-        Cache<GameObject>& goMap;
-        Cache<Model>& modelCache;
+        GameObjectCache& goMap;
+        ModelCache& modelCache;
 };

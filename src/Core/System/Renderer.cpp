@@ -81,7 +81,7 @@ void Renderer::renderMesh(int VAO, int indiceCount)
 
 void Renderer::setUpShader(Material material, bool textured)
 {
-    activeShader = material.getShader();
+    activeShader = *material.getShader().getResourcePointer();
     activeShader.use();
     if (textured) {
         // bind appropriate textures
@@ -157,8 +157,8 @@ void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, bool textu
     for (auto GO : renderBatch) {
         for(auto mesh : GO.second.getMeshes())
         {
-            if (mesh.getMaterial().getName() != activeMaterial->getName()) {
-                *activeMaterial = mesh.getMaterial();
+            if (mesh.getMaterial().getResourceID() != activeMaterial->getResourceID()) {
+                activeMaterial = mesh.getMaterial().getResourcePointer();
                 setUpShader(*activeMaterial, textured);
                 activeMaterial->Use();
             } 
@@ -172,9 +172,9 @@ void Renderer::renderGameObject(GameObject gameObj, bool texture = true, bool re
     //if(requiredShaderSetUp)
     for(Mesh mesh : gameObj.getMeshes())
     {
-        setUpShader(mesh.getMaterial(), texture);
-       mesh.getMaterial().getShader().setMat4("view", _currentCamera->GetViewMatrix());
-       mesh.getMaterial().getShader().setMat4("model", gameObj.getModelMatrix());
+        setUpShader(*mesh.getMaterial().getResourcePointer(), texture);
+       mesh.getMaterial().getResourcePointer()->getShader().getResourcePointer()->setMat4("view", _currentCamera->GetViewMatrix());
+       mesh.getMaterial().getResourcePointer()->getShader().getResourcePointer()->setMat4("model", gameObj.getModelMatrix());
     }
         
 

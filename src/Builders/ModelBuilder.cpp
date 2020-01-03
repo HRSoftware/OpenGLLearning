@@ -1,12 +1,14 @@
 
 
 #include "../../include/Builders/ModelBuilder.h"
+#include "../../include/Helpers/GUIDAllocator.h"
 
-ModelBuilder& ModelBuilder::create(std::string name)
+ModelBuilder& ModelBuilder::create(int id, std::string name)
 {
     modelName = name;
     meshes.clear();
-    textureHandleCollection.clear();
+    _textureHandles.clear();
+    
     return *this;
 }
 
@@ -74,7 +76,7 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    std::vector<Texture> _texturesHandles;
+    MaterialHandle _materialHandle;
 
     for ( unsigned int i = 0; i < mesh->mNumVertices; i++ )
     {
@@ -139,34 +141,33 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
     aiString MaterialName;
     material->Get(AI_MATKEY_NAME, MaterialName);
 
-    MaterialHandle mat = materialCache.find(MaterialName.C_Str());
+    _materialHandle = materialCache.findMaterial(MaterialName.C_Str());
 
-    if(mat.getResourcePointer() == nullptr)
+    if(_materialHandle.getResourceID() == -1)
     {
-        _texturesHandles = ResourceC;
-        ResourceLoader<Material>::loadNewResource()
-        materialCache.addNew(MaterialName.C_Str(), Material(MaterialName.C_Str(), _texturesHandles));
-        mat = materialCache.find(MaterialName.C_Str());
+        materialBuilder.create(GUID_Allocator::getNewUniqueGUID(), directory)
+        .loadTexturesFromAIMaterial(material, directory);
+       materialCache.addMaterial(directory, materialBuilder.build());
     }
-    return Mesh(vertices, indices, mat);
+    return Mesh(vertices, indices, _materialHandle);
 }
 
 Model ModelBuilder::build()
 {
-    Model newModel;
+    Model newModel(GUID_Allocator::getNewUniqueGUID());
         newModel.meshes = meshes;
         newModel.directory = directory;
         newModel.gammaCorrection = true;
-        newModel.textureHandlesCollection = textureHandleCollection;
+        newModel.textureHandles = _textureHandles;
     return newModel;
 }
 
-Model* ModelFactory::create(std::string name, string path)
+ModelHandle ModelFactory::create(std::string name, string path)
 {
-    Model* model = resourceCache.modelCache.findModel(name);
-    if(model == nullptr)
+    ModelHandle model = resourceCache.modelCache.findModel(name);
+    if(model.getResourceID() == -1)
     {
-        Model newModel = modelBuilder.create(name)
+        Model newModel = modelBuilder.create(GUID_Allocator::getNewUniqueGUID(), name)
             .loadFromPath(path)
             .build();
 

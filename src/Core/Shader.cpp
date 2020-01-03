@@ -1,6 +1,6 @@
 
 #include "../../include/Core/Shader.h"
-
+#include <iostream>
 
 
 Shader::Shader(int id, std::string name, std::map<std::string, int>& uniformLocations) : Resource(id, RT_Shader)

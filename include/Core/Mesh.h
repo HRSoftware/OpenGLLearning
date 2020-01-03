@@ -36,7 +36,7 @@ public:
     vector<unsigned int> getIndices();
     std::unordered_map<int, aiTextureType> getAllTextures();
     unsigned int getVAO();
-    Material getMaterial();
+    MaterialHandle getMaterial();
     void setMaterial(MaterialHandle);
 
     Mesh() : _material(-1, nullptr, RT_Material){}

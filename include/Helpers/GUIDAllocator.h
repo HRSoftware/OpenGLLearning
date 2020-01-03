@@ -3,12 +3,12 @@
 class GUID_Allocator
 {
     public:
-        static int getNewUniqueGUID()
+        inline static int getNewUniqueGUID()
         {
             return currentGUID++;
         }
         
     private:
-        static int currentGUID;
+        inline static int currentGUID = 0;
 
 };
