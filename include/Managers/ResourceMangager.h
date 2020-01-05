@@ -5,6 +5,7 @@
 #include "../Cache/ResourceCache.h"
 #include <regex>
 #include <filesystem>
+#include <iostream>
 
 
 
@@ -33,6 +34,9 @@ class ResourceManager
     ResourceLoader<Material> materialLoader;
     ResourceLoader<Shader> shaderLoader;
     ResourceLoader<Model> modelLoader;
+
+    void handleFile(filesystem::directory_entry file);
+    void handleFolder(filesystem::directory_iterator dir);
     
     
 };
@@ -45,7 +49,7 @@ inline ResourceHandle<Texture> ResourceManager::loadNewTexture(aiTextureType typ
 inline ResourceHandle<Shader> ResourceManager::loadNewShader(int shaderMask, ::string pathToFile, std::string referenceName)
 {
     ShaderBuilder newShader;
-    newShader.createShader(GUID_Allocator::getNewUniqueGUID(), referenceName, pathToFile);
+    newShader.createShader(GUID_Allocator::getNewUniqueGUID(), referenceName.empty() ? pathToFile : referenceName, pathToFile);
 
     if ((shaderMask & VERTEX) == VERTEX)
         newShader.addShader(VERTEX, pathToFile);
@@ -123,8 +127,47 @@ inline ResourceHandle<Model> ResourceManager::loadNewModel(std::string name, std
     return resourceCache.modelCache.addModel(name, modelLoader.loadNewResource(GUID_Allocator::getNewUniqueGUID(), name, path));
 }
 
-inline void ResourceManager::LoadAllBasicResources(std::string rootDirectory)
+inline void ResourceManager::LoadAllBasicResources(std::string rootDirectory = "")
 {
     filesystem::path path = rootDirectory;
 
+    std::vector<string> folders;
+    filesystem::path resourceFolder = "Resources";
+    filesystem::path shaderFolder = "Shaders";
+
+    handleFolder(filesystem::directory_iterator(resourceFolder));
+
+    //rosource
+    //  --Models
+    //    --HighRise
+    //    --BlockOfFlats
+    //    -- etc.....
+    //Shaders
+    //  -- core
+    //shader1
+    //shader2
+    //.....
+    //shaderN
+
+}
+
+inline void ResourceManager::handleFile(filesystem::directory_entry file)
+{
+    std::vector<string> textureExtensions = {".png", ".jpeg", ".tga", ".svg"};
+
+    auto ext = file.path().extension().string();
+    std::vector<string>::iterator it = std::find(textureExtensions.begin(), textureExtensions.end(), ext);
+    if (it != textureExtensions.end())
+    {   
+        std::string path = std::regex_replace(file.path().string(), std::regex("\\\\"), "\\"); // 
+        loadNewTexture(aiTextureType_UNKNOWN, path, path);
+    }
+}
+inline void ResourceManager::handleFolder(filesystem::directory_iterator dir)
+{
+    for (auto const& entry : filesystem::directory_iterator(dir))
+        if (entry.is_directory())
+            handleFolder(filesystem::directory_iterator(entry.path().string()));
+        else
+            handleFile(entry);
 }

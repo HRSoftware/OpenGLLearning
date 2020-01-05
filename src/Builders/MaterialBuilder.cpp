@@ -29,6 +29,11 @@ MaterialBuilder& MaterialBuilder::addTexture(TextureHandle texture)
 
 void MaterialBuilder::loadTexturesFromAIMaterial(aiMaterial* mat, std::string directory)
 {
+
+    filesystem::path filepath = directory;
+    string path = filepath.parent_path().string();
+    string file = filepath.filename().string();
+
     std::vector<TextureHandle> textures;
     aiTextureType _type;
     std::vector<std::string> types = {
@@ -57,8 +62,8 @@ void MaterialBuilder::loadTexturesFromAIMaterial(aiMaterial* mat, std::string di
             mat->GetTexture(_type, i, &str);
             // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
             bool skip = false;
-           TextureHandle textHandle =  textureCache.findTexture(directory + "/" + str.data);
-
+           TextureHandle textHandle =  textureCache.findTexture("Resources\\Models\\" + path + "\\" + str.data);
+           textHandle.getResourcePointer()->_textureType = _type;
             /*if (textHandle.getResourceID() == -1) {
                 std::string path = directory + "/" + str.C_Str();
                 path = std::regex_replace(path, std::regex("//"), "/");

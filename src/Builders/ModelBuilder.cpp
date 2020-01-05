@@ -145,9 +145,9 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
 
     if(_materialHandle.getResourceID() == -1)
     {
-        materialBuilder.create(GUID_Allocator::getNewUniqueGUID(), directory)
+        materialBuilder.create(GUID_Allocator::getNewUniqueGUID(), MaterialName.C_Str())
         .loadTexturesFromAIMaterial(material, directory);
-       materialCache.addMaterial(directory, materialBuilder.build());
+       materialCache.addMaterial(MaterialName.C_Str(), materialBuilder.build());
     }
     return Mesh(vertices, indices, _materialHandle);
 }

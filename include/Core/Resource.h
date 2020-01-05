@@ -45,8 +45,8 @@ class ResourceHandle
 {
 public:
     ResourceHandle();
-    ResourceHandle(int id = -1, T * ptr = nullptr, ResourceType resType = RT_INVALID);
-    ResourceHandle(const ResourceHandle& resHndl) : resourceID(resHndl.resourceID), ptr_Resource(resHndl.ptr_Resource), resourceType(resHndl.resourceType) {};
+    ResourceHandle(int id = -1, T* ptr = nullptr, ResourceType resType = RT_INVALID);
+    ResourceHandle(const ResourceHandle<T>& resHndl) : resourceID(resHndl.resourceID), ptr_Resource(resHndl.ptr_Resource), resourceType(resHndl.resourceType) {};
 
     int getResourceID();
 

@@ -19,19 +19,26 @@ class Shader : Resource<Shader>
 {
 public:
     Shader() : Resource<Shader>(-1, RT_Shader){};
-	Shader(int id): Resource<Shader>(id, RT_Shader) {}
+	Shader(int id): Resource<Shader>(id, RT_Shader)
+	{
+        programID = id;
+	}
     Shader(int id, std::string name, std::map<std::string, int>& _uniformLocations);
     ~Shader() {}
 	void reloadShaderFromFile(const char* fileName, bool isCoreShader);
 
 	int getShaderID()
 	{
-        return shaderID;
+        return programID;
 	}
 
 	int getResourceID()
 	{
         return resourceID;
+	}
+	std::string getShaderName()
+	{
+        return _shaderName;
 	}
 
 	ResourceType getResourceType() 
@@ -41,7 +48,7 @@ public:
 
 	void use()
 	{
-		glUseProgram(shaderID);
+		glUseProgram(programID);
 	}
 	// utility uniform functions
 	// ------------------------------------------------------------------------
@@ -75,8 +82,13 @@ public:
 	{
         _uniformLocations = shader._uniformLocations;
         _shaderName = shader._shaderName;
-        shaderID = shader.shaderID;
+        programID = shader.programID;
         return *this;
+	}
+
+    std::map<std::string, int> getUniformLocations()
+	{
+        return _uniformLocations;
 	}
 
 	private:
@@ -84,7 +96,7 @@ public:
 	
 	std::map<std::string, int> _uniformLocations;
 	std::string _shaderName;
-    unsigned int shaderID;
+    int programID = -1;
 
 };
 

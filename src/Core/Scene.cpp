@@ -26,8 +26,10 @@ bool Scene::initScene(Camera cam)
 
 void Scene::loadResources()
 {
-    resourceManager.loadNewShader(VERTEX | FRAGMENT, "basicShader");
-    resourceManager.loadNewShader(VERTEX | FRAGMENT, "shadowMapShader");
+    resourceManager.LoadAllBasicResources();
+
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "basicShader", "basicShader");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "shadowMapShader", "shadowMapShader");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "materialShader");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "skyboxShader");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "gridShader");
@@ -36,7 +38,7 @@ void Scene::loadResources()
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "modelLoadingShader");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "debugDepthShader");
 
-    resourceManager.loadNewModel("Building1", "BlockOfFlats/apartment.fbx");
+    resourceManager.loadNewModel("Building1", "HighRise\\Residential Buildings 010.obj");
 
 
 
