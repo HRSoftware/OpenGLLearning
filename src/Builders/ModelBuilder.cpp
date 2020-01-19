@@ -3,18 +3,19 @@
 #include "../../include/Builders/ModelBuilder.h"
 #include "../../include/Helpers/GUIDAllocator.h"
 
-ModelBuilder& ModelBuilder::create(int id, std::string name)
+ModelBuilder& ModelBuilder::create(int id, std::string name, std::string _shader)
 {
     modelName = name;
     meshes.clear();
     _textureHandles.clear();
+    ShaderToUse = _shader;
     
     return *this;
 }
 
-ModelBuilder& ModelBuilder::loadFromPath(std::string path)
+ModelBuilder& ModelBuilder::loadFromPath(std::string _path)
 {
-    std::string fullPath = "Resources/Models/" + path;
+    std::string fullPath = _path;
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
         fullPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -25,7 +26,7 @@ ModelBuilder& ModelBuilder::loadFromPath(std::string path)
         return *this;
     }
 
-    directory = path.substr(0, fullPath.find_last_of('/'));
+    directory = _path.substr(0, fullPath.find_last_of('/'));
 
     processNode(scene->mRootNode, scene);
     return *this;
@@ -76,56 +77,35 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    MaterialHandle _materialHandle;
+    Material _materialHandle;
 
-    for ( unsigned int i = 0; i < mesh->mNumVertices; i++ )
-    {
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
-        glm::vec3 vector;
         // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's
-        vector.x = mesh->mVertices[i].x;
-        vector.y = mesh->mVertices[i].y;
-        vector.z = mesh->mVertices[i].z;
-        vertex.Position = vector;
+        vertex.Position = {
+            mesh->mVertices[i].x,
+            mesh->mVertices[i].y,
+            mesh->mVertices[i].z
+        };
 
         // normals
-        if ( mesh->mNormals != NULL )
-        {
-            vector.x = mesh->mNormals[i].x;
-            vector.y = mesh->mNormals[i].y;
-            vector.z = mesh->mNormals[i].z;
-            vertex.Normal = vector;
-        }
+        if (mesh->mNormals != NULL)
+            vertex.Normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z};
 
         // texture coordinates
-        if ( mesh->mTextureCoords[0] ) // does the mesh contain texture coordinates?
+        if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
         {
-            glm::vec2 vec;
-            // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
-            // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
-            vec.x = mesh->mTextureCoords[0][i].x;
-            vec.y = mesh->mTextureCoords[0][i].y;
-            vertex.TexCoords = vec;
+            vertex.TexCoords = { mesh->mTextureCoords[0][i].x,mesh->mTextureCoords[0][i].y};
         }
         else
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);
 
-        if ( mesh->mTangents != NULL )
-        {
-            vector.x = mesh->mTangents[i].x;
-            vector.y = mesh->mTangents[i].y;
-            vector.z = mesh->mTangents[i].z;
-            vertex.Tangent = vector;
-        }
+        if (mesh->mTangents != NULL)
+            vertex.Tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
 
-        if ( mesh->mBitangents != NULL )
-        {
-            vector.x = mesh->mBitangents[i].x;
-            vector.y = mesh->mBitangents[i].y;
-            vector.z = mesh->mBitangents[i].z;
-            vertex.Bitangent = vector;
-        }
-
+        if (mesh->mBitangents != NULL) 
+            vertex.Bitangent = {  mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z};
+        
         vertices.push_back(vertex);
     }
 
@@ -138,16 +118,19 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
     // process materials
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-    aiString MaterialName;
-    material->Get(AI_MATKEY_NAME, MaterialName);
+    aiString materialName;
+    material->Get(AI_MATKEY_NAME, materialName);
 
-    _materialHandle = materialCache.findMaterial(MaterialName.C_Str());
+    _materialHandle = materialCache.findMaterial(materialName.C_Str());
 
-    if(_materialHandle.getResourceID() == -1)
+    if( !materialCache.findMaterial(materialName.C_Str())._isValid)
     {
-        materialBuilder.create(GUID_Allocator::getNewUniqueGUID(), MaterialName.C_Str())
-        .loadTexturesFromAIMaterial(material, directory);
-       materialCache.addMaterial(MaterialName.C_Str(), materialBuilder.build());
+        string newMaterialName = modelName + "_" + materialName.C_Str();
+        materialBuilder.create(GUID_Allocator::getNewUniqueGUID(), newMaterialName)
+                       .loadTexturesFromAIMaterial(material, directory)
+                       .addShader(shaderCache.findShader(ShaderToUse));
+        
+       _materialHandle = materialCache.addMaterial(newMaterialName, materialBuilder.build());
     }
     return Mesh(vertices, indices, _materialHandle);
 }
@@ -159,20 +142,21 @@ Model ModelBuilder::build()
         newModel.directory = directory;
         newModel.gammaCorrection = true;
         newModel.textureHandles = _textureHandles;
+        
     return newModel;
 }
 
-ModelHandle ModelFactory::create(std::string name, string path)
+Model ModelFactory::create(std::string name, string path)
 {
-    ModelHandle model = resourceCache.modelCache.findModel(name);
+    Model model = resourceCache.modelCache.findModel(name);
     if(model.getResourceID() == -1)
     {
-        Model newModel = modelBuilder.create(GUID_Allocator::getNewUniqueGUID(), name)
+        Model newModel = modelBuilder.create(GUID_Allocator::getNewUniqueGUID(), name, "modelLoadingShader")
             .loadFromPath(path)
             .build();
 
         resourceCache.modelCache.addModel(name, newModel);
-        model = resourceCache.modelCache.findModel(name);
+        return newModel;
     }
     return model;
 }

@@ -15,9 +15,7 @@ ShaderBuilder& ShaderBuilder::createShader(int id, std::string refName , std::st
 ShaderBuilder& ShaderBuilder::addShader(ShaderType shaderType, std::string fileName)
 {
     std::string shaderRAWCode;
-    std::ifstream shaderFile;
-    fileName = shaderFileName.empty() ? shaderProgramName : shaderFileName;
-    
+    std::ifstream shaderFile;   
 
     shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
@@ -50,7 +48,7 @@ ShaderBuilder& ShaderBuilder::addShader(ShaderType shaderType, std::string fileN
             break;
         }
 
-    std::filesystem::path filePath("./Shaders/" + fileName + fileEXT);
+    std::filesystem::path filePath(fileName + fileEXT);
     std::filesystem::path fullbackfilePath("./Shaders/core/" + fileName + fileEXT);
 
         if (exists(filePath))
@@ -113,8 +111,8 @@ Shader ShaderBuilder::build()
     {
         glDeleteShader(shaderID);
     }
-    
-    return Shader(programID, shaderProgramName, uniforms);
+   
+    return Shader{programID, uniforms, shaderProgramName};
 }
 
 std::map<std::string, int> ShaderBuilder::findUniformLocations()

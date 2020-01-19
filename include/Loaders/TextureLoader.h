@@ -24,9 +24,8 @@ inline Texture TextureLoader::loadNewResource(std::string path,  aiTextureType t
 
 inline Texture TextureLoader::createTexture(std::string path, aiTextureType type = aiTextureType_UNKNOWN)
 {
-    Texture newTexture(GUID_Allocator::getNewUniqueGUID());
-    newTexture._path = path;
-    newTexture._textureID = createTextureIDFromFile(path.c_str(),"", true);
-    newTexture._textureType = type;
+    Texture newTexture;
+    newTexture.id = createTextureIDFromFile(path.c_str(),"", true);
+    newTexture.type = type;
     return newTexture;
 }

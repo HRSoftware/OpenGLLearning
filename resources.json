@@ -1,0 +1,115 @@
+{
+  "Shaders": [{
+      "name": "basicShader",
+      "path": "Shaders/basicShader",
+      "type": [
+        "VERTEX",
+        "FRAGMENT"
+      ]
+    },
+    {
+      "name": "shadowMapShader",
+      "path": "Shaders/core/shadowMapShader",
+      "type": [
+        "VERTEX",
+        "FRAGMENT"
+      ]
+    },
+    {
+      "name": "materialShader",
+      "path": "Shaders/materialShader",
+      "type": [
+        "VERTEX",
+        "FRAGMENT"
+      ]
+    },
+    {
+      "name": "skyboxShader",
+      "path": "Shaders/core/skyboxShader",
+      "type": [
+        "VERTEX",
+        "FRAGMENT"
+      ]
+    },
+    {
+      "name": "framebufferShader",
+      "path": "Shaders/framebufferShader",
+      "type": [
+        "VERTEX",
+        "FRAGMENT"
+      ]
+    },
+    {
+      "name": "lightingShader",
+      "path": "Shaders/basicLighting",
+      "type": [
+        "VERTEX",
+        "FRAGMENT"
+      ]
+    },
+    {
+      "name": "modelLoadingShader",
+      "path": "Shaders/core/modelLoadingShader",
+      "type": [
+        "VERTEX",
+        "FRAGMENT"
+      ]
+    },
+    {
+      "name": "debugDepthShader",
+      "path": "Shaders/core/debugDepthShader",
+      "type": [
+        "VERTEX",
+        "FRAGMENT"
+      ]
+    }
+  ],
+  "Models": [{
+      "name": "BlockOfFlats",
+      "model": "Resources/Models/BlockOfFlats/apartment.FBX",
+      "shader": "modelLoadingShader",
+      "textures": {
+        "brick_d.png": "Resources/Models/BlockOfFlats/brick_d.png",
+        "brick_h.png": "Resources/Models/BlockOfFlats/brick_h.png",
+        "brick_n.png": "Resources/Models/BlockOfFlats/brick_n.png",
+        "brick_r.png": "Resources/Models/BlockOfFlats/brick_r.png",
+        "buildingpartslow_DefaultMaterial_BaseColor.png": "Resources/Models/BlockOfFlats/buildingpartslow_DefaultMaterial_BaseColor.png",
+        "buildingpartslow_DefaultMaterial_Normal.png": "Resources/Models/BlockOfFlats/buildingpartslow_DefaultMaterial_Normal.png",
+        "buildingpartslow_r.png": "Resources/Models/BlockOfFlats/buildingpartslow_r.png",
+        "concrete_d.png": "Resources/Models/BlockOfFlats/concrete_d.png",
+        "concrete_n.png": "Resources/Models/BlockOfFlats/concrete_n.png",
+        "concrete_r.png": "Resources/Models/BlockOfFlats/concrete_r.png"
+      },
+      "material": {
+        "shader": "modelLoadingShader"
+      }
+    },
+    {
+      "name": "House",
+      "model": "Resources/Models/House/house_obj.obj",
+      "textures": {
+        "house_diffuse.tga": "Resources/Models/House/house_diffuse.tga",
+        "house_normal.tga": "Resources/Models/House/house_normal.tga",
+        "house_spec.tga": "Resources/Models/House/house_spec.tga"
+      },
+      "shader": "modelLoadingShader",
+      "material": {
+        "house_obj.mtl": "Resources/Models/House/house_obj.mtl"
+      }
+    }
+  ],
+  "GameObjects": [{
+    "name": "Building1",
+    "model": "House",
+    "position": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "scale": {
+      "x": 0.005,
+      "y": 0.005,
+      "z": 0.005
+    }
+  }]
+}

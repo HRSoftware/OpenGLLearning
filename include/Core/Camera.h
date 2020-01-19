@@ -14,8 +14,8 @@ enum Camera_Movement
 
 const float YAW = -90.f;
 const float PITCH = 0.f;
-const float SPEED = 2.5f;
-const float SENSITIVITY = 0.1f;
+const float SPEED = 0.05f;
+const float SENSITIVITY = 0.075f;
 const float ZOOM = 45.f;
 
 
@@ -60,7 +60,7 @@ public:
 		updateCameraVectors();
 	}
 
-	~Camera() {}
+	~Camera() = default;
 
 
 	// Returns the view matrix calculated using Euler Angles and the LookAt Matrix

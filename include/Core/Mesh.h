@@ -12,7 +12,6 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include <glad/glad.h>
 #include "Texture.h"
 #include <map>
 #include "Material.h"
@@ -34,20 +33,20 @@ public:
     std::vector<Mesh> childrenMeshNodes;
     vector<Vertex> getVertices();
     vector<unsigned int> getIndices();
-    std::unordered_map<int, aiTextureType> getAllTextures();
+    std::map<aiTextureType, int> getAllTextures();
     unsigned int getVAO();
-    MaterialHandle getMaterial();
-    void setMaterial(MaterialHandle);
+    Material getMaterial();
+    void setMaterial(Material);
 
-    Mesh() : _material(-1, nullptr, RT_Material){}
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, MaterialHandle newMaterial, bool root = false) :  _material(newMaterial)
+    Mesh() {};
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material newMaterial, bool root = false) :  _material(newMaterial)
 	{
 		_vertices = std::move(vertices);
 		_indices = std::move(indices);
 		Mesh::setUpBuffers();
 	}
 
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, bool root = false) : _material(-1, nullptr, RT_Material)
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, bool root = false)
 	{
         _vertices = std::move(vertices);
         _indices = std::move(indices);
@@ -66,7 +65,7 @@ protected:
     unsigned int VAO, VBO, EBO;
 	void updateChildNodesWithNewParent();
 	virtual void setUpBuffers();
-	MaterialHandle _material;
+	Material _material;
 };
 #endif
 

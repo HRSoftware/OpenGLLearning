@@ -8,20 +8,20 @@
 #include <utility>
 
 
-class GameObject : Resource<GameObject>
+class GameObject
 {
 public:
-    GameObject() ;
+    GameObject();
 
     GameObject(FloorGrid floor) ;
-	GameObject(std::string name, ModelHandle model);
+	GameObject(const std::string& name, const Model& model);
 	GameObject(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices);
 	~GameObject();
 
 
-    void setModel(ModelHandle _model);
-    void setName(std::string name);
-	void setPosition(glm::vec3 pos);
+    void setModel(const Model& model);
+    void setName(const std::string& name);
+	void setPosition(const glm::vec3 pos);
 	void moveBy(glm::vec3 pos);
 	void moveXBy(float pos);
 	void moveYBy(float pos);
@@ -32,44 +32,23 @@ public:
 	void rotateBy(float angle, const glm::vec3 axis);
 	void updateModelMatrix();
 
-	std::string getName();
-	glm::vec3 getPosition() const;
-	glm::vec3 getScale() const;
+    [[nodiscard]] std::string getName() const;
+    [[nodiscard]]glm::vec3 getPosition() const;
+    [[nodiscard]]glm::vec3 getScale() const;
 	glm::mat4 getModelMatrix();
-	std::vector<Mesh>& getMeshes();
-    int getResourceID()
-    {
-        return resourceID;
-    }
+    std::vector<Mesh> getMeshes() const;
 
-    ResourceType getResourceType()
-    {
-        return resourceType;
-    }
 
-    GameObject& operator= (const GameObject& gameObject)
-    {
-        _model = gameObject._model;
-        GOName = gameObject.GOName;
-        _position = gameObject._position;
-        _scale = gameObject._scale;
-        _orientation = gameObject._orientation;
-        _isModelNULL = gameObject._isModelNULL;
-        _isModelMatrixOutdated = gameObject._isModelMatrixOutdated;
+    GameObject& operator= (const GameObject& gameObject)= default;
 
-        _modelMatrix = gameObject._modelMatrix;
+    protected:
 
-        return *this;
-    }
-
-	protected:
-
-    ModelHandle _model;
+    std::shared_ptr<Model> _model;
 
 	private:
         std::string GOName;
 	glm::vec3 _position = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 _scale = { 1.f, 1.f, 1.f };
+    glm::vec3 _scale = { 1.f, 1.f, 1.f };
 	glm::quat _orientation = {1.f, 0.f, 0.f, 0.f};
 	bool _isModelNULL = false;
 
@@ -78,8 +57,8 @@ public:
 };
 
 
-struct GameObjectHandle : ResourceHandle<GameObject>
-{
-    GameObjectHandle(int id = -1, GameObject* ptr = nullptr, ResourceType resType = RT_GameObject) : ResourceHandle(id, ptr, RT_GameObject) {};
-    GameObjectHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
-};
+//struct GameObjectHandle : ResourceHandle<GameObject>
+//{
+//    GameObjectHandle(int id = -1, GameObject* ptr = nullptr, ResourceType resType = RT_GameObject) : ResourceHandle(id, ptr, RT_GameObject) {};
+//    GameObjectHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
+//};

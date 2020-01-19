@@ -10,9 +10,9 @@
      return _indices;
  }
 
- std::unordered_map<int, aiTextureType> Mesh::getAllTextures()
+ std::map<aiTextureType, int> Mesh::getAllTextures()
  {
-     return _material.getResourcePointer()->getAllTextures();
+     return _material.textures;
  }
 
  unsigned Mesh::getVAO()
@@ -20,12 +20,12 @@
      return VAO;
  }
 
- MaterialHandle Mesh::getMaterial()
+ Material Mesh::getMaterial()
  {
      return _material;
  }
 
- void Mesh::setMaterial(MaterialHandle material)
+ void Mesh::setMaterial(Material material)
  {
      _material = material;
  }

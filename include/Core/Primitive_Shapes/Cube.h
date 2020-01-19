@@ -1,5 +1,6 @@
 #pragma once
 #include "PrimitiveObject.h"
+#include <glad/glad.h>
 
 
 class Cube : public PrimitiveObject

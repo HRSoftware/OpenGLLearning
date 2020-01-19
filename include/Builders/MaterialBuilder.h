@@ -8,22 +8,23 @@
 class MaterialBuilder
 {
     public:
-        MaterialBuilder(TextureCache& cache) : textureCache(cache){ };
+        MaterialBuilder(ResourceCache& cache) : textureCache(cache.textureCache), shaderCache(cache.shaderCache){ };
         ~MaterialBuilder();
         MaterialBuilder& create(const int id, std::string name = "DefaultTexture");
-        MaterialBuilder& addTextures(std::vector<TextureHandle>& _textures);
-        MaterialBuilder& addTexture(TextureHandle texture);
-        void loadTexturesFromAIMaterial(aiMaterial* mat, std::string directory);
-        MaterialBuilder& addShader(ShaderHandle _shader);
+        MaterialBuilder& addTextures(std::vector<Texture>& _textures);
+        MaterialBuilder& addTexture(Texture texture);
+        MaterialBuilder& loadTexturesFromAIMaterial(aiMaterial* mat, std::string directory);
+        MaterialBuilder& addShader(Shader _shader);
         Material build();
 
     private:
         
         std::string materialName;
-        std::vector<TextureHandle> textureHandles;
-        ShaderHandle shader;
+        std::map<aiTextureType, int> textureHandles;
+        Shader shader;
 
         TextureCache& textureCache;
+        ShaderCache& shaderCache;
         int resID = -1;
 };
 
@@ -31,12 +32,12 @@ class MaterialBuilder
 class MaterialFactory
 {
 public:
-    MaterialFactory(TextureCache& cache) : builder(cache){};
+    MaterialFactory(ResourceCache& cache) : builder(cache){};
 
-    Material createBasicMaterial(const int id, const std::string name, ShaderHandle shdr)
+    Material createBasicMaterial(const int id, const std::string name, Shader _shader)
     {
         Material newMaterial = builder.create(id, name)
-            .addShader(shdr)
+            .addShader(_shader)
             .build();
         return newMaterial;
     }

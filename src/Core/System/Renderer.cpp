@@ -1,6 +1,7 @@
 
 #include "../../../include/Core/System/Renderer.h"
 #include "../../../include/Core/Material.h"
+#include "../../../include/Helpers/OpenGLCalls.h"
 
 
 std::shared_ptr<Model> Renderable::getModel(std::string modelName)
@@ -13,15 +14,6 @@ std::shared_ptr<Model> Renderable::addModel(std::string fileName)
     std::shared_ptr<Model> model = Renderable::getModel(fileName);
     return model != nullptr ? model : Renderable::getModel(fileName);
 }
-
-void Renderer::setCamera(Camera& cam)
-{
-    _currentCamera = &cam;
-}
-
-
-
-
 
 void Renderer::addLightToScene(IBaseLight* light)
 {
@@ -81,8 +73,8 @@ void Renderer::renderMesh(int VAO, int indiceCount)
 
 void Renderer::setUpShader(Material material, bool textured)
 {
-    activeShader = *material.getShader().getResourcePointer();
-    activeShader.use();
+    activeShader = material.shader;
+    HR::useProgram(activeShader.programID);
     if (textured) {
         // bind appropriate textures
         unsigned int diffuseNr = 1;
@@ -91,23 +83,23 @@ void Renderer::setUpShader(Material material, bool textured)
         unsigned int heightNr = 1;
 
         int _textureIndex = 0;
-        for ( auto _texture : material.getAllTextures() )
+        for ( auto _texture : material.textures )
         {
             glActiveTexture(GL_TEXTURE0 + _textureIndex);
 
             switch ( _texture.second )
             {
             case aiTextureType_DIFFUSE:
-                activeShader.setInt(("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
+                HR::setInt(activeShader, ("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
                 break;
             case aiTextureType_SPECULAR:
-                activeShader.setInt(("texture_specular" + std::to_string(specularNr++)), _textureIndex);
+                HR::setInt(activeShader, ("texture_specular" + std::to_string(specularNr++)), _textureIndex);
                 break;
             case aiTextureType_NORMALS:
-                activeShader.setInt(("texture_normal" + std::to_string(normalNr++)), _textureIndex);
+                HR::setInt(activeShader, ("texture_normal" + std::to_string(normalNr++)), _textureIndex);
                 break;
             case aiTextureType_HEIGHT:
-                activeShader.setInt(("texture_height" + std::to_string(heightNr++)), _textureIndex);
+                HR::setInt(activeShader, ("texture_height" + std::to_string(heightNr++)), _textureIndex);
                 break;
             default:
                 break;
@@ -121,7 +113,7 @@ void Renderer::setUpShader(Material material, bool textured)
     }
 }
 
-void Renderer::renderGameObject_ToDepthBuffer(GameObject gameobj)
+void Renderer::renderGameObject_ToDepthBuffer(const GameObject& gameobj)
 {
     for ( auto mesh : gameobj.getMeshes())
     {
@@ -132,7 +124,7 @@ void Renderer::renderGameObject_ToDepthBuffer(GameObject gameobj)
 void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBatch, Shader shader)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, _framebufferDepth);
-    shader.use();
+    HR::useProgram(shader.programID);
     glViewport(0, 0, _shadowWidth, _shadowHeight);
     
 
@@ -140,10 +132,10 @@ void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBat
       _light->useLight();
 
        //shader.setVec3("viewPos", _light->getPosition());
-      shader.setMat4("lightSpaceMatrix", _light->getShadowViewProjectionMatrix(true));
+      HR::setMat4(shader,"lightSpaceMatrix", _light->getShadowViewProjectionMatrix(true));
 
       for (auto GO : renderBatch) {
-        shader.setMat4("modelMatrix", GO.second.getModelMatrix());
+        HR::setMat4(shader, "modelMatrix", GO.second.getModelMatrix());
         renderGameObject_ToDepthBuffer(GO.second);
          
       }
@@ -157,12 +149,18 @@ void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, bool textu
     for (auto GO : renderBatch) {
         for(auto mesh : GO.second.getMeshes())
         {
-            if (mesh.getMaterial().getResourceID() != activeMaterial->getResourceID()) {
-                activeMaterial = mesh.getMaterial().getResourcePointer();
-                setUpShader(*activeMaterial, textured);
-                activeMaterial->Use();
-            } 
-            renderGameObject(GO.second, textured, false);
+            if (mesh.getMaterial().materialName != activeMaterial.materialName) {
+                activeMaterial = mesh.getMaterial();
+                HR::currentShaderName = mesh.getMaterial().shader.shaderName;
+                setUpShader(activeMaterial, textured);
+                HR::useProgram(activeMaterial.shader.programID);
+            }
+            
+            setUpShader(mesh.getMaterial(), textured);
+            HR::setMat4(mesh.getMaterial().shader, "view", SceneStats::currentCamera->GetViewMatrix());
+            HR::setMat4(mesh.getMaterial().shader,"model", GO.second.getModelMatrix());
+           // renderGameObject(GO.second, textured, false);
+            renderMesh(mesh.getVAO(), mesh.getIndices().size());
         }
     }
 }
@@ -170,12 +168,12 @@ void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, bool textu
 void Renderer::renderGameObject(GameObject gameObj, bool texture = true, bool requiredShaderSetUp = false)
 {
     //if(requiredShaderSetUp)
-    for(Mesh mesh : gameObj.getMeshes())
-    {
-        setUpShader(*mesh.getMaterial().getResourcePointer(), texture);
-       mesh.getMaterial().getResourcePointer()->getShader().getResourcePointer()->setMat4("view", _currentCamera->GetViewMatrix());
-       mesh.getMaterial().getResourcePointer()->getShader().getResourcePointer()->setMat4("model", gameObj.getModelMatrix());
-    }
+    //for(Mesh mesh : gameObj.getMeshes())
+    //{
+    //                 //redundant??
+    //   HR::setMat4(mesh.getMaterial().shader, "view", _currentCamera->GetViewMatrix());
+    //   HR::setMat4(mesh.getMaterial().shader,"model", gameObj.getModelMatrix());
+    //}
         
 
     

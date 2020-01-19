@@ -3,44 +3,49 @@
 
 
 
-GameObjectBuilder& GameObjectBuilder::create(std::string name)
+GameObjectBuilder& GameObjectBuilder::create(const std::string& name)
 {
     _goName = name;
     return *this;
 }
 
-GameObjectBuilder& GameObjectBuilder::addMeshes(std::vector<Mesh> _meshes)
+GameObjectBuilder& GameObjectBuilder::addMeshes(const std::vector<Mesh>& _meshes)
 {
-    
-    _model.getResourcePointer()->meshes = _meshes;
+    _model.meshes = _meshes;
     return *this;
 }
 
-GameObjectBuilder& GameObjectBuilder::addModel(std::string path, std::string name)
+GameObjectBuilder& GameObjectBuilder::addModel(const Model& model)
+{
+    _model = model;
+    return *this;
+}
+
+GameObjectBuilder& GameObjectBuilder::addModel(const std::string& path, const std::string& name)
 {
     _model = modelFactory.create(name, path);
     return *this;
 }
 
-GameObject GameObjectBuilder::build()
+GameObject GameObjectBuilder::build() const
 {
     return GameObject(_goName, _model);
 }
 
-GameObjectHandle GameObjectFactory::create(string gameObjectName)
+GameObject GameObjectFactory::create(const string& gameObjectName)
 {
-    GameObject newObject = GOBuilder.create(gameObjectName)
+    const auto newObject = GOBuilder.create(gameObjectName)
         .build();
     return goMap.addGameObject(gameObjectName, newObject);
 };
 
-GameObjectHandle GameObjectFactory::createFloorGrid(std::string name, FloorGrid grid)
+GameObject GameObjectFactory::createFloorGrid(const std::string& name, FloorGrid& grid)
 {
-   GameObject go =  GOBuilder.create(name).addMeshes({ grid.getMesh() }).build();
-   return goMap.addGameObject(name, go);
+   const auto GO =  GOBuilder.create(name).addModel({-1, {grid.getMesh()}}).build();
+   return goMap.addGameObject(name, GO);
 }
 
-GameObjectHandle GameObjectFactory::createWithModel(std::string name, std::string modelPath)
+GameObject GameObjectFactory::createWithModel(const std::string& name, const std::string& modelPath)
 {
     GameObject go = GOBuilder.create(name)
         .addModel(modelPath, modelPath)

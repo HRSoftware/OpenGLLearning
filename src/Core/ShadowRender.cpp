@@ -1,5 +1,6 @@
 
 #include "../../include/Core/ShadowRender.h"
+#include "../../include/Helpers/OpenGLCalls.h"
 
 
 void ShadowRender::castShadows(std::vector<GameObject*> &renderableObjects)
@@ -18,10 +19,10 @@ void ShadowRender::castShadows(std::vector<GameObject*> &renderableObjects)
    {
       light->useLight();
       _shadowMatrixWithBias = light->getShadowViewProjectionMatrix(true) * _shadowBiasMatrix;
-      _shadowShader.setMat4("lightSpaceMatrix", _shadowMatrixWithBias);
+      HR::setMat4(_shadowShader, "lightSpaceMatrix", _shadowMatrixWithBias);
       for ( auto renderable : renderableObjects )
       {
-         _shadowShader.setMat4("model", renderable->getModelMatrix());
+         HR::setMat4(_shadowShader, "model", renderable->getModelMatrix());
       }
    }
    glBindFramebuffer(GL_FRAMEBUFFER, 0);

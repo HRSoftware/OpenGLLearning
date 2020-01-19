@@ -5,11 +5,11 @@
 void Skybox::Draw(glm::mat4 view, glm::mat4 projection)
 {
 	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-	skyShader.use();
-	skyShader.setInt("skybox", 0);
+	HR::useProgram(skyShader.programID);
+	HR::setInt(skyShader,"skybox", 0);
 
-	skyShader.setMat4("view", glm::mat4(glm::mat3(view)));
-	skyShader.setMat4("projection", projection);
+	HR::setMat4(skyShader, "view", glm::mat4(glm::mat3(view)));
+	HR::setMat4(skyShader, "projection", projection);
 	
 
 	glBindVertexArray(skyboxVAO);
