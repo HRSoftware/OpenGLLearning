@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../CurrentSceneStats.h"
-
+#include "../Camera.h"
+#include <glfw3.h>
 inline bool firstMouse = true;
 class InputController
 {
@@ -9,11 +9,21 @@ class InputController
 	InputController(){}
 	InputController(GLFWwindow& window, Camera* cam = nullptr)
 	{
-        firstMouse = true;
+		_window = &window;
+		firstMouse = true;
+		InputController::_camera = cam;
 	}
 
+
+	void setCamera(Camera& newCamera)
+	{
+		_camera = &newCamera;
+	}
+
+	static Camera* _camera;
 	static float lastX, lastY;
 	private:
+		 GLFWwindow* _window;
 		 //bool firstMouse; 
 		 
 		 

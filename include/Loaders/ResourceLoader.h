@@ -19,7 +19,7 @@ template<>
 class ResourceLoader<Texture>
 {
     public:
-static Texture loadNewResource(int id, std::string pathToFile, aiTextureType type)
+    static Texture loadNewResource(int id, std::string pathToFile, aiTextureType type)
     {
         return createTexture(id, pathToFile, type);
     }
@@ -27,33 +27,42 @@ static Texture loadNewResource(int id, std::string pathToFile, aiTextureType typ
     private:
     static Texture createTexture(int id, std::string pathToFile, aiTextureType type)
     {
-        Texture newTexture;
-        newTexture.type = type;
-        newTexture.id = createTextureIDFromFile(pathToFile, aiTextureType_UNKNOWN);
+        Texture newTexture(id);
+        newTexture._path = pathToFile;
+        newTexture._textureID = createTextureIDFromFile(pathToFile.c_str(),"", true);
+        newTexture._textureType = type;
 
         return newTexture;
 
     }
-    static int createTextureIDFromFile(std::string _filePath, bool gamma)
+    static int createTextureIDFromFile(const char* path, const std::string& directory, bool gamma)
         {
-          /*  std::filesystem::path filePath = _filePath;
+            std::filesystem::path filePath = path;
             std::string fullFilePath;
             std::string fullbackFilePath = std::string(filePath.parent_path().string() + "/textures/" + filePath.filename().string());
 
-            fullFilePath = std::regex_replace(fullFilePath, std::regex("//"), "/");
-            fullbackFilePath = std::regex_replace(fullbackFilePath, std::regex("//"), "/");*/
 
-            if(!std::filesystem::exists(_filePath))
+            fullFilePath = directory == "" ? filePath.string() : directory + "/" + filePath.string();
+            fullFilePath = std::regex_replace(fullFilePath, std::regex("//"), "/");
+            fullbackFilePath = std::regex_replace(fullbackFilePath, std::regex("//"), "/");
+
+            if (!std::filesystem::exists(fullFilePath))
             {
-                std::cout << "\tTexture not found for " << _filePath << std::endl;
-                return -1;
+                fullFilePath = fullbackFilePath;
+                if(!std::filesystem::exists(fullFilePath))
+                {
+                    std::cout << "\tTexture not found for " << filePath.parent_path() << "\t" <<filePath.filename() << std::endl;
+                    return -1;
+                }
+
+                std::cout << "texture file found!" << std::endl;
             }
 
             int textureID;
             glGenTextures(1, reinterpret_cast<GLuint*>(&textureID));
 
             int width, height, nrComponents;
-            unsigned char* data = stbi_load(_filePath.c_str(), &width, &height, &nrComponents, 0);
+            unsigned char* data = stbi_load(fullFilePath.c_str(), &width, &height, &nrComponents, 0);
             if (data)
             {
                 GLenum format;
@@ -86,7 +95,7 @@ static Texture loadNewResource(int id, std::string pathToFile, aiTextureType typ
             }
             else
             {
-                std::cout << "Texture failed to load at path: " << _filePath << std::endl;
+                std::cout << "Texture failed to load at path: " << path << std::endl;
                 stbi_image_free(data);
             }
 
@@ -161,10 +170,10 @@ public:
     explicit ResourceLoader(ResourceCache& cache)
         : resourceCache(cache) {}
 
-    Model loadNewResource(std::string name, string path, std::string shader, int _shaderID = -1)
+    Model loadNewResource(int id, std::string name, string path)
     {
         ModelBuilder model(resourceCache);
-        return model.create(GUID_Allocator::getNewUniqueGUID(), name, shader)
+        return model.create(id, name)
                     .loadFromPath(path)
                     .build();
     }

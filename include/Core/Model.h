@@ -27,7 +27,7 @@ using namespace std;
 class Model : Resource<Model>
 {
 public:
-    std::map<aiTextureType, int> textureHandles; //redundant??
+    vector<TextureHandle> textureHandles; //redundant??
     vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
@@ -55,10 +55,6 @@ public:
     {
         //meshes.push_back(processMesh(pos, _indices));
     }
-    Model(int id, vector<Mesh> _meshes) : Resource<Model>(id, RT_Model)
-    {
-        meshes = _meshes;
-    }
 
     int getResourceID()
     {
@@ -69,7 +65,7 @@ public:
     {
         return resourceType;
     }
-    void setMaterial(Material material);
+    void setMaterial(MaterialHandle material);
     //Mesh processMesh(std::vector<glm::vec3> pos, std::vector<unsigned int> _indices);
 
 private:

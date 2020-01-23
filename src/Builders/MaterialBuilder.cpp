@@ -6,41 +6,36 @@ MaterialBuilder& MaterialBuilder::create(const int id, std::string name)
     resID = id;
     materialName = name;
     textureHandles.clear();
-    
     return *this;
 }
 
-MaterialBuilder& MaterialBuilder::addShader(Shader _shader)
+MaterialBuilder& MaterialBuilder::addShader(ShaderHandle _shader)
 {
     shader = _shader;
     return *this;
 }
 
-MaterialBuilder& MaterialBuilder::addTextures(std::vector<Texture>& _textures)
+MaterialBuilder& MaterialBuilder::addTextures(std::vector<TextureHandle>& _textures)
 {
-    for (auto t : _textures)
-        textureHandles.insert_or_assign(t.type, t.id);
-
+    textureHandles = _textures;
     return *this;
 }
 
-MaterialBuilder& MaterialBuilder::addTexture(Texture texture)
+MaterialBuilder& MaterialBuilder::addTexture(TextureHandle texture)
 {
-    textureHandles.insert_or_assign(texture.type, texture.id);
+    textureHandles.push_back(texture);
     return *this;
 }
 
-MaterialBuilder& MaterialBuilder::loadTexturesFromAIMaterial(aiMaterial* mat, std::string directory)
+void MaterialBuilder::loadTexturesFromAIMaterial(aiMaterial* mat, std::string directory)
 {
-    aiString name;
-    mat->Get(AI_MATKEY_NAME, name);
-    string matName = name.C_Str();
+
     filesystem::path filepath = directory;
     string path = filepath.parent_path().string();
     string file = filepath.filename().string();
 
-    std::vector<Texture> textures;
-    aiTextureType _type = aiTextureType_UNKNOWN;
+    std::vector<TextureHandle> textures;
+    aiTextureType _type;
     std::vector<std::string> types = {
         "texture_diffuse",
         "texture_normal",
@@ -65,21 +60,24 @@ MaterialBuilder& MaterialBuilder::loadTexturesFromAIMaterial(aiMaterial* mat, st
         for (unsigned int i = 0; i < mat->GetTextureCount(_type); i++) {
             aiString str;
             mat->GetTexture(_type, i, &str);
+            // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
+            bool skip = false;
+           TextureHandle textHandle =  textureCache.findTexture("Resources\\Models\\" + path + "\\" + str.data);
+           textHandle.getResourcePointer()->_textureType = _type;
+            /*if (textHandle.getResourceID() == -1) {
+                std::string path = directory + "/" + str.C_Str();
+                path = std::regex_replace(path, std::regex("//"), "/");
+                textHandle = textureCache.addTexture(path, (path, _type));
+            }*/
 
-            string path = filepath.string() + "/" + str.data;
-           int textureID = textureCache.findTexture(path).id;
-
-           textureCache.setTextureType(textureID, _type);
-
-            textureHandles.insert_or_assign(_type, textureID);
+            textureHandles.push_back(textHandle);
         }
     }
-    return *this;
 }
 
 Material MaterialBuilder::build()
 {
-    return Material{ true, materialName, textureHandles, shader };
+    return Material(resID, materialName, textureHandles, shader);
 }
 
 MaterialBuilder::~MaterialBuilder() {}

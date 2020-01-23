@@ -9,11 +9,15 @@ class ModelCache : Cache<Model>
 {
 public:
     ModelCache() {};
-    Model& findModel(std::string name)
+    ModelHandle findModel(std::string name)
     {
-        return model_map[name];
+        auto modelHandle = model_map[name];
+        if(modelHandle.getResourceID() != -1)
+            return ModelHandle(modelHandle.getResourceID(), &model_map[name], RT_Texture) ;
+
+        return ModelHandle();
     }
-    Model addModel(std::string name, Model newModel);
+    ModelHandle addModel(std::string name, Model newModel);
     private:
     
     std::map<std::string, Model> model_map;

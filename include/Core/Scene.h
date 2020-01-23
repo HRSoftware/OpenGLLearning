@@ -1,11 +1,12 @@
 #pragma once
 
-#include "CurrentSceneStats.h"
+#include "Camera.h"
 #include <string>
 #include "../Managers/ModelManager.h"
 #include "Lighting.h"
 #include "floorGrid.h"
 #include "Skybox.h"
+#include "glfw3.h"
 #include "System/InputController.h"
 
 
@@ -23,22 +24,20 @@
 class Scene
 {
 public:
-	Scene(const shared_ptr<struct GLFWwindow*>& wnd, Renderer* renderer) : resourceManager(resourceCache)
+	Scene(GLFWwindow& wnd, Renderer* renderer) : _window(&wnd), resourceManager(resourceCache)
 	{
-        SceneStats::window = wnd;
-        SceneStats::currentCamera = std::make_shared<Camera>(Camera({ 1.f, 1.f, 1.f }, { 0.f, 1.f, 0.f }));
       _renderer = renderer;
 	}
 	bool initScene(Camera cam = Camera({ 1.f, 1.f, 1.f }, {0.f, 1.f, 0.f}));
-	void moreHouses();
 	void loadResources();
 	void run();
 	void stop();
 	void save();
-
+	Camera* getCurrentCamera();
 
 
 	private:
+	Camera _currentCamera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 	GLFWwindow* _window;
 	InputController* _inputController;
 	Renderer* _renderer;
@@ -49,62 +48,73 @@ public:
 
     ResourceCache resourceCache;
     ResourceManager resourceManager;
- 
+    
+	glm::vec2 _screenDimensions;
+
 	DirectionalLight _sunLight;
 	FloorGrid _floorGrid;
 	Skybox skybox;
 
+	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 
+   int _screenWidth = 0;
+   int _screenHeight = 0;
+
+	float lastX = 0;
+	float lastY = 0;
 	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
 };
 
 static void processInput(GLFWwindow* _window, float deltaTime)
 {
+
 	if (glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(_window, true);
 
 	if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
-		SceneStats::currentCamera->ProcessKeyboard(FORWARD, deltaTime);
+		InputController::_camera->ProcessKeyboard(FORWARD, deltaTime);
 	if (glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS)
-        SceneStats::currentCamera->ProcessKeyboard(BACKWARD, deltaTime);
+		InputController::_camera->ProcessKeyboard(BACKWARD, deltaTime);
 	if (glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS)
-        SceneStats::currentCamera->ProcessKeyboard(LEFT, deltaTime);
+		InputController::_camera->ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS)
-        SceneStats::currentCamera->ProcessKeyboard(RIGHT, deltaTime);
+		InputController::_camera->ProcessKeyboard(RIGHT, deltaTime);
 
 
 
 	if (glfwGetKey(_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        SceneStats::currentCamera->MovementSpeed = SceneStats::currentCamera->boostSpeed;
+		InputController::_camera->MovementSpeed = InputController::_camera->boostSpeed;
 
 	if (glfwGetKey(_window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-        SceneStats::currentCamera->MovementSpeed = SceneStats::currentCamera->normalSpeed;
+		InputController::_camera->MovementSpeed = InputController::_camera->normalSpeed;
 }
 
+	static float lastX = 0;
+	static float lastY = 0;
 static void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	
 	
 	if (firstMouse)
 	{
-        SceneStats::lastX = xpos;
-        SceneStats::lastY = ypos;
-		SceneStats::firstMouse = false;
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
 	}
 
-	float xoffset = xpos - SceneStats::lastX;
-	float yoffset = SceneStats::lastY - ypos; // reversed since y-coordinates go from bottom to top
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-    SceneStats::lastX = xpos;
-    SceneStats::lastY = ypos;
+	lastX = xpos;
+	lastY = ypos;
 
-    SceneStats::currentCamera->ProcessMouseMovement(xoffset, yoffset);
+	InputController::_camera->ProcessMouseMovement(xoffset, yoffset);
 }
 
 static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    SceneStats::currentCamera->ProcessMouseScroll(yoffset);
+	InputController::_camera->ProcessMouseScroll(yoffset);
 }
 

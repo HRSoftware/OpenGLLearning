@@ -14,9 +14,6 @@ CppProperties.json
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-# DoxyGen folder
-doxygen/
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

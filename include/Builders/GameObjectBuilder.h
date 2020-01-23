@@ -10,15 +10,14 @@ class GameObjectBuilder
 {
     public:
         GameObjectBuilder(ResourceCache& cache) : modelFactory(cache) {};
-        GameObjectBuilder& create(const std::string& name);
-        GameObjectBuilder& addMeshes(const std::vector<Mesh>& _meshes);
-        GameObjectBuilder& addModel(const Model& model);
-        GameObjectBuilder& addModel(const std::string&, const std::string& name);
-        GameObject build() const;
+        GameObjectBuilder& create(std::string name);
+        GameObjectBuilder& addMeshes(std::vector<Mesh> _meshes);
+        GameObjectBuilder& addModel(std::string, std::string name);
+        GameObject build();
         
     private:
         std::string _goName;
-        Model _model;
+        ModelHandle _model;
         ModelFactory modelFactory;
 };
 
@@ -29,10 +28,10 @@ class GameObjectFactory
         GameObjectFactory(ResourceCache& cache) : GOBuilder(GameObjectBuilder(cache)), 
                                                   goMap(cache.gameObjectCache),
                                                   modelCache(cache.modelCache){};
-        GameObject create(const string& gameObjectName);
+        GameObjectHandle create(string gameObjectName);
 
-        GameObject createFloorGrid(const std::string& name, FloorGrid& grid);
-        GameObject createWithModel(const std::string& name, const std::string& modelPath);
+        GameObjectHandle createFloorGrid(std::string name, FloorGrid);
+        GameObjectHandle createWithModel(std::string name, string modelPath);
 
     protected:
         GameObjectBuilder GOBuilder;

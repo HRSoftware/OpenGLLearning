@@ -2,14 +2,18 @@
 
 #include "../../include/Cache/GameObjectCache.h"
 
-GameObject GameObjectCache::findGameObject(std::string gameObjectName)
+GameObjectHandle GameObjectCache::findGameObject(std::string gameObjectName)
 {
-    return  gameObject_map[gameObjectName];
+    auto gameObject = gameObject_map[gameObjectName];
+    if(gameObject.getResourceID() != -1)
+        return GameObjectHandle(gameObject.getResourceID(), &gameObject_map[gameObjectName], RT_Material);
+
+    return GameObjectHandle();
 }
 
-GameObject GameObjectCache::addGameObject(const std::string& name, GameObject gameobject)
+GameObjectHandle GameObjectCache::addGameObject(const std::string& name, GameObject material)
 {
-    gameObject_map.insert_or_assign(name, gameobject);
-    return gameobject;
+    gameObject_map.insert_or_assign(name, material);
+    return findGameObject(name);
 }
 

@@ -148,7 +148,7 @@
 //    return Mesh(vertices, indices, mat);
 //}
 
-void Model::setMaterial(Material material)
+void Model::setMaterial(MaterialHandle material)
 {
     for (Mesh mesh : meshes) {
         mesh.setMaterial(material);

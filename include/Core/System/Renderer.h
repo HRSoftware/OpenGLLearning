@@ -1,5 +1,5 @@
 #pragma once
-#include "../CurrentSceneStats.h"
+#include "../Camera.h"
 
 #include "../GameObject.h"
 #include "../Lighting.h"
@@ -20,29 +20,36 @@ class Renderable
 
 struct RenderDetails
 {
-   RenderDetails()
+   RenderDetails(): _cam(nullptr), _screenHeight(0), _screenWidth(0)
    {
       
    }
 
-   int _screenHeight = SceneStats::_screenHeight;
-   int _screenWidth = SceneStats::_screenWidth;
+   RenderDetails(Camera& cam, int screenHeight = 768, int screenWidth = 1024)
+   {
+      _cam = &cam;
+      _screenHeight = screenHeight;
+      _screenWidth = screenWidth;
+   }
+   Camera* _cam;
+   int _screenHeight, _screenWidth;
 };
 
 class Renderer
 {
    public:
-        Renderer(int screenW = 1366, int screenH = 768) : _framebuffer(0), _framebufferDepth(0)
+        Renderer(int screenW = 1366, int screenH = 768) : _framebuffer(0), _currentCamera(nullptr), _framebufferDepth(0)
         {
-           _screenWidth = SceneStats::_screenWidth;
-           _screenHeight = SceneStats::_screenHeight;
+           _screenWidth = screenW;
+           _screenHeight = screenH;
            _shadowHeight = screenH / 2;
            _shadowWidth = screenW / 2;
            //initDepthRender();
         }
 
+        void setCamera(Camera& cam);
         void renderGameObject(GameObject gameObj, bool texture, bool requiredShaderSetUp);
-        void renderGameObject_ToDepthBuffer(const GameObject& gameobj);
+        void renderGameObject_ToDepthBuffer(GameObject gameobj);
         void renderMesh(int VAO, int indiceCount);
         void setUpShader(Material, bool = true);
         void renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBatch, Shader shader);
@@ -53,6 +60,7 @@ class Renderer
 
    private:
         GLuint _framebuffer;
+        Camera* _currentCamera;
         std::vector<IBaseLight*> _sceneLights;
 
         GLuint _framebufferDepth;
@@ -66,7 +74,7 @@ class Renderer
         GLuint _screenHeight;
         GLuint _shadowWidth, _shadowHeight;
         Shader activeShader;
-        Material activeMaterial;
+        Material* activeMaterial;
 
 
 };

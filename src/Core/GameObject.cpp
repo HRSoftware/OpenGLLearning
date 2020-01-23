@@ -1,51 +1,51 @@
 
-#include <utility>
 #include "../../include/Core/GameObject.h"
 #include "../../include/Helpers/GUIDAllocator.h"
 
-GameObject::GameObject()
+GameObject::GameObject() : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
 {
     _isModelNULL = true;
 }
 
-GameObject::GameObject(FloorGrid floor)
+GameObject::GameObject(FloorGrid floor) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
 {
     _isModelNULL = false;
     GOName = floor.getName();
     _isModelMatrixOutdated = true;
+    _model.getResourcePointer()->meshes = {floor.getMesh()};
 }
 
 
-GameObject::GameObject(const std::string& name, const Model& model)
+GameObject::GameObject(std::string name, ModelHandle model) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
 {
     _isModelNULL = false;
     GOName = name;
-    _model = std::make_shared<Model>(model);
+    _model = model;
     _isModelMatrixOutdated = true;
 }
 
-GameObject::GameObject(std::vector<Vertex> _vertices, std::vector<unsigned> _indices)
+GameObject::GameObject(std::vector<Vertex> _vertices, std::vector<unsigned> _indices) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
 {
     _isModelMatrixOutdated = true;
-    _model->meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
+    _model.getResourcePointer()->meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
 }
 
 GameObject::~GameObject()
 {
 }
 
-void GameObject::setModel(const Model& model)
+void GameObject::setModel(ModelHandle model)
 {
-    _model = std::make_shared<Model>(model);
+    _model = model;
     _isModelMatrixOutdated = true;
     _isModelNULL = false;
 }
 
-void GameObject::setName(const std::string& name)
+void GameObject::setName(std::string name)
 {
     GOName = name;
 }
-std::string GameObject::getName() const
+std::string GameObject::getName()
 {
     return GOName;
 }
@@ -135,7 +135,7 @@ glm::vec3 GameObject::getScale() const
     return _scale;
 }
 
-std::vector<Mesh> GameObject::getMeshes() const
+std::vector<Mesh>& GameObject::getMeshes()
 {
-    return _model->meshes;
+    return _model.getResourcePointer()->meshes;
 }

@@ -1,70 +1,99 @@
 #include "../../include/Core/Primitive_Shapes/Cube.h"
 #include "../../include/Core/Scene.h"
 #include "../../include/Builders/GameObjectBuilder.h"
-#include "../../include/Helpers/OpenGLCalls.h"
-#include "../../include/Core/Nodes/Node.h"
+
 
 
 bool Scene::initScene(Camera cam)
 {
-    glfwGetWindowSize(_window, &SceneStats::_screenWidth, &SceneStats::_screenHeight);
-    SceneStats::lastX = SceneStats::_screenWidth / 2;
-    SceneStats::lastY = SceneStats::_screenHeight / 2;
+    glfwGetWindowSize(_window, &_screenWidth, &_screenHeight);
+    lastX = _screenWidth / 2;
+    lastY = _screenHeight / 2;
 
+
+    _currentCamera = cam;
+    InputController::_camera = &cam;
+
+    _renderDetails = RenderDetails(_currentCamera, _screenWidth, _screenHeight);
     glfwSetCursorPosCallback(_window, mouse_callback);
     
 
     _renderer->initDepthRender();
+    _renderer->setCamera(_currentCamera);
 
     return true;
 }
-void Scene::moreHouses()
-{
-    int houseNum = 1;
-    for(int i = 0; i < 10; i++)
-        for ( int j = 0; j < 10; j++ )
-        {
-            GameObject house = resourceCache.gameObjectCache.findGameObject("Building1");
-            house.setPosition({ 10.f * (i + 1), 0, 10.f * (j + 1)});
 
-            _GOVec.insert_or_assign("House" + to_string(houseNum), house);
-            houseNum++;
-        }
-}
 void Scene::loadResources()
 {
     resourceManager.LoadAllBasicResources();
 
-    _GOVec.insert_or_assign("House", resourceCache.gameObjectCache.findGameObject("Building1"));
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "basicShader", "basicShader");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "shadowMapShader", "shadowMapShader");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "materialShader");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "skyboxShader");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "gridShader");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "framebufferShader");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "lightingShader", "basicLighting");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "modelLoadingShader");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "debugDepthShader");
+
+    resourceManager.loadNewModel("Building1", "HighRise\\Residential Buildings 010.obj");
+
+
+
+    
+    
+    /*_shaderVec.emplace("BasicShader", Shader("basicShader"));
+    _shaderVec.emplace("shadowMapShaderShader" ,Shader("shadowMapShader", true));
+    _shaderVec.emplace("materialShader" ,Shader("materialShader"));
+    _shaderVec.emplace("skyboxShader" ,Shader("skyboxShader", true));
+    _shaderVec.emplace("gridShader" ,Shader("gridShader", true));
+    _shaderVec.emplace("debugDepth" ,Shader("debugDepth"));
+    _shaderVec.emplace("framebufferShader" ,Shader("framebufferShader"));
+    _shaderVec.emplace("lightingShader" ,Shader("basicLighting"));
+    _shaderVec.emplace("modelLoadingShader" ,Shader("modelLoadingShader", true));*/
+
+
     
 
+    resourceCache.gameObjectCache.findGameObject("Building1").getResourcePointer()->setPosition({ 0.1f, 0.f, -0.2f });
+    resourceCache.gameObjectCache.findGameObject("Building1").getResourcePointer()->setScale({ 0.005f, 0.005f, 0.005f });
+
+    //resourceCache.gameObjectCache.findGameObject("Building2")->setPosition({ 10.f, 0.f, 10.f });
+    //resourceCache.gameObjectCache.findGameObject("Building2")->setScale({ 0.005f, 0.005f, 0.005f });
+    //resourceCache.gameObjectCache.findGameObject("Building2")->setAngle(90, { 0.0, 1.f, 0.0f });
+
+    //resourceCache.gameObjectCache.findGameObject("Building3")->setPosition({ 25.f, 0.f, 5.f });
+    //resourceCache.gameObjectCache.findGameObject("Building3")->setScale({ 0.05f, 0.05f, 0.05f });
 
      DirectionalLight _sunLight(glm::vec3(.2f, 0.2f, 0.2f), 4.f, { 10.f, 15.f, 4.f });
     _sunLight.setAmbient({ 0.2f, 0.2f, 0.2f });
     _sunLight.setDiffuse({ 0.5f, 0.5f, 0.5f });
     _sunLight.setSpecular({ 0.1f,0.1f, 0.1f });
     _sunLight.setDirection({ -0.2f, -1.0f, -0.3f });
+    
+    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setFloat("shininess", 10.0f);
+    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setVec3("light.position", _sunLight.getPosition());
+    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setVec3("light.ambient", _sunLight.getAmbient());
+    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setVec3("light.diffuse", _sunLight.getDiffuse());
+    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setFloat("light.intensity", _sunLight.getStrength());
+    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setVec3("light.specular", _sunLight.getSpecular());
 
-    HR::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "shininess", 10.f);
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.position", _sunLight.getPosition());
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.ambient", _sunLight.getAmbient());
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.diffuse", _sunLight.getDiffuse());
-    HR::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.intensity", _sunLight.getStrength());
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.specular", _sunLight.getSpecular());
-
-    HR::setFloat(resourceCache.shaderCache.findShader("lightingShader"), "shininess", 10.f);
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"),"light.position", _sunLight.getPosition());
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"),"light.ambient", _sunLight.getAmbient());
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"),"light.diffuse", _sunLight.getDiffuse());
+    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setFloat("shininess", 10.f);
+    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setVec3("light.position", _sunLight.getPosition());
+    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setVec3("light.ambient", _sunLight.getAmbient());
+    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setVec3("light.diffuse", _sunLight.getDiffuse());
     //_shaderVec.at("lightingShader").setFloat("light.intensity", _sunLight.getStrength());
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"),"light.specular", _sunLight.getSpecular());
+    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setVec3("light.specular", _sunLight.getSpecular());
 
-    skybox.setShader(resourceCache.shaderCache.findShader("skyboxShader"));
+    skybox.setShader(*resourceCache.shaderCache.findShader("skyboxShader").getResourcePointer());
         
-    //resourceCache.modelCache.findModel("House").setMaterial(resourceCache.materialCache.findMaterial("building1Material"));
+
+    resourceCache.modelCache.findModel("Building1").getResourcePointer()->setMaterial(resourceCache.materialCache.findMaterial("building1Material"));
     //resourceCache.modelCache.findModel("Building2")->setMaterial(resourceCache.materialCache.findMaterial("building1Material"));
     //resourceCache.modelCache.findModel("Building3")->setMaterial(resourceCache.materialCache.findMaterial("building2Material"));
-
+    //resourceCache.modelCache.findModel("gridFloor")->setMaterial(resourceCache.materialCache.findMaterial("gridFloorMaterial"));
 };
 
 namespace ImGui {
@@ -94,6 +123,8 @@ namespace ImGui {
 void Scene::run()
 {
     glEnable(GL_DEPTH_TEST);
+    InputController::_camera = &_currentCamera;
+    _renderer->setCamera(_currentCamera);
 
     const float near_plane = 0.01f;
     const float far_plane = 1000.f;
@@ -104,58 +135,52 @@ void Scene::run()
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    float numberOfFrames = 0;
-    lastFrame = glfwGetTime();
-    float drawTime;
-    UI::generate_data();
+    Cube testCube;
 
+    bool show_demo_window = true;
 
     while (glfwWindowShouldClose(_window) == false) {
         float currentFrame = glfwGetTime();
-        SceneStats::deltaTime = currentFrame - lastFrame;
-        /*numberOfFrames++;
-
-        if(deltaTime >= 1.0)
-        {
-            drawTime = 1000.0/float(numberOfFrames);
-            numberOfFrames = 0;
-            lastFrame += 1.0;
-        }*/
-        //lastFrame = currentFrame;
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
         UI::updateUI(_window);
         UI::selectList(_GOVec);
+
         ImGui::Render();
-        processInput(_window, SceneStats::deltaTime);
-
-        HR::useProgram(resourceCache.shaderCache.findShader("modelLoadingShader").programID);
-        HR::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"), "lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
 
 
-        glViewport(0, 0, SceneStats::_screenWidth, SceneStats::_screenHeight);
+        processInput(_window, deltaTime);
+        
+        //shaderCache.findShader("debugDepthShader")->use();
+        //_renderer->renderBatch_ToDepthBuffer(_GOVec, *resourceCache.shaderCache.findShader("debugDepthShader"));
+
+        resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->use();
+        resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setMat4("lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
+
+
+        glViewport(0, 0, _screenWidth, _screenHeight);
 
         glClearColor(0.25f, 0.25f, 0.5f, 1.0f);		// Background Fill Color
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 projection = glm::perspective(SceneStats::currentCamera->Zoom, static_cast<float>(SceneStats::_screenWidth) / static_cast<float>(SceneStats::_screenHeight), 0.01f, 1000.f);
-        glm::mat4 view = SceneStats::currentCamera->GetViewMatrix();
+        glm::mat4 projection = glm::perspective(_currentCamera.Zoom, (float)_screenWidth / (float)_screenHeight, 0.01f, 1000.f);
+        glm::mat4 view = _currentCamera.GetViewMatrix();
 
- 
         if (glfwGetKey(_window, GLFW_KEY_T) == GLFW_PRESS)
             //sunLight.setPosition(camera.Position);
-            SceneStats::currentCamera->Position = _sunLight.getPosition();
-
-        if (glfwGetKey(_window, GLFW_KEY_M) == GLFW_PRESS)
-            moreHouses();
+            _currentCamera.Position = _sunLight.getPosition();
 
         if (glfwGetKey(_window, GLFW_KEY_R) == GLFW_PRESS)
-            _GOVec["House"].rotateBy(0.1f, { 0, 1, 0 });
+            _GOVec["Building1"].rotateBy(0.1f, { 0, 1, 0 });
 
-        HR::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"), "projection", projection);
-       
-        
-        skybox.Draw(view, projection);
+        resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setMat4("projection", projection);
         _renderer->renderBatch(_GOVec);
+        //_renderer->renderGameObject()
+
+        testCube.draw();
+        skybox.Draw(view, projection);
+
         //_renderer->renderGameObject_ToDepthBuffer(lightVec, _GOVec["Building1"], ShaderCache::findShader("lightingShader"));
         
         
@@ -173,6 +198,10 @@ void Scene::stop()
 void Scene::save()
 {
 	
+}
+
+Camera* Scene::getCurrentCamera() {
+	return &_currentCamera;
 }
 
 

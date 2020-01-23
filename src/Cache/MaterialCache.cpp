@@ -1,16 +1,15 @@
 #include "../../include/Cache/MaterialCache.h"
 
-Material MaterialCache::findMaterial(std::string matName)
+MaterialHandle MaterialCache::findMaterial(std::string matName)
 {
-    
-    if (material_map.count(matName) != 0)
-        return material_map[matName];
+    auto materialHndl = material_map[matName];
+    if(materialHndl.getResourceID() != -1)
+        return MaterialHandle(materialHndl.getResourceID(), &material_map[matName], RT_Material);
 
-        return Material();
-
+    return MaterialHandle();
 }
 
-Material MaterialCache::addMaterial(const std::string& name, Material material)
+MaterialHandle MaterialCache::addMaterial(const std::string& name, Material material)
 {
     material_map.insert_or_assign(name, material);
     return findMaterial(name);
