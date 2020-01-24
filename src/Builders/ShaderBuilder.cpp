@@ -16,7 +16,7 @@ ShaderBuilder& ShaderBuilder::addShader(ShaderType shaderType, std::string fileN
 {
     std::string shaderRAWCode;
     std::ifstream shaderFile;
-    fileName = shaderFileName.empty() ? shaderProgramName : shaderFileName;
+    //fileName = shaderFileName.empty() ? shaderProgramName : shaderFileName;
     
 
     shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -50,8 +50,8 @@ ShaderBuilder& ShaderBuilder::addShader(ShaderType shaderType, std::string fileN
             break;
         }
 
-    std::filesystem::path filePath("./Shaders/" + fileName + fileEXT);
-    std::filesystem::path fullbackfilePath("./Shaders/core/" + fileName + fileEXT);
+    std::filesystem::path filePath( fileName + fileEXT);
+    std::filesystem::path fullbackfilePath( fileName + fileEXT);
 
         if (exists(filePath))
             shaderFile.open(filePath);
