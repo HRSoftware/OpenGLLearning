@@ -1,6 +1,6 @@
 #include "../../include/Cache/ModelCache.h"
 
-ModelHandle ModelCache::addModel(std::string name, Model newModel)
+Model ModelCache::addModel(std::string name, Model newModel)
 {
     model_map[name] = newModel;
     //        

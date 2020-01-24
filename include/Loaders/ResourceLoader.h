@@ -111,7 +111,7 @@ class ResourceLoader<Material>
         : textureCache(textureCache) {}
 
     private:
-    /*std::vector<TextureHandle> loadTexturesFromMaterial(aiMaterial* mat, std::string directory)
+    /*std::vector<Texture> loadTexturesFromMaterial(aiMaterial* mat, std::string directory)
     {
         std::vector<std::string> types = {
             "texture_diffuse",
@@ -120,7 +120,7 @@ class ResourceLoader<Material>
             "texture_height"
         };
 
-        std::vector<TextureHandle> textures;
+        std::vector<Texture> textures;
 
         for (std::string _typeString : types) {
             aiTextureType _type;
@@ -140,7 +140,7 @@ class ResourceLoader<Material>
                 aiString str;
                 mat->GetTexture(_type, i, &str);
 
-                TextureHandle textureHandle = textureCache.findTexture(str.C_Str());
+                Texture textureHandle = textureCache.findTexture(str.C_Str());
                 if (textureHandle.getResourceID() == -1)
                     textures.push_back(loadTextureFromMaterial(str, _type, directory));
                 else
@@ -150,7 +150,7 @@ class ResourceLoader<Material>
         return textures;*/
 
     //}
-   /* auto loadTextureFromMaterial(aiString str, aiTextureType type, std::string directory) -> std::vector<TextureHandle>
+   /* auto loadTextureFromMaterial(aiString str, aiTextureType type, std::string directory) -> std::vector<Texture>
     {
         std::string path = directory + "/" + str.C_Str();
         path = std::regex_replace(path, std::regex("//"), "/");
@@ -179,5 +179,38 @@ public:
     }
   
     private:
+    ResourceCache& resourceCache;
+};
+
+template<>
+class ResourceLoader<Shader>
+{
+public:
+    explicit ResourceLoader(ResourceCache& cache)
+        : resourceCache(cache) {}
+
+    Shader loadNewResource(const int shaderBitMask, std::string name, string path)
+    {
+        ShaderBuilder shader;
+
+        shader.createShader(2, name);
+        if ((shaderBitMask & VERTEX) == ShaderType::VERTEX)
+            shader.addShader(VERTEX, path);
+        if ((shaderBitMask & FRAGMENT) == ShaderType::FRAGMENT)
+            shader.addShader(FRAGMENT, path);
+        if ((shaderBitMask & ShaderType::COMPUTE) == ShaderType::COMPUTE)
+            shader.addShader(COMPUTE, path);
+        if ((shaderBitMask & ShaderType::GEOMETRY) == ShaderType::GEOMETRY)
+            shader.addShader(GEOMETRY, path);
+        if ((shaderBitMask & ShaderType::TESS_CONTROL) == ShaderType::TESS_CONTROL)
+            shader.addShader(TESS_CONTROL, path);
+        if ((shaderBitMask & ShaderType::TESS_EVAL) == ShaderType::TESS_EVAL)
+            shader.addShader(TESS_EVAL, path);
+
+   
+       return shader.build();
+    }
+
+private:
     ResourceCache& resourceCache;
 };

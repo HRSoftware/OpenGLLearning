@@ -6,6 +6,7 @@
 
 #include <string>
 #include "../Material.h"
+#include "../../Core/CurrentSceneStats.h"
 
 class Renderable
 {
@@ -51,7 +52,6 @@ class Renderer
         void renderGameObject(GameObject gameObj, bool texture, bool requiredShaderSetUp);
         void renderGameObject_ToDepthBuffer(GameObject gameobj);
         void renderMesh(int VAO, int indiceCount);
-        void setUpShader(Material, bool = true);
         void renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBatch, Shader shader);
         void renderBatch(std::map<string, GameObject>& renderBatch, bool textured = true);
         void renderGameObject(GameObject gameobj, bool texture);

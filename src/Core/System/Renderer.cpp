@@ -79,47 +79,7 @@ void Renderer::renderMesh(int VAO, int indiceCount)
     glActiveTexture(GL_TEXTURE0);
 }
 
-void Renderer::setUpShader(Material material, bool textured)
-{
-    activeShader = *material.getShader().getResourcePointer();
-    activeShader.use();
-    if (textured) {
-        // bind appropriate textures
-        unsigned int diffuseNr = 1;
-        unsigned int specularNr = 1;
-        unsigned int normalNr = 1;
-        unsigned int heightNr = 1;
 
-        int _textureIndex = 0;
-        for ( auto _texture : material.getAllTextures() )
-        {
-            glActiveTexture(GL_TEXTURE0 + _textureIndex);
-
-            switch ( _texture.second )
-            {
-            case aiTextureType_DIFFUSE:
-                activeShader.setInt(("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
-                break;
-            case aiTextureType_SPECULAR:
-                activeShader.setInt(("texture_specular" + std::to_string(specularNr++)), _textureIndex);
-                break;
-            case aiTextureType_NORMALS:
-                activeShader.setInt(("texture_normal" + std::to_string(normalNr++)), _textureIndex);
-                break;
-            case aiTextureType_HEIGHT:
-                activeShader.setInt(("texture_height" + std::to_string(heightNr++)), _textureIndex);
-                break;
-            default:
-                break;
-            }
-
-            // and finally bind the texture
-            glBindTexture(GL_TEXTURE_2D, _texture.first);
-            
-            _textureIndex++;
-        }
-    }
-}
 
 void Renderer::renderGameObject_ToDepthBuffer(GameObject gameobj)
 {
@@ -132,7 +92,7 @@ void Renderer::renderGameObject_ToDepthBuffer(GameObject gameobj)
 void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBatch, Shader shader)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, _framebufferDepth);
-    shader.use();
+    HR::useProgram(shader.programID);
     glViewport(0, 0, _shadowWidth, _shadowHeight);
     
 
@@ -140,10 +100,10 @@ void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBat
       _light->useLight();
 
        //shader.setVec3("viewPos", _light->getPosition());
-      shader.setMat4("lightSpaceMatrix", _light->getShadowViewProjectionMatrix(true));
+      HR::setMat4(shader, "lightSpaceMatrix", _light->getShadowViewProjectionMatrix(true));
 
       for (auto GO : renderBatch) {
-        shader.setMat4("modelMatrix", GO.second.getModelMatrix());
+        HR::setMat4(shader,"modelMatrix", GO.second.getModelMatrix());
         renderGameObject_ToDepthBuffer(GO.second);
          
       }
@@ -157,9 +117,11 @@ void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, bool textu
     for (auto GO : renderBatch) {
         for(auto mesh : GO.second.getMeshes())
         {
-            if (mesh.getMaterial().getResourceID() != activeMaterial->getResourceID()) {
-                activeMaterial = mesh.getMaterial().getResourcePointer();
-                setUpShader(*activeMaterial, textured);
+            Material currentMat = mesh.getMaterial();
+            if (currentMat.getName() != SceneStats::activeMaterial.getName()) {
+                SceneStats::activeMaterial = currentMat;
+               
+                currentMat.setUpShader(textured);
                 activeMaterial->Use();
             } 
             renderGameObject(GO.second, textured, false);
@@ -172,9 +134,13 @@ void Renderer::renderGameObject(GameObject gameObj, bool texture = true, bool re
     //if(requiredShaderSetUp)
     for(Mesh mesh : gameObj.getMeshes())
     {
-        setUpShader(*mesh.getMaterial().getResourcePointer(), texture);
-       mesh.getMaterial().getResourcePointer()->getShader().getResourcePointer()->setMat4("view", _currentCamera->GetViewMatrix());
-       mesh.getMaterial().getResourcePointer()->getShader().getResourcePointer()->setMat4("model", gameObj.getModelMatrix());
+        Material currentMat = mesh.getMaterial();
+        if (currentMat.getName() != SceneStats::activeMaterial.getName())
+            SceneStats::activeMaterial = currentMat;
+
+        SceneStats::activeMaterial.setUpShader(texture);
+       HR::setMat4(currentMat.getShader(), "view", _currentCamera->GetViewMatrix());
+       HR::setMat4(currentMat.getShader(), "model", gameObj.getModelMatrix());
     }
         
 

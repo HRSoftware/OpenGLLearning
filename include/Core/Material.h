@@ -2,6 +2,7 @@
 #include <assimp/material.h>
 #include "Shader.h"
 #include "Texture.h"
+#include "../Helpers/ShaderFunctions.h"
 
 
 
@@ -9,53 +10,38 @@ class Material : public Resource<Material>
 {
   public:
       Material();
-    Material(int id, std::string name, std::vector<TextureHandle>, ShaderHandle);
-    Material(int id, std::string name, std::vector<TextureHandle> texture);
-    Material(int id, std::string name, TextureHandle );
+    Material(int id, std::string name, std::vector<Texture>, Shader);
+    Material(int id, std::string name, std::vector<Texture> texture);
+    Material(int id, std::string name, Texture );
     std::string getName();
     void setName(std::string);
-    void setTexture(TextureHandle texture);
-    void setTextures(std::vector<TextureHandle> textures);
+    void setTexture(Texture texture);
+    void setTextures(std::vector<Texture> textures);
     int getTextureIDForType(aiTextureType);
 
     std::unordered_map<int, aiTextureType> getAllTextures();
-    std::vector<TextureHandle> getAllTextureHandles();
-    ShaderHandle getShader();
 
-    void setShader(ShaderHandle& newShader);
+    Shader getShader();
+
+    void setShader(Shader& newShader);
     void Use();
     void setTextureToType(int id, aiTextureType textType);
 
 
-    Material& operator = (const Material& mat)
-    {
-        textureHandles = mat.textureHandles;
-        materialName = mat.materialName;
-        shader = mat.shader;
-
-        diffTexture = mat.diffTexture;
-        specTexture = mat.specTexture;
-        heightTexture = mat.heightTexture;
-        normTexture = mat.normTexture;
-        return *this;
-    }
-
+    Material& operator =(const Material& mat);
+    void setUpShader(bool textured);
 
   private:
-    std::vector<TextureHandle> textureHandles;
-    std::string materialName; 
-    ShaderHandle shader;
+    std::vector<Texture> textures;
+    std::string materialName = ""; 
+    Shader shader;
     void setUpShader(); 
 
-    int diffTexture; 
-    int specTexture;
-    int heightTexture;
-    int normTexture; 
-};
+    int diffTexture = -1; 
+    int specTexture = -1;
+    int heightTexture = -1;
+    int normTexture = -1;
 
-struct MaterialHandle : ResourceHandle<Material>
-{
-public:
-    MaterialHandle(int id = -1, Material* ptr = nullptr, ResourceType resType = RT_Material) : ResourceHandle(id, ptr, resType) {};
-    MaterialHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
+
+      
 };

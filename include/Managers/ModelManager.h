@@ -13,7 +13,7 @@
 //    {
 //        modelMap[modelName] = Model("Resources/Models/" + fileName, true);
 //        
-//        return modelMap[modelName].textureHandlesCollection;
+//        return modelMap[modelName].TexturesCollection;
 //    }
 //
 //    void addModel(std::string modelName, Model newModel)

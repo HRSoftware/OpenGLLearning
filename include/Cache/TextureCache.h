@@ -8,12 +8,12 @@
 #include "Cache.h"
 
 
-class TextureCache : Cache<Texture>
+class TextureCache
 {
 public:
-    TextureHandle addTexture(std::string name, Texture tex);
-    TextureHandle findTexture(std::string name);
-    TextureHandle findTextureByID(int id);
+    Texture addTexture(std::string name, Texture tex);
+    Texture findTexture(std::string name);
+    Texture findTextureByID(int id);
 
 private:
     std::map<std::string, Texture> texture_map;

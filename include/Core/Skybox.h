@@ -2,9 +2,11 @@
 #include "glm/glm.hpp"
 
 #include <vector>
-#include "Shader.h"
+
 #include "stb/stb.h"
 #include "stb/stb_image.h"
+#include "../../include/Helpers/ShaderFunctions.h"
+#include "Material.h"
 
 
 class Skybox
@@ -22,7 +24,7 @@ public:
 	}
 	~Skybox(){}
 	void Draw(glm::mat4 view, glm::mat4 projection);
-	void setShader(Shader shader);
+	void setMaterial(Material material);
 	void setVerticies(std::vector<float> vert);
 
 private:
@@ -34,7 +36,7 @@ private:
 	void loadSkyboxMap();
 	void setUpBuffers();
 	
-	Shader skyShader;
+	Material skyMaterial;
 
 	std::vector<float> skyboxVertices = {
 	// positions          

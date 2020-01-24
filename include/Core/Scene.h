@@ -4,7 +4,6 @@
 #include <string>
 #include "../Managers/ModelManager.h"
 #include "Lighting.h"
-#include "floorGrid.h"
 #include "Skybox.h"
 #include "glfw3.h"
 #include "System/InputController.h"
@@ -20,7 +19,7 @@
 #include "../Builders/GameObjectBuilder.h"
 #include "../Builders/ModelBuilder.h"
 #include "../Managers/ResourceMangager.h"
-
+#include "../Helpers/ShaderFunctions.h"
 class Scene
 {
 public:
@@ -52,7 +51,6 @@ public:
 	glm::vec2 _screenDimensions;
 
 	DirectionalLight _sunLight;
-	FloorGrid _floorGrid;
 	Skybox skybox;
 
 	float deltaTime = 0.0f;

@@ -7,14 +7,14 @@ ModelBuilder& ModelBuilder::create(int id, std::string name)
 {
     modelName = name;
     meshes.clear();
-    _textureHandles.clear();
+    _Textures.clear();
     
     return *this;
 }
 
 ModelBuilder& ModelBuilder::loadFromPath(std::string path)
 {
-    std::string fullPath = "Resources/Models/" + path;
+    std::string fullPath = path;
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
         fullPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -76,7 +76,7 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    MaterialHandle _materialHandle;
+    Material _material;
 
     for ( unsigned int i = 0; i < mesh->mNumVertices; i++ )
     {
@@ -141,15 +141,15 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
     aiString MaterialName;
     material->Get(AI_MATKEY_NAME, MaterialName);
 
-    _materialHandle = materialCache.findMaterial(MaterialName.C_Str());
+    _material = materialCache.findMaterial(MaterialName.C_Str());
 
-    if(_materialHandle.getResourceID() == -1)
+    if(_material.getResourceID() == -1)
     {
         materialBuilder.create(GUID_Allocator::getNewUniqueGUID(), MaterialName.C_Str())
         .loadTexturesFromAIMaterial(material, directory);
        materialCache.addMaterial(MaterialName.C_Str(), materialBuilder.build());
     }
-    return Mesh(vertices, indices, _materialHandle);
+    return Mesh(vertices, indices, _material);
 }
 
 Model ModelBuilder::build()
@@ -158,13 +158,13 @@ Model ModelBuilder::build()
         newModel.meshes = meshes;
         newModel.directory = directory;
         newModel.gammaCorrection = true;
-        newModel.textureHandles = _textureHandles;
+        newModel.textures = _Textures;
     return newModel;
 }
 
-ModelHandle ModelFactory::create(std::string name, string path)
+Model ModelFactory::create(std::string name, string path)
 {
-    ModelHandle model = resourceCache.modelCache.findModel(name);
+    Model model = resourceCache.modelCache.findModel(name);
     if(model.getResourceID() == -1)
     {
         Model newModel = modelBuilder.create(GUID_Allocator::getNewUniqueGUID(), name)

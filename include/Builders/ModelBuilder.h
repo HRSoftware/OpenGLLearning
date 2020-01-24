@@ -22,7 +22,7 @@ class ModelBuilder
         std::string modelName;
         std::vector<Mesh> meshes;
         std::string directory;
-        std::vector<TextureHandle> _textureHandles;
+        std::vector<Texture> _Textures;
 
         MaterialCache& materialCache;
         TextureCache& textureCache;
@@ -35,7 +35,7 @@ class ModelFactory
         ModelFactory(ResourceCache& resCache) : modelBuilder(ModelBuilder(resCache)), resourceCache(resCache)
         {
         };
-        ModelHandle create(std::string name, string path);
+        Model create(std::string name, string path);
 
     private:
         ModelBuilder modelBuilder;

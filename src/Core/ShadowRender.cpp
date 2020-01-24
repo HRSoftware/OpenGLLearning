@@ -18,10 +18,10 @@ void ShadowRender::castShadows(std::vector<GameObject*> &renderableObjects)
    {
       light->useLight();
       _shadowMatrixWithBias = light->getShadowViewProjectionMatrix(true) * _shadowBiasMatrix;
-      _shadowShader.setMat4("lightSpaceMatrix", _shadowMatrixWithBias);
+      HR::setMat4(_shadowMaterial.getShader(), "lightSpaceMatrix", _shadowMatrixWithBias);
       for ( auto renderable : renderableObjects )
       {
-         _shadowShader.setMat4("model", renderable->getModelMatrix());
+          HR::setMat4(_shadowMaterial.getShader(),"model", renderable->getModelMatrix());
       }
    }
    glBindFramebuffer(GL_FRAMEBUFFER, 0);

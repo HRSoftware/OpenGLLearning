@@ -27,7 +27,7 @@ using namespace std;
 class Model : Resource<Model>
 {
 public:
-    vector<TextureHandle> textureHandles; //redundant??
+    vector<Texture> textures; //redundant??
     vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
@@ -41,7 +41,7 @@ public:
     {
         meshes = newModel.meshes;
         directory = newModel.directory;
-        textureHandles = newModel.textureHandles;
+        textures = newModel.textures;
         gammaCorrection = newModel.gammaCorrection;
         return *this;
     }
@@ -65,7 +65,7 @@ public:
     {
         return resourceType;
     }
-    void setMaterial(MaterialHandle material);
+    void setMaterial(Material material);
     //Mesh processMesh(std::vector<glm::vec3> pos, std::vector<unsigned int> _indices);
 
 private:
@@ -78,11 +78,6 @@ private:
     //Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 };
 
-struct ModelHandle : ResourceHandle<Model>
-{
-    ModelHandle(int id = -1, Model* ptr = nullptr, ResourceType resType = RT_Model) : ResourceHandle(id, ptr, resType) {};
-    ModelHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
-};
 
 #endif
 

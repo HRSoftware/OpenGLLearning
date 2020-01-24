@@ -6,7 +6,7 @@
 class ShadowRender
 {
 	public:
-		ShadowRender(Shader& shader) : _shadowShader(shader)
+		ShadowRender(Material& material) : _shadowMaterial(material)
 		{
 			init();
 			_shadowBiasMatrix={
@@ -32,7 +32,7 @@ class ShadowRender
 		const GLuint _SHADOW_WIDTH = 1024;
 		const GLuint _SHADOW_HEIGHT = 1024;
 		glm::mat4 _shadowMatrixWithBias;
-		Shader& _shadowShader;
+		Material& _shadowMaterial;
 		glm::mat4 _shadowBiasMatrix;
 
 

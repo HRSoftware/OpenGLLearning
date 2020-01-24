@@ -38,7 +38,7 @@ void Scene::loadResources()
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "modelLoadingShader");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "debugDepthShader");
 
-    resourceManager.loadNewModel("Building1", "HighRise\\Residential Buildings 010.obj");
+    //resourceManager.addNewModel("Building1", "HighRise\\Residential Buildings 010.obj",);
 
 
 
@@ -57,8 +57,8 @@ void Scene::loadResources()
 
     
 
-    resourceCache.gameObjectCache.findGameObject("Building1").getResourcePointer()->setPosition({ 0.1f, 0.f, -0.2f });
-    resourceCache.gameObjectCache.findGameObject("Building1").getResourcePointer()->setScale({ 0.005f, 0.005f, 0.005f });
+    resourceCache.gameObjectCache.findGameObject("Building1").setPosition({ 0.1f, 0.f, -0.2f });
+    resourceCache.gameObjectCache.findGameObject("Building1").setScale({ 0.005f, 0.005f, 0.005f });
 
     //resourceCache.gameObjectCache.findGameObject("Building2")->setPosition({ 10.f, 0.f, 10.f });
     //resourceCache.gameObjectCache.findGameObject("Building2")->setScale({ 0.005f, 0.005f, 0.005f });
@@ -73,24 +73,24 @@ void Scene::loadResources()
     _sunLight.setSpecular({ 0.1f,0.1f, 0.1f });
     _sunLight.setDirection({ -0.2f, -1.0f, -0.3f });
     
-    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setFloat("shininess", 10.0f);
-    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setVec3("light.position", _sunLight.getPosition());
-    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setVec3("light.ambient", _sunLight.getAmbient());
-    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setVec3("light.diffuse", _sunLight.getDiffuse());
-    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setFloat("light.intensity", _sunLight.getStrength());
-    resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setVec3("light.specular", _sunLight.getSpecular());
+    HR::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "shininess", 10.0f);
+    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.position", _sunLight.getPosition());
+    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.ambient", _sunLight.getAmbient());
+    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.diffuse", _sunLight.getDiffuse());
+    HR::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.intensity", _sunLight.getStrength());
+    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.specular", _sunLight.getSpecular());
 
-    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setFloat("shininess", 10.f);
-    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setVec3("light.position", _sunLight.getPosition());
-    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setVec3("light.ambient", _sunLight.getAmbient());
-    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setVec3("light.diffuse", _sunLight.getDiffuse());
+    HR::setFloat(resourceCache.shaderCache.findShader("lightingShader"),"shininess", 10.f);
+    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.position", _sunLight.getPosition());
+    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.ambient", _sunLight.getAmbient());
+    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.diffuse", _sunLight.getDiffuse());
     //_shaderVec.at("lightingShader").setFloat("light.intensity", _sunLight.getStrength());
-    resourceCache.shaderCache.findShader("lightingShader").getResourcePointer()->setVec3("light.specular", _sunLight.getSpecular());
+    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"),"light.specular", _sunLight.getSpecular());
 
-    skybox.setShader(*resourceCache.shaderCache.findShader("skyboxShader").getResourcePointer());
+    skybox.setMaterial(resourceCache.materialCache.findMaterial("skyboxMaterial"));
         
 
-    resourceCache.modelCache.findModel("Building1").getResourcePointer()->setMaterial(resourceCache.materialCache.findMaterial("building1Material"));
+    resourceCache.modelCache.findModel("Building1").setMaterial(resourceCache.materialCache.findMaterial("building1Material"));
     //resourceCache.modelCache.findModel("Building2")->setMaterial(resourceCache.materialCache.findMaterial("building1Material"));
     //resourceCache.modelCache.findModel("Building3")->setMaterial(resourceCache.materialCache.findMaterial("building2Material"));
     //resourceCache.modelCache.findModel("gridFloor")->setMaterial(resourceCache.materialCache.findMaterial("gridFloorMaterial"));
@@ -155,8 +155,8 @@ void Scene::run()
         //shaderCache.findShader("debugDepthShader")->use();
         //_renderer->renderBatch_ToDepthBuffer(_GOVec, *resourceCache.shaderCache.findShader("debugDepthShader"));
 
-        resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->use();
-        resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setMat4("lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
+        HR::useProgram(resourceCache.shaderCache.findShader("modelLoadingShader").programID);
+        HR::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"), "lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
 
 
         glViewport(0, 0, _screenWidth, _screenHeight);
@@ -174,7 +174,7 @@ void Scene::run()
         if (glfwGetKey(_window, GLFW_KEY_R) == GLFW_PRESS)
             _GOVec["Building1"].rotateBy(0.1f, { 0, 1, 0 });
 
-        resourceCache.shaderCache.findShader("modelLoadingShader").getResourcePointer()->setMat4("projection", projection);
+        HR::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"),"projection", projection);
         _renderer->renderBatch(_GOVec);
         //_renderer->renderGameObject()
 

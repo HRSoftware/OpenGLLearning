@@ -2,33 +2,33 @@
 #include "../Core/Shader.h"
 #include "Cache.h"
 
-class ShaderCache : Cache<Shader> {
+class ShaderCache {
     friend class ShaderBuilder;
 public:
-    ShaderHandle findShader(std::string refName);
-    ShaderHandle addShader(const std::string& refName, Shader shader);
+    Shader findShader(std::string refName);
+    Shader addShader(const std::string& refName, Shader shader);
 
 private:
     std::map<std::string, Shader> shader_Map;
     std::map<int, std::map<string, int>> uniformLocationMap;
 };
 
-inline ShaderHandle ShaderCache::findShader(std::string refName)
+inline Shader ShaderCache::findShader(std::string refName)
 {
     for ( auto _shader : shader_Map )
     {
-        if(_shader.second.getShaderName() == refName)
+        if(_shader.second._shaderName == refName)
         {
-            return ShaderHandle(_shader.second.getResourceID(), &_shader.second, _shader.second.getResourceType());
+            return _shader.second;
         }
     }
 
-    return ShaderHandle(); //return default invalid textureHandle
+    return Shader(); //return default invalid Texture
 }
 
-inline ShaderHandle ShaderCache::addShader(const std::string& refName, Shader shader)
+inline Shader ShaderCache::addShader(const std::string& refName, Shader shader)
 {
     shader_Map.insert_or_assign(refName, shader);
-    uniformLocationMap.insert_or_assign(shader.getShaderID(), shader.getUniformLocations());
+    uniformLocationMap.insert_or_assign(shader.programID, shader._uniformLocations);
     return findShader(refName);
 }

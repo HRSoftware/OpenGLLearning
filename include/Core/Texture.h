@@ -43,24 +43,7 @@ class Texture : Resource<Texture>
 
         aiTextureType _textureType = aiTextureType_UNKNOWN;
         std::string _path;
-        int _textureID{};
-};
-
-struct TextureHandle : ResourceHandle<Texture>
-{
-    TextureHandle() : ResourceHandle(-1, nullptr, RT_Texture) {};
-    TextureHandle(int id, Texture* ptr, ResourceType resType) : ResourceHandle(id, ptr, RT_Shader) {};
-    TextureHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
-
-    auto getTextureType()
-    {
-        return ptr_Resource->getTextureType();
-    }
-
-    auto getTextureID()
-    {
-        return ptr_Resource->getTextureID();
-    }
+        int _textureID = -1;
 };
 
 

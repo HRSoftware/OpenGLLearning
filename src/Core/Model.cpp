@@ -28,10 +28,10 @@
 //        // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 //        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 //        Mesh newMesh = processMesh(mesh, scene);
-//        for ( auto textureHandleID : newMesh.getAllTextures())
+//        for ( auto TextureID : newMesh.getAllTextures())
 //        {
-//            if (std::find(textureHandlesCollection.begin(), textureHandlesCollection.end(), textureHandleID.second) == textureHandlesCollection.end())
-//                textureHandlesCollection.push_back(textureHandleID.first); 
+//            if (std::find(TexturesCollection.begin(), TexturesCollection.end(), TextureID.second) == TexturesCollection.end())
+//                TexturesCollection.push_back(TextureID.first); 
 //        }
 //        meshes.push_back(newMesh);
 //    }
@@ -148,7 +148,7 @@
 //    return Mesh(vertices, indices, mat);
 //}
 
-void Model::setMaterial(MaterialHandle material)
+void Model::setMaterial(Material material)
 {
     for (Mesh mesh : meshes) {
         mesh.setMaterial(material);

@@ -11,8 +11,7 @@ GameObjectBuilder& GameObjectBuilder::create(std::string name)
 
 GameObjectBuilder& GameObjectBuilder::addMeshes(std::vector<Mesh> _meshes)
 {
-    
-    _model.getResourcePointer()->meshes = _meshes;
+    _model.meshes = _meshes;
     return *this;
 }
 
@@ -27,20 +26,14 @@ GameObject GameObjectBuilder::build()
     return GameObject(_goName, _model);
 }
 
-GameObjectHandle GameObjectFactory::create(string gameObjectName)
+GameObject GameObjectFactory::create(string gameObjectName)
 {
     GameObject newObject = GOBuilder.create(gameObjectName)
         .build();
     return goMap.addGameObject(gameObjectName, newObject);
 };
 
-GameObjectHandle GameObjectFactory::createFloorGrid(std::string name, FloorGrid grid)
-{
-   GameObject go =  GOBuilder.create(name).addMeshes({ grid.getMesh() }).build();
-   return goMap.addGameObject(name, go);
-}
-
-GameObjectHandle GameObjectFactory::createWithModel(std::string name, std::string modelPath)
+GameObject GameObjectFactory::createWithModel(std::string name, std::string modelPath)
 {
     GameObject go = GOBuilder.create(name)
         .addModel(modelPath, modelPath)

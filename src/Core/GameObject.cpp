@@ -7,16 +7,8 @@ GameObject::GameObject() : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID
     _isModelNULL = true;
 }
 
-GameObject::GameObject(FloorGrid floor) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
-{
-    _isModelNULL = false;
-    GOName = floor.getName();
-    _isModelMatrixOutdated = true;
-    _model.getResourcePointer()->meshes = {floor.getMesh()};
-}
 
-
-GameObject::GameObject(std::string name, ModelHandle model) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
+GameObject::GameObject(std::string name, Model model) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
 {
     _isModelNULL = false;
     GOName = name;
@@ -27,14 +19,14 @@ GameObject::GameObject(std::string name, ModelHandle model) : Resource<GameObjec
 GameObject::GameObject(std::vector<Vertex> _vertices, std::vector<unsigned> _indices) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
 {
     _isModelMatrixOutdated = true;
-    _model.getResourcePointer()->meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
+    _model.meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
 }
 
 GameObject::~GameObject()
 {
 }
 
-void GameObject::setModel(ModelHandle model)
+void GameObject::setModel(Model model)
 {
     _model = model;
     _isModelMatrixOutdated = true;
@@ -137,5 +129,5 @@ glm::vec3 GameObject::getScale() const
 
 std::vector<Mesh>& GameObject::getMeshes()
 {
-    return _model.getResourcePointer()->meshes;
+    return _model.meshes;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "floorGrid.h"
+
 #include "Model.h"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
@@ -13,13 +13,12 @@ class GameObject : Resource<GameObject>
 public:
     GameObject() ;
 
-    GameObject(FloorGrid floor) ;
-	GameObject(std::string name, ModelHandle model);
+	GameObject(std::string name, Model model);
 	GameObject(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices);
 	~GameObject();
 
 
-    void setModel(ModelHandle _model);
+    void setModel(Model _model);
     void setName(std::string name);
 	void setPosition(glm::vec3 pos);
 	void moveBy(glm::vec3 pos);
@@ -64,7 +63,7 @@ public:
 
 	protected:
 
-    ModelHandle _model;
+    Model _model;
 
 	private:
         std::string GOName;
@@ -78,8 +77,3 @@ public:
 };
 
 
-struct GameObjectHandle : ResourceHandle<GameObject>
-{
-    GameObjectHandle(int id = -1, GameObject* ptr = nullptr, ResourceType resType = RT_GameObject) : ResourceHandle(id, ptr, RT_GameObject) {};
-    GameObjectHandle(const ResourceHandle& resHndl) : ResourceHandle(resHndl) {};
-};

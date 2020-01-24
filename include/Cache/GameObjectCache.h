@@ -3,12 +3,12 @@
 #include "Cache.h"
 
 
-class GameObjectCache : Cache<GameObject>
+class GameObjectCache
 {
 public:
 
-    GameObjectHandle findGameObject(std::string gameObjectName);
-    GameObjectHandle addGameObject(const std::string& name, GameObject material);
+    GameObject findGameObject(std::string gameObjectName);
+    GameObject addGameObject(const std::string& name, GameObject material);
 
 private:
     std::map<std::string, GameObject> gameObject_map;

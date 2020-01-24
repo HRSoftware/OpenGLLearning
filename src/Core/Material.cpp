@@ -1,22 +1,23 @@
 
 #include "../../include/Core/Material.h"
 
-Material::Material() : Resource(-1, RT_Material){}
 
-Material::Material(int id, std::string name, std::vector<TextureHandle> _textures, ShaderHandle shdr) : Resource(id, RT_Material)
+Material::Material() {}
+
+Material::Material(int id, std::string name, std::vector<Texture> _textures, Shader shdr) : Resource(id, RT_Material)
 {
     materialName = name;
     setTextures(_textures);
     shader = shdr;
 }
 
-Material::Material(int id, std::string name, std::vector<TextureHandle> texture) : Resource(id, RT_Material)
+Material::Material(int id, std::string name, std::vector<Texture> texture) : Resource(id, RT_Material)
 {
     materialName = name;
     setTextures(texture);
 }
 
-Material::Material(int id, std::string name, TextureHandle texture) : Resource(id, RT_Material)
+Material::Material(int id, std::string name, Texture texture) : Resource(id, RT_Material)
 {
     materialName = name;
     setTexture(texture);
@@ -31,32 +32,31 @@ void Material::setName(std::string newMaterialName)
 {
     materialName = newMaterialName;
 }
-void Material::setTexture(TextureHandle texture)
+void Material::setTexture(Texture texture)
 {
-    Texture tempTexture = *texture.getResourcePointer();
-    switch (tempTexture.getTextureType() )
+    switch (texture.getTextureType() )
     {
     case aiTextureType_DIFFUSE:
-        diffTexture = tempTexture.getTextureID();
+        diffTexture = texture.getTextureID();
         break;
 
     case aiTextureType_SPECULAR:
-        specTexture = tempTexture._textureID;
+        specTexture = texture._textureID;
         break;
 
     case aiTextureType_NORMALS:
-        normTexture = tempTexture._textureID;
+        normTexture = texture._textureID;
         break;
     case aiTextureType_HEIGHT:
-        heightTexture = tempTexture._textureID;
+        heightTexture = texture._textureID;
         break;
     default:
         break;
     }
 
-    textureHandles.push_back(texture);
+    textures.push_back(texture);
 }
-void Material::setTextures(std::vector<TextureHandle> textures)
+void Material::setTextures(std::vector<Texture> textures)
 {
     for (auto texture : textures) {
         setTexture(texture);
@@ -100,16 +100,11 @@ std::unordered_map<int, aiTextureType> Material::getAllTextures()
     return textureMap;
 }
 
-std::vector<TextureHandle> Material::getAllTextureHandles()
-{
-    return textureHandles;
-}
-
-ShaderHandle Material::getShader()
+Shader Material::getShader()
 {
     return shader;
 }
-void Material::setShader(ShaderHandle& newShader)
+void Material::setShader(Shader& newShader)
 {
     shader = newShader;
     setUpShader();
@@ -117,7 +112,7 @@ void Material::setShader(ShaderHandle& newShader)
 
 void Material::Use()
 {
-    shader.getResourcePointer()->use();
+    HR::useProgram(shader.programID);
 }
 
 void Material::setTextureToType(int id, aiTextureType textType)
@@ -141,6 +136,19 @@ void Material::setTextureToType(int id, aiTextureType textType)
     }
 }
 
+Material& Material::operator=(const Material& mat)
+{
+    textures = mat.textures;
+    materialName = mat.materialName;
+    shader = mat.shader;
+
+    diffTexture = mat.diffTexture;
+    specTexture = mat.specTexture;
+    heightTexture = mat.heightTexture;
+    normTexture = mat.normTexture;
+    return *this;
+}
+
 void Material::setUpShader()
 {
         // bind appropriate textures
@@ -159,16 +167,16 @@ void Material::setUpShader()
             switch ( type )
             {
             case aiTextureType_DIFFUSE:
-                shader.getResourcePointer()->setInt(("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
+                HR::setInt(shader,("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
                 break;
             case aiTextureType_SPECULAR:
-                shader.getResourcePointer()->setInt(("texture_specular" + std::to_string(specularNr++)), _textureIndex);
+                HR::setInt(shader,("texture_specular" + std::to_string(specularNr++)), _textureIndex);
                 break;
             case aiTextureType_NORMALS:
-                shader.getResourcePointer()->setInt(("texture_normal" + std::to_string(normalNr++)), _textureIndex);
+                HR::setInt(shader,("texture_normal" + std::to_string(normalNr++)), _textureIndex);
                 break;
             case aiTextureType_HEIGHT:
-                shader.getResourcePointer()->setInt(("texture_height" + std::to_string(heightNr++)), _textureIndex);
+                HR::setInt(shader,("texture_height" + std::to_string(heightNr++)), _textureIndex);
                 break;
             default:
                 break;
@@ -179,5 +187,46 @@ void Material::setUpShader()
 
             _textureIndex++;
         }
+}
+
+void Material::setUpShader(bool textured)
+{
+    if ( textured )
+    {
+        // bind appropriate textures
+        unsigned int diffuseNr = 1;
+        unsigned int specularNr = 1;
+        unsigned int normalNr = 1;
+        unsigned int heightNr = 1;
+
+        int _textureIndex = 0;
+        for ( auto _texture : textures )
+        {
+            glActiveTexture(GL_TEXTURE0 + _textureIndex);
+
+            switch ( _texture.getTextureType() )
+            {
+                case aiTextureType_DIFFUSE:
+                    HR::setInt(shader, ("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
+                    break;
+                case aiTextureType_SPECULAR:
+                    HR::setInt(shader, ("texture_specular" + std::to_string(specularNr++)), _textureIndex);
+                    break;
+                case aiTextureType_NORMALS:
+                    HR::setInt(shader, ("texture_normal" + std::to_string(normalNr++)), _textureIndex);
+                    break;
+                case aiTextureType_HEIGHT:
+                    HR::setInt(shader, ("texture_height" + std::to_string(heightNr++)), _textureIndex);
+                    break;
+                default:
+                    break;
+            }
+
+            // and finally bind the texture
+            glBindTexture(GL_TEXTURE_2D, _texture._textureID);
+
+            _textureIndex++;
+        }
+    }
 }
 
