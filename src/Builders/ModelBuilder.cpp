@@ -1,5 +1,5 @@
 
-
+#include "stdafx.h"
 #include "../../include/Builders/ModelBuilder.h"
 #include "../../include/Helpers/GUIDAllocator.h"
 

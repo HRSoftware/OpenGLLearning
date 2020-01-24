@@ -1,6 +1,5 @@
 #pragma once
 #include "Interfaces/IBaseLight.h"
-#include <vector>
 #include "GameObject.h"
 
 class ShadowRender

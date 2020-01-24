@@ -1,7 +1,6 @@
 #pragma once
 
 
-#include <glfw3.h>
 
 //void processinput(glfwwindow* window)
 //{

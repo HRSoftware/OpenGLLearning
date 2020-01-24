@@ -1,6 +1,5 @@
-
+#include "stdafx.h"
 #include "../../include/Core/Shader.h"
-#include <iostream>
 
 
 Shader::Shader(): Resource<Shader>(-1, RT_Shader) {}

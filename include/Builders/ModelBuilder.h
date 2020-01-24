@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+
 #include "../Core/Model.h"
 #include "../Cache/ResourceCache.h"
 #include "MaterialBuilder.h"

@@ -1,7 +1,5 @@
 //#pragma once
 //#include "../Core/Model.h"
-//#include <map>
-//#include <glm\common.hpp>
 //
 //class ModelManager
 //{

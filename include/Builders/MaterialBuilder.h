@@ -1,6 +1,5 @@
 #pragma once
-#include <vector>
-#include <utility>
+
 #include "../Core/Material.h"
 #include "../Cache/ResourceCache.h"
 

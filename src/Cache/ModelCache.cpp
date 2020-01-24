@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "../../include/Cache/ModelCache.h"
 
 Model ModelCache::addModel(std::string name, Model newModel)

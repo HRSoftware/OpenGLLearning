@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "../../include/Builders/ShaderBuilder.h"
 
 

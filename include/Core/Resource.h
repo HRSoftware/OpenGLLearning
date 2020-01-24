@@ -1,7 +1,4 @@
 #pragma once
-#include <string>
-#include <unordered_map>
-#include <map>
 enum ResourceType
   {
       RT_None = 0,

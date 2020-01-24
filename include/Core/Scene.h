@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Camera.h"
-#include <string>
 #include "../Managers/ModelManager.h"
 #include "Lighting.h"
 #include "Skybox.h"

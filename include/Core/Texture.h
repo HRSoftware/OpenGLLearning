@@ -1,7 +1,4 @@
 ﻿#pragma once
-#include <string>
-#include <assimp/material.h>
-#include <map>
 #include "Resource.h"
 
 class Texture : Resource<Texture>

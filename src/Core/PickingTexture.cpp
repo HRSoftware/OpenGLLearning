@@ -1,5 +1,4 @@
-
-#include <cstdio>
+#include "stdafx.h"
 #include "../../include/Core/PickingTextures.h"
 
 bool PickingTexture::Init(unsigned windowWidth, unsigned windowHeight)

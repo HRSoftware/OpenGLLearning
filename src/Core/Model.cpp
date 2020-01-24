@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "../../include/Core/Model.h"
 #include "../../include/Builders/MaterialBuilder.h"
 

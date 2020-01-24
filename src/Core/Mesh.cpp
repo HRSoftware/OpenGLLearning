@@ -1,4 +1,5 @@
- #include "../../include/Core/Mesh.h"
+#include "stdafx.h" 
+#include "../../include/Core/Mesh.h"
 
  vector<Vertex> Mesh::getVertices()
  {

@@ -1,8 +1,4 @@
 //#pragma once
-//#include <unordered_map>
-//#include <string>
-//#include <vector>
-//#include <assimp/material.h>
 //#include "../Core/Texture.h"
 //
 //namespace TextureManager

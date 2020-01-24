@@ -1,10 +1,5 @@
 #pragma once
-#include "glm/glm.hpp"
 
-#include <vector>
-
-#include "stb/stb.h"
-#include "stb/stb_image.h"
 #include "../../include/Helpers/ShaderFunctions.h"
 #include "Material.h"
 

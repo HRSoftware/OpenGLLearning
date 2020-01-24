@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "../../include/Builders/MaterialBuilder.h"
 #include "../../include/Loaders/TextureLoader.h"
 

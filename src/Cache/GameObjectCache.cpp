@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 
 #include "../../include/Cache/GameObjectCache.h"
 

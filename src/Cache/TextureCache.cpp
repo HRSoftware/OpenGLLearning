@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "../../include/Cache/TextureCache.h"
 #include "../../include/Loaders/TextureLoader.h"
 

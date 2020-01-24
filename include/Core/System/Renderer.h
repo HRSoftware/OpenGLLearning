@@ -4,7 +4,6 @@
 #include "../GameObject.h"
 #include "../Lighting.h"
 
-#include <string>
 #include "../Material.h"
 #include "../../Core/CurrentSceneStats.h"
 

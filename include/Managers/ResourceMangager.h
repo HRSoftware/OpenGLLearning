@@ -3,15 +3,9 @@
 #include "../Core/Resource.h"
 #include <string>
 #include "../Cache/ResourceCache.h"
-#include <regex>
-#include <filesystem>
-#include <iostream>
 
-#include <rapidjson/error/error.h>
-#include <rapidjson\document.h>
-#include <rapidjson/istreamwrapper.h>
-#include <rapidjson/rapidjson.h>
-#include <rapidjson/error/en.h>
+
+
 
 
 class ResourceManager

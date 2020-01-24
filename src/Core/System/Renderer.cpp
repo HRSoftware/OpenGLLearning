@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "../../../include/Core/System/Renderer.h"
 #include "../../../include/Core/Material.h"
 

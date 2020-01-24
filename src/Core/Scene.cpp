@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "../../include/Core/Primitive_Shapes/Cube.h"
 #include "../../include/Core/Scene.h"
 #include "../../include/Builders/GameObjectBuilder.h"

@@ -1,7 +1,6 @@
+#include "stdafx.h"
 #pragma once
 
-#include <iostream>
-#include <filesystem>
 #include "include/Core/Scene.h"
 //#include "Bullet/btBulletDynamicsCommon.h"
 #include "include/Core/LoadTextures.h"

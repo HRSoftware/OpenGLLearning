@@ -1,10 +1,5 @@
+#include "stdafx.h"
 //#include "../../include/Managers/TextureManager.h"
-//#include <assimp/material.h>
-//#include <filesystem>
-//#include <stb/stb_image.h>
-//#include <iostream>
-//#include <glad/glad.h>
-//#include <regex>
 //
 //
 //auto TextureManager::getTextureByID(unsigned ID) -> Texture*

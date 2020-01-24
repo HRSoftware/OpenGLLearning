@@ -2,10 +2,6 @@
 
 
 #include "Model.h"
-#include "glm/gtc/quaternion.hpp"
-#include "glm/gtx/quaternion.hpp"
-#include <glm/gtc/bitfield.hpp>
-#include <utility>
 
 
 class GameObject : Resource<GameObject>

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Camera.h"
-#include <glfw3.h>
 inline bool firstMouse = true;
 class InputController
 {

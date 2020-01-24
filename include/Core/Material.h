@@ -1,5 +1,5 @@
 #pragma once
-#include <assimp/material.h>
+
 #include "Shader.h"
 #include "Texture.h"
 #include "../Helpers/ShaderFunctions.h"

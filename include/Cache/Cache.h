@@ -1,6 +1,5 @@
 #pragma once
-#include <string>
-#include <map>
+
 #include "../Core/Resource.h"
 #include "../Core/GameObject.h"
 

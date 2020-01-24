@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "../../include/Cache/MaterialCache.h"
 
 Material MaterialCache::findMaterial(std::string matName)
