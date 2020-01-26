@@ -16,6 +16,7 @@ class Model : Resource<Model>
 {
 public:
     vector<Texture> textures; //redundant??
+    std::string modelName = "";
     vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
@@ -31,6 +32,7 @@ public:
         directory = newModel.directory;
         textures = newModel.textures;
         gammaCorrection = newModel.gammaCorrection;
+        modelName = newModel.modelName;
         return *this;
     }
 

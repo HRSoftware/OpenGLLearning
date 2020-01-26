@@ -170,11 +170,12 @@ public:
     explicit ResourceLoader(ResourceCache& cache)
         : resourceCache(cache) {}
 
-    Model loadNewResource(int id, std::string name, string path)
+    Model loadNewResource(int id, std::string name, std::string path, std::string materialName)
     {
         ModelBuilder model(resourceCache);
         return model.create(id, name)
                     .loadFromPath(path)
+                    .setMaterial(materialName)
                     .build();
     }
   

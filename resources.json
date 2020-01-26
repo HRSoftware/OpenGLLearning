@@ -68,6 +68,7 @@
       "name": "BlockOfFlats",
       "model": "Resources/Models/BlockOfFlats/apartment.FBX",
       "shader": "modelLoadingShader",
+      "materialName": "BlockOfFlatsMaterial",
       "textures": {
         "brick_d.png": "Resources/Models/BlockOfFlats/brick_d.png",
         "brick_h.png": "Resources/Models/BlockOfFlats/brick_h.png",
@@ -81,6 +82,7 @@
         "concrete_r.png": "Resources/Models/BlockOfFlats/concrete_r.png"
       },
       "material": {
+
         "shader": "modelLoadingShader"
       }
     },
@@ -93,6 +95,7 @@
         "house_spec.tga": "Resources/Models/House/house_spec.tga"
       },
       "shader": "modelLoadingShader",
+      "materialName": "HouseMaterial",
       "material": {
         "house_obj.mtl": "Resources/Models/House/house_obj.mtl"
       }

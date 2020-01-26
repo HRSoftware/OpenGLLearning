@@ -15,7 +15,7 @@ Shader ResourceManager::loadNewShader(int shaderMask, ::string pathToFile, std::
 Material ResourceManager::loadNewMaterial(aiMaterial* mat, std::string pathToFile, std::string referenceName)
 {
     std::string matName = referenceName.empty() ? pathToFile : referenceName;
-    MaterialBuilder newMaterial(resourceCache.textureCache);
+    MaterialBuilder newMaterial(resourceCache);
     newMaterial.create(GUID_Allocator::getNewUniqueGUID(), referenceName.empty() ? pathToFile : referenceName);
 
     aiTextureType _type = aiTextureType_UNKNOWN;
@@ -63,9 +63,9 @@ Material ResourceManager::loadNewMaterial(aiMaterial* mat, std::string pathToFil
 
 }
 
-Model ResourceManager::addNewModel(std::string name, std::string path, string shader)
+Model ResourceManager::addNewModel(std::string name, std::string path, std::string shader)
 {
-    return resourceCache.modelCache.addModel(name, modelLoader.loadNewResource(GUID_Allocator::getNewUniqueGUID(), name, path));
+    return resourceCache.modelCache.addModel(name, modelLoader.loadNewResource(GUID_Allocator::getNewUniqueGUID(), name, path, shader));
 }
 
 inline void ResourceManager::LoadShadersFromJson(const rapidjson::Value& shaders)
@@ -119,9 +119,10 @@ inline void ResourceManager::LoadModelsFromJson(const rapidjson::Value& models)
         string name = modelObject.FindMember("name")->value.GetString();
         string model = modelObject.FindMember("model")->value.GetString();
         string shader = modelObject.FindMember("shader")->value.GetString();
+        string materialName = modelObject.FindMember("materialName")->value.GetString();
         addNewModel(name,
-            model,
-            shader);
+                    model,
+                    shader);
     }
 }
 

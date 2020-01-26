@@ -93,7 +93,7 @@ Shader ShaderBuilder::build()
 {
     int success;
     char infoLog[512];
-    std::map<std::string, int> uniforms;
+    
 
     programID = glCreateProgram();
     for ( auto shaderID : shadersIDs )
@@ -109,18 +109,18 @@ Shader ShaderBuilder::build()
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\t" << shaderProgramName << "\n\t" << infoLog << std::endl;
     }
 
-    uniforms = findUniformLocations();
+    _uniformLocations = findUniformLocations();
     for ( auto shaderID : shadersIDs )
     {
         glDeleteShader(shaderID);
     }
     
-    return Shader(programID, shaderProgramName, uniforms);
+    return Shader(programID, shaderProgramName, _uniformLocations);
 }
 
 std::map<std::string, int> ShaderBuilder::findUniformLocations()
 {
-    _uniformLocations.clear();
+    std::map<std::string, int> uniforms;
     GLint numUniforms = 0;
 #ifdef __APPLE__
     // For OpenGL 4.1, use glGetActiveUniform
@@ -154,11 +154,11 @@ std::map<std::string, int> ShaderBuilder::findUniformLocations()
         GLint nameBufSize = results[0] + 1;
         char * name = new char[nameBufSize];
         glGetProgramResourceName(programID, GL_UNIFORM, i, nameBufSize, NULL, name);
-        _uniformLocations[name] = results[2];
+        uniforms[name] = results[2];
         delete [] name;
     }
 #endif
 
-    return _uniformLocations;
+    return uniforms;
 }
 

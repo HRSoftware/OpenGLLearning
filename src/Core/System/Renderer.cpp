@@ -117,12 +117,11 @@ void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, bool textu
     for (auto GO : renderBatch) {
         for(auto mesh : GO.second.getMeshes())
         {
-            Material currentMat = mesh.getMaterial();
-            if (currentMat.getName() != SceneStats::activeMaterial.getName()) {
-                SceneStats::activeMaterial = currentMat;
+            if (mesh.getMaterial().getName() != SceneStats::activeMaterial.getName()) {
+                SceneStats::activeMaterial =  mesh.getMaterial();
                
-                currentMat.setUpShader(textured);
-                activeMaterial->Use();
+                SceneStats::activeMaterial.setUpShader(textured);
+                SceneStats::activeMaterial.Use();
             } 
             renderGameObject(GO.second, textured, false);
         }

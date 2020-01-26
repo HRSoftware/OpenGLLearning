@@ -21,7 +21,7 @@ public:
     Texture loadNewTexture(aiTextureType type, std::string pathToFile, std::string referenceNamed = "");
     Shader loadNewShader(int shaderMask, ::string pathToFile, std::string referenceName = "");
     Material loadNewMaterial(aiMaterial* mat, std::string pathToFile, std::string referenceNamed = "");
-    Model addNewModel(std::string name, std::string path, string shader);
+    Model addNewModel(std::string name, std::string path, std::string shader);
 
 
     template<class T>

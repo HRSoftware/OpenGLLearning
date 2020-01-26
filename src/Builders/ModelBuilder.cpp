@@ -31,17 +31,20 @@ ModelBuilder& ModelBuilder::loadFromPath(std::string path)
     return *this;
 }
 
+ModelBuilder& ModelBuilder::setMaterial(const string& matName)
+{
+    modelMaterial = materialCache.findMaterial(matName);
+    return *this;
+}
+
 void ModelBuilder::processNode(aiNode* node, const aiScene* scene)
 {
-    // process each mesh located at the current node
     for ( unsigned int i = 0; i < node->mNumMeshes; i++ )
     {
-        // the node object only contains _indices to index the actual objects in the scene. 
-        // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
     }
-    // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
+
     for ( unsigned int i = 0; i < node->mNumChildren; i++ )
     {
         processNode(node->mChildren[i], scene);
@@ -57,16 +60,13 @@ Mesh ModelBuilder::processMesh(std::vector<glm::vec3> pos, std::vector<unsigned>
     {
         Vertex vertex;
         glm::vec3 vector;
-        // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's
         vector.x = pos[i].x;
         vector.y = pos[i].y;
         vector.z = pos[i].z;
         vertex.Position = vector;
 
-
         vertices.push_back(vertex);
     }
-
     indices = _indices;
 
     return Mesh(vertices, indices, true);
@@ -107,8 +107,6 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.TexCoords = vec;
         }
-        else
-            vertex.TexCoords = glm::vec2(0.0f, 0.0f);
 
         if ( mesh->mTangents != NULL )
         {
@@ -143,14 +141,15 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
 
     _material = materialCache.findMaterial(MaterialName.C_Str());
 
-    if(_material.getResourceID() == -1)
+    if(_material.getName() == "")
     {
         materialBuilder.create(GUID_Allocator::getNewUniqueGUID(), MaterialName.C_Str())
         .loadTexturesFromAIMaterial(material, directory);
-       materialCache.addMaterial(MaterialName.C_Str(), materialBuilder.build());
+       _material = materialCache.addMaterial(MaterialName.C_Str(), materialBuilder.build());
     }
     return Mesh(vertices, indices, _material);
 }
+
 
 Model ModelBuilder::build()
 {
@@ -159,6 +158,7 @@ Model ModelBuilder::build()
         newModel.directory = directory;
         newModel.gammaCorrection = true;
         newModel.textures = _Textures;
+        newModel.modelName = modelName;
     return newModel;
 }
 

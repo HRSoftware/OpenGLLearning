@@ -8,9 +8,10 @@
 
 namespace HR {
     inline std::string currentShaderName = "";
-    inline void useProgram(int id)
+    inline void useProgram(Shader shader)
     {
-        glUseProgram(id);
+        HR::currentShaderName = shader._shaderName;
+        glUseProgram(shader.programID);
     }
 
     inline GLint getLocation(Shader shader, const std::string& name)

@@ -2,7 +2,7 @@
 #include "../../include/Builders/MaterialBuilder.h"
 #include "../../include/Loaders/TextureLoader.h"
 
-MaterialBuilder& MaterialBuilder::create(const int id, std::string name)
+MaterialBuilder& MaterialBuilder::create(const int id = 2, std::string name)
 {
     resID = id;
     materialName = name;
@@ -10,7 +10,7 @@ MaterialBuilder& MaterialBuilder::create(const int id, std::string name)
     return *this;
 }
 
-MaterialBuilder& MaterialBuilder::addShader(Shader _shader)
+MaterialBuilder& MaterialBuilder::setShader(Shader _shader)
 {
     shader = _shader;
     return *this;

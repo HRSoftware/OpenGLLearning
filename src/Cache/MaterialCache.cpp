@@ -4,7 +4,7 @@
 Material MaterialCache::findMaterial(std::string matName)
 {
 
-    if(material_map[matName].getResourceID() != -1)
+    if(material_map[matName].getName() != "")
         return material_map[matName];
 
     return Material();
@@ -13,5 +13,5 @@ Material MaterialCache::findMaterial(std::string matName)
 Material MaterialCache::addMaterial(const std::string& name, Material material)
 {
     material_map.insert_or_assign(name, material);
-    return findMaterial(name);
+    return material;
 }

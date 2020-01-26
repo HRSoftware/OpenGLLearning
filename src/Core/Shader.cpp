@@ -2,14 +2,18 @@
 #include "../../include/Core/Shader.h"
 
 
-Shader::Shader(): Resource<Shader>(-1, RT_Shader) {}
-
 Shader::Shader(int id): Resource<Shader>(id, RT_Shader)
 {
     programID = id;
 }
 
-Shader::~Shader() {}
+Shader::Shader(int id, std::string name, std::map<std::string, int>& locations)
+{
+    _shaderName = name;
+    _uniformLocations = std::move(locations);
+    programID = id;
+}
+
 
 int Shader::getResourceID()
 {
@@ -21,18 +25,11 @@ ResourceType Shader::getResourceType()
     return resourceType;
 }
 
-Shader& Shader::operator=(Shader newShader)
+Shader& Shader::operator=(const Shader& newShader)
 {
-    std::swap(_uniformLocations, newShader._uniformLocations);
-    std::swap(_shaderName, newShader._shaderName);
-    std::swap(programID, newShader.programID);
+    _uniformLocations = newShader._uniformLocations;
+    _shaderName = newShader._shaderName;
+    programID = newShader.programID;
     return *this;
-}
-
-Shader::Shader(int id, std::string name, std::map<std::string, int>& uniformLocations) : Resource(id, RT_Shader)
-{
-    _shaderName = name;
-    _uniformLocations = std::move(uniformLocations);
-    programID = id;
 }
 

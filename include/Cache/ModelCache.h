@@ -10,7 +10,7 @@ public:
     Model findModel(std::string name)
     {
         auto model = model_map[name];
-        if (model.getResourceID() != -1)
+        if (_stricmp(name.c_str(), model.modelName.c_str()) == 0)
             return model;
 
         return Model();

@@ -29,7 +29,7 @@ void Scene::loadResources()
 {
     resourceManager.LoadAllBasicResources();
 
-    resourceManager.loadNewShader(VERTEX | FRAGMENT, "basicShader", "basicShader");
+    /*resourceManager.loadNewShader(VERTEX | FRAGMENT, "basicShader", "basicShader");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "shadowMapShader", "shadowMapShader");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "materialShader");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "skyboxShader");
@@ -37,7 +37,7 @@ void Scene::loadResources()
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "framebufferShader");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "lightingShader", "basicLighting");
     resourceManager.loadNewShader(VERTEX | FRAGMENT, "modelLoadingShader");
-    resourceManager.loadNewShader(VERTEX | FRAGMENT, "debugDepthShader");
+    resourceManager.loadNewShader(VERTEX | FRAGMENT, "debugDepthShader");*/
 
     //resourceManager.addNewModel("Building1", "HighRise\\Residential Buildings 010.obj",);
 

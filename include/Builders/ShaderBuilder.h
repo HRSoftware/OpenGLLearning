@@ -15,7 +15,7 @@ class ShaderBuilder {
         std::string shaderFileName;
         std::vector<int> shadersIDs;
         
-        std::map<std::string, int> _uniformLocations;
+        std::map<std::string, int> _uniformLocations = {};
         int programID = -1;
         int resID = -1;
 };

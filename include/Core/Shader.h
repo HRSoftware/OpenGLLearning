@@ -15,22 +15,23 @@ enum ShaderType
 class Shader : Resource<Shader>
 {
 public:
-    Shader();
+    Shader() = default;
 	Shader(int id);
-    Shader(int id, std::string name, std::map<std::string, int>& _uniformLocations);
-    ~Shader();
+    Shader(int id, std::string name, std::map<std::string, int>& locations);
+    ~Shader() = default;
 
     int getResourceID();
 
     ResourceType getResourceType();
 
-    Shader& operator=(Shader other);
+    Shader& operator=(const Shader&);
 
 	int programID = -1;
 
 
-	std::map<std::string, int> _uniformLocations;
-	std::string _shaderName;
+	std::map<std::string, int> _uniformLocations{};
+	std::string _shaderName="";
+
     
 
 };

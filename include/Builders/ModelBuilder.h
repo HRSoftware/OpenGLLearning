@@ -8,21 +8,25 @@
 class ModelBuilder
 {
     public:
-        ModelBuilder(ResourceCache& cache) : materialCache(cache.materialCache), textureCache(cache.textureCache), materialBuilder(cache.textureCache) {};
+        ModelBuilder(ResourceCache& cache) : materialCache(cache.materialCache), textureCache(cache.textureCache), materialBuilder(cache) {};
         ModelBuilder& create(int id, std::string);
         ModelBuilder& loadFromPath(std::string);
+        ModelBuilder& setMaterial(const string& cs);
         Model build();
+        
 
-    private:
+        private:
 
         void processNode(aiNode* node, const aiScene* scene);
         Mesh processMesh(std::vector<glm::vec3> pos, std::vector<unsigned> _indices);
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
         std::string modelName;
+        Material modelMaterial;
         std::vector<Mesh> meshes;
         std::string directory;
         std::vector<Texture> _Textures;
+
 
         MaterialCache& materialCache;
         TextureCache& textureCache;
