@@ -1,11 +1,12 @@
 ﻿#pragma once
-#include "Resource.h"
+#include <assimp\material.h>
 
-class Texture : Resource<Texture>
+
+class Texture
 {
     public:
-    Texture(int id = -1) : Resource(id, RT_Texture){} ;
-    Texture(const Texture& text, int id): Resource(id, ResourceType::RT_Texture) {
+        Texture();
+    Texture(const Texture& text, int id) {
         _textureType = text._textureType;
         _path = text._path;
     }
@@ -20,16 +21,6 @@ class Texture : Resource<Texture>
         return _textureID;
     }
 
-    int getResourceID()
-    {
-        return resourceID;
-    }
-
-    ResourceType getResourceType()
-    {
-        return resourceType;
-    }
-
     Texture& operator=(Texture newTexture)
     {
         _textureType = newTexture._textureType;
@@ -42,6 +33,8 @@ class Texture : Resource<Texture>
         std::string _path;
         int _textureID = -1;
 };
+
+inline Texture::Texture() {}
 
 
 

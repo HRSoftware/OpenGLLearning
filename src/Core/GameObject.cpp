@@ -1,32 +1,35 @@
 #include "stdafx.h"
-#include "../../include/Core/GameObject.h"
-#include "../../include/Helpers/GUIDAllocator.h"
 
-GameObject::GameObject() : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
+#include "../../include/Helpers/GUIDAllocator.h"
+#include "../../include/Core/Model.h"
+#include "../../include/Core/Mesh.h"
+
+#include "../../include/Core/GameObject.h"
+GameObject::GameObject()
 {
     _isModelNULL = true;
 }
 
 
-GameObject::GameObject(std::string name, Model model) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
+GameObject::GameObject(std::string name, std::weak_ptr<Model> model)
 {
     _isModelNULL = false;
     GOName = name;
-    _model = model;
+    _model = model.lock();
     _isModelMatrixOutdated = true;
 }
 
-GameObject::GameObject(std::vector<Vertex> _vertices, std::vector<unsigned> _indices) : Resource<GameObject>(GUID_Allocator::getNewUniqueGUID(), RT_GameObject)
+GameObject::GameObject(std::vector<Vertex> _vertices, std::vector<unsigned> _indices)
 {
     _isModelMatrixOutdated = true;
-    _model.meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
+    _model->meshes.push_back(Mesh(std::move(_vertices), std::move(_indices), true));
 }
 
 GameObject::~GameObject()
 {
 }
 
-void GameObject::setModel(Model model)
+void GameObject::setModel(std::shared_ptr<Model> model)
 {
     _model = model;
     _isModelMatrixOutdated = true;
@@ -129,5 +132,20 @@ glm::vec3 GameObject::getScale() const
 
 std::vector<Mesh>& GameObject::getMeshes()
 {
-    return _model.meshes;
+    return _model->meshes;
+}
+
+GameObject& GameObject::operator=(const GameObject& gameObject)
+{
+    _model = gameObject._model;
+    GOName = gameObject.GOName;
+    _position = gameObject._position;
+    _scale = gameObject._scale;
+    _orientation = gameObject._orientation;
+    _isModelNULL = gameObject._isModelNULL;
+    _isModelMatrixOutdated = gameObject._isModelMatrixOutdated;
+
+    _modelMatrix = gameObject._modelMatrix;
+
+    return *this;
 }

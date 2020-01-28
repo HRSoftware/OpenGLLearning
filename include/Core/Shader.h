@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Resource.h"
+
 
 enum ShaderType
 {
@@ -12,17 +12,41 @@ enum ShaderType
     TESS_EVAL = GL_TESS_EVALUATION_SHADER
 };
 
-class Shader : Resource<Shader>
+enum ShaderLocationIndex{
+    LOC_VERTEX_POSITION = 0,
+    LOC_VERTEX_TEXCOORD01,
+    LOC_VERTEX_TEXCOORD02,
+    LOC_VERTEX_NORMAL,
+    LOC_VERTEX_TANGENT,
+    LOC_VERTEX_COLOR,
+    LOC_MATRIX_MVP,
+    LOC_MATRIX_MODEL,
+    LOC_MATRIX_VIEW,
+    LOC_MATRIX_PROJECTION,
+    LOC_VECTOR_VIEW,
+    LOC_COLOR_DIFFUSE,
+    LOC_COLOR_SPECULAR,
+    LOC_COLOR_AMBIENT,
+    LOC_MAP_ALBEDO,          // LOC_MAP_DIFFUSE
+    LOC_MAP_METALNESS,       // LOC_MAP_SPECULAR
+    LOC_MAP_NORMAL,
+    LOC_MAP_ROUGHNESS,
+    LOC_MAP_OCCLUSION,
+    LOC_MAP_EMISSION,
+    LOC_MAP_HEIGHT,
+    LOC_MAP_CUBEMAP,
+    LOC_MAP_IRRADIANCE,
+    LOC_MAP_PREFILTER,
+    LOC_MAP_BRDF
+};
+
+class Shader
 {
 public:
     Shader() = default;
 	Shader(int id);
     Shader(int id, std::string name, std::map<std::string, int>& locations);
     ~Shader() = default;
-
-    int getResourceID();
-
-    ResourceType getResourceType();
 
     Shader& operator=(const Shader&);
 

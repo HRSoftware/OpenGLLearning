@@ -12,6 +12,7 @@
 #include <vector>
 #include <unordered_map>
 #include <regex>
+#include <memory>
 
 //glad
 #include <glad/glad.h>

@@ -25,7 +25,7 @@ class ModelBuilder
         Material modelMaterial;
         std::vector<Mesh> meshes;
         std::string directory;
-        std::vector<Texture> _Textures;
+        std::vector<Texture> _textures;
 
 
         MaterialCache& materialCache;

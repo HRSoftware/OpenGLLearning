@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
-#include "Structures/JsonFormatModel.h""
-#include "JsonExporter.h"
 #include "../Core/Model.h"
+#include "JsonExporter.h"
 
-std::vector<JsonFormatModel> JsonExporter::processModels(Model modelToProcess)
+std::vector<JsonModel> JsonExporter::processModels(Model modelToProcess)
 {
-    JsonFormatModel JFM;
+    std::vector<JsonModel> modelVec;
+    JsonModel JFM;
     std::vector<Vertex> _vertex;
     std::vector<string> _textures;
     std::vector<Material> _materials;
@@ -17,7 +17,9 @@ std::vector<JsonFormatModel> JsonExporter::processModels(Model modelToProcess)
             _vertex.push_back(vertices);
         }
 
-        fpr(auto textures : mesh.getAllTextures());
+        
         
     }
+
+    return modelVec;
 }

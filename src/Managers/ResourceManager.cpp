@@ -153,7 +153,7 @@ inline void ResourceManager::LoadGameObjectsFromJson(const rapidjson::Value& gam
         newGameObject.setName(gameObjectName);
         newGameObject.setPosition(position);
         newGameObject.setScale(scale);
-        newGameObject.setModel(resourceCache.modelCache.findModel(gameObject.FindMember("model")->value.GetString()));
+        //newGameObject.setModel();
         newGameObject.updateModelMatrix();
 
         resourceCache.gameObjectCache.addGameObject(gameObjectName, newGameObject);

@@ -1,15 +1,16 @@
 #pragma once
 
-#include "Shader.h"
-#include "Texture.h"
-#include "../Helpers/ShaderFunctions.h"
+#include "../Core/Texture.h"
+#include "../Core/Shader.h"
+
+//class Texture;
+enum aiTextureType;
 
 
-
-class Material : public Resource<Material>
+class Material
 {
   public:
-      Material();
+      Material() = default;
     Material(int id, std::string name, std::vector<Texture>, Shader);
     Material(int id, std::string name, std::vector<Texture> texture);
     Material(int id, std::string name, Texture );
@@ -32,7 +33,7 @@ class Material : public Resource<Material>
     void setUpShader(bool textured);
 
   private:
-    std::vector<Texture> textures;
+    std::vector<Texture> textures{};
     std::string materialName = ""; 
     Shader shader;
     void setUpShader(); 

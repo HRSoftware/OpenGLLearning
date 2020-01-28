@@ -1,7 +1,9 @@
 #pragma once
-#include "Interfaces/IBaseLight.h"
-#include "GameObject.h"
 
+
+class Material;
+class GameObject;
+class IBaseLight;
 class ShadowRender
 {
 	public:

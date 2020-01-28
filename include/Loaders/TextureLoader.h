@@ -20,7 +20,7 @@ class TextureLoader : private ResourceLoader<Texture>
 
 inline Texture TextureLoader::createTexture(std::string path, aiTextureType type = aiTextureType_UNKNOWN)
 {
-    Texture newTexture(GUID_Allocator::getNewUniqueGUID());
+    Texture newTexture;
     newTexture._path = path;
     newTexture._textureID = createTextureIDFromFile(path.c_str(),"", true);
     newTexture._textureType = type;

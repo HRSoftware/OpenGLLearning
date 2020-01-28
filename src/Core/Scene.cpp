@@ -74,19 +74,19 @@ void Scene::loadResources()
     _sunLight.setSpecular({ 0.1f,0.1f, 0.1f });
     _sunLight.setDirection({ -0.2f, -1.0f, -0.3f });
     
-    HR::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "shininess", 10.0f);
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.position", _sunLight.getPosition());
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.ambient", _sunLight.getAmbient());
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.diffuse", _sunLight.getDiffuse());
-    HR::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.intensity", _sunLight.getStrength());
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.specular", _sunLight.getSpecular());
+    ShaderHelper::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "shininess", 10.0f);
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.position", _sunLight.getPosition());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.ambient", _sunLight.getAmbient());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.diffuse", _sunLight.getDiffuse());
+    ShaderHelper::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.intensity", _sunLight.getStrength());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.specular", _sunLight.getSpecular());
 
-    HR::setFloat(resourceCache.shaderCache.findShader("lightingShader"),"shininess", 10.f);
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.position", _sunLight.getPosition());
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.ambient", _sunLight.getAmbient());
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.diffuse", _sunLight.getDiffuse());
+    ShaderHelper::setFloat(resourceCache.shaderCache.findShader("lightingShader"),"shininess", 10.f);
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.position", _sunLight.getPosition());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.ambient", _sunLight.getAmbient());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.diffuse", _sunLight.getDiffuse());
     //_shaderVec.at("lightingShader").setFloat("light.intensity", _sunLight.getStrength());
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"),"light.specular", _sunLight.getSpecular());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("lightingShader"),"light.specular", _sunLight.getSpecular());
 
     skybox.setMaterial(resourceCache.materialCache.findMaterial("skyboxMaterial"));
         
@@ -156,8 +156,8 @@ void Scene::run()
         //shaderCache.findShader("debugDepthShader")->use();
         //_renderer->renderBatch_ToDepthBuffer(_GOVec, *resourceCache.shaderCache.findShader("debugDepthShader"));
 
-        HR::useProgram(resourceCache.shaderCache.findShader("modelLoadingShader").programID);
-        HR::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"), "lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
+        ShaderHelper::useProgram(resourceCache.shaderCache.findShader("modelLoadingShader").programID);
+        ShaderHelper::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"), "lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
 
 
         glViewport(0, 0, _screenWidth, _screenHeight);
@@ -175,7 +175,7 @@ void Scene::run()
         if (glfwGetKey(_window, GLFW_KEY_R) == GLFW_PRESS)
             _GOVec["Building1"].rotateBy(0.1f, { 0, 1, 0 });
 
-        HR::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"),"projection", projection);
+        ShaderHelper::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"),"projection", projection);
         _renderer->renderBatch(_GOVec);
         //_renderer->renderGameObject()
 

@@ -1,6 +1,8 @@
 #pragma once
-#include "../Core/Shader.h"
+
 #include "Cache.h"
+#include "../Core/Shader.h"
+
 
 class ShaderCache {
     friend class ShaderBuilder;
@@ -10,7 +12,7 @@ public:
 
 private:
     std::map<std::string, Shader> shader_Map;
-    std::map<int, std::map<string, int>> uniformLocationMap;
+    std::map<int, std::map<std::string, int>> uniformLocationMap;
 };
 
 inline Shader ShaderCache::findShader(std::string refName)

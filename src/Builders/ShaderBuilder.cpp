@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "../../include/Builders/ShaderBuilder.h"
 
+#include "../../include/Core/Shader.h"
+#include "../../include/Builders/ShaderBuilder.h"
 
 ShaderBuilder& ShaderBuilder::createShader(int id, std::string refName , std::string fileName, bool core)
 {
@@ -160,5 +161,18 @@ std::map<std::string, int> ShaderBuilder::findUniformLocations()
 #endif
 
     return uniforms;
+}
+
+ShaderFactory::ShaderFactory()
+{
+}
+
+Shader ShaderFactory::createBasicShader(int id, const std::string refName, std::string filename)
+{
+    Shader newShader = builder.createShader(id, refName, filename)
+                              .addShader(VERTEX, filename)
+                              .addShader(FRAGMENT, filename)
+                              .build();
+    return newShader;
 }
 

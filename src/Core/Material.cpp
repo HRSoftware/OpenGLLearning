@@ -1,23 +1,25 @@
 #include "stdafx.h"
+#pragma once
+
+#include "../../include/Helpers/ShaderFunctions.h"
 #include "../../include/Core/Material.h"
 
 
-Material::Material() {}
 
-Material::Material(int id, std::string name, std::vector<Texture> _textures, Shader shdr) : Resource(id, RT_Material)
+Material::Material(int id, std::string name, std::vector<Texture> _textures, Shader shdr)
 {
     materialName = name;
     setTextures(_textures);
     shader = shdr;
 }
 
-Material::Material(int id, std::string name, std::vector<Texture> texture) : Resource(id, RT_Material)
+Material::Material(int id, std::string name, std::vector<Texture> texture)
 {
     materialName = name;
     setTextures(texture);
 }
 
-Material::Material(int id, std::string name, Texture texture) : Resource(id, RT_Material)
+Material::Material(int id, std::string name, Texture texture)
 {
     materialName = name;
     setTexture(texture);
@@ -112,7 +114,7 @@ void Material::setShader(Shader& newShader)
 
 void Material::Use()
 {
-    HR::useProgram(shader.programID);
+    ShaderHelper::useProgram(shader.programID);
 }
 
 void Material::setTextureToType(int id, aiTextureType textType)
@@ -167,16 +169,16 @@ void Material::setUpShader()
             switch ( type )
             {
             case aiTextureType_DIFFUSE:
-                HR::setInt(shader,("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
+                ShaderHelper::setInt(shader,("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
                 break;
             case aiTextureType_SPECULAR:
-                HR::setInt(shader,("texture_specular" + std::to_string(specularNr++)), _textureIndex);
+                ShaderHelper::setInt(shader,("texture_specular" + std::to_string(specularNr++)), _textureIndex);
                 break;
             case aiTextureType_NORMALS:
-                HR::setInt(shader,("texture_normal" + std::to_string(normalNr++)), _textureIndex);
+                ShaderHelper::setInt(shader,("texture_normal" + std::to_string(normalNr++)), _textureIndex);
                 break;
             case aiTextureType_HEIGHT:
-                HR::setInt(shader,("texture_height" + std::to_string(heightNr++)), _textureIndex);
+                ShaderHelper::setInt(shader,("texture_height" + std::to_string(heightNr++)), _textureIndex);
                 break;
             default:
                 break;
@@ -207,16 +209,16 @@ void Material::setUpShader(bool textured)
             switch ( _texture.getTextureType() )
             {
                 case aiTextureType_DIFFUSE:
-                    HR::setInt(shader, ("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
+                    ShaderHelper::setInt(shader, ("texture_diffuse" + std::to_string(diffuseNr++)), _textureIndex);
                     break;
                 case aiTextureType_SPECULAR:
-                    HR::setInt(shader, ("texture_specular" + std::to_string(specularNr++)), _textureIndex);
+                    ShaderHelper::setInt(shader, ("texture_specular" + std::to_string(specularNr++)), _textureIndex);
                     break;
                 case aiTextureType_NORMALS:
-                    HR::setInt(shader, ("texture_normal" + std::to_string(normalNr++)), _textureIndex);
+                    ShaderHelper::setInt(shader, ("texture_normal" + std::to_string(normalNr++)), _textureIndex);
                     break;
                 case aiTextureType_HEIGHT:
-                    HR::setInt(shader, ("texture_height" + std::to_string(heightNr++)), _textureIndex);
+                    ShaderHelper::setInt(shader, ("texture_height" + std::to_string(heightNr++)), _textureIndex);
                     break;
                 default:
                     break;

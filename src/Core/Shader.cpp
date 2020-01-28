@@ -1,8 +1,9 @@
 #include "stdafx.h"
+
 #include "../../include/Core/Shader.h"
 
 
-Shader::Shader(int id): Resource<Shader>(id, RT_Shader)
+Shader::Shader(int id)
 {
     programID = id;
 }
@@ -12,17 +13,6 @@ Shader::Shader(int id, std::string name, std::map<std::string, int>& locations)
     _shaderName = name;
     _uniformLocations = std::move(locations);
     programID = id;
-}
-
-
-int Shader::getResourceID()
-{
-    return resourceID;
-}
-
-ResourceType Shader::getResourceType()
-{
-    return resourceType;
 }
 
 Shader& Shader::operator=(const Shader& newShader)

@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "../../include/Cache/TextureCache.h"
-#include "../../include/Loaders/TextureLoader.h"
 
+#include "../../include/Loaders/TextureLoader.h"
+#include "../../include/Cache/TextureCache.h"
 
 Texture TextureCache::addTexture(std::string name, Texture tex)
 {
@@ -20,7 +20,7 @@ Texture TextureCache::findTextureByID(int id)
 {
     for ( auto _texture : texture_map )
     {
-        if(_texture.second.getResourceID() == id)
+        if(_texture.second.getTextureID() == id)
         {
             return _texture.second;
         }
