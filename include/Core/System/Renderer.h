@@ -1,11 +1,11 @@
 #pragma once
+#include "../Camera.h"
 
+#include "../GameObject.h"
+#include "../Lighting.h"
+
+#include "../Material.h"
 #include "../../Core/CurrentSceneStats.h"
-class Material;
-class IBaseLight;
-class GameObject;
-class Camera;
-class Model;
 
 class Renderable
 {
@@ -51,8 +51,8 @@ class Renderer
         void renderGameObject(GameObject gameObj, bool texture, bool requiredShaderSetUp);
         void renderGameObject_ToDepthBuffer(GameObject gameobj);
         void renderMesh(int VAO, int indiceCount);
-        void renderBatch_ToDepthBuffer(std::map<std::string, GameObject>& renderBatch, Shader shader);
-        void renderBatch(std::map<std::string, GameObject>& renderBatch, bool textured = true);
+        void renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBatch, Shader shader);
+        void renderBatch(std::map<string, GameObject>& renderBatch, bool textured = true);
         void renderGameObject(GameObject gameobj, bool texture);
         void addLightToScene(IBaseLight* light);
         void initDepthRender();

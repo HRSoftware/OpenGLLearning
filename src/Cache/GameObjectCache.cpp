@@ -5,7 +5,7 @@
 GameObject GameObjectCache::findGameObject(std::string gameObjectName)
 {
     auto gameObject = gameObject_map[gameObjectName];
-    if(gameObject.getName() != "")
+    if(gameObject.getResourceID() != -1)
         return gameObject;
 
     return GameObject();

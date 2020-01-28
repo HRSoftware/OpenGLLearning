@@ -6,11 +6,11 @@
 #include "../Core/Shader.h"
 
 
-namespace ShaderHelper {
+namespace HR {
     inline std::string currentShaderName = "";
     inline void useProgram(Shader shader)
     {
-        ShaderHelper::currentShaderName = shader._shaderName;
+        HR::currentShaderName = shader._shaderName;
         glUseProgram(shader.programID);
     }
 

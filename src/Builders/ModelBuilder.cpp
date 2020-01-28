@@ -1,16 +1,13 @@
 
 #include "stdafx.h"
-
-#include "../../include/Helpers/GUIDAllocator.h"
-#include "../../include/Core/Mesh.h"
 #include "../../include/Builders/ModelBuilder.h"
-#include "../../include/Core/Data_Structures/Vertex.h"
+#include "../../include/Helpers/GUIDAllocator.h"
 
 ModelBuilder& ModelBuilder::create(int id, std::string name)
 {
     modelName = name;
     meshes.clear();
-    _textures.clear();
+    _Textures.clear();
     
     return *this;
 }
@@ -160,7 +157,7 @@ Model ModelBuilder::build()
         newModel.meshes = meshes;
         newModel.directory = directory;
         newModel.gammaCorrection = true;
-        //newModel.textures = _textures;
+        newModel.textures = _Textures;
         newModel.modelName = modelName;
     return newModel;
 }
@@ -168,7 +165,7 @@ Model ModelBuilder::build()
 Model ModelFactory::create(std::string name, string path)
 {
     Model model = resourceCache.modelCache.findModel(name);
-    if(model.modelName == "")
+    if(model.getResourceID() == -1)
     {
         Model newModel = modelBuilder.create(GUID_Allocator::getNewUniqueGUID(), name)
             .loadFromPath(path)

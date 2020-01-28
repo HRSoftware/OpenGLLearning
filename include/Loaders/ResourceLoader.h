@@ -27,7 +27,7 @@ class ResourceLoader<Texture>
     private:
     static Texture createTexture(int id, std::string pathToFile, aiTextureType type)
     {
-        Texture newTexture;
+        Texture newTexture(id);
         newTexture._path = pathToFile;
         newTexture._textureID = createTextureIDFromFile(pathToFile.c_str(),"", true);
         newTexture._textureType = type;

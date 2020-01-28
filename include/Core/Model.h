@@ -4,8 +4,6 @@
 #define MODEL_H
 
 #include "Mesh.h"
-class Texture;
-class Material;
 
 #include "Interfaces/IRenderCallbacks.h"
 
@@ -14,20 +12,49 @@ class Material;
 using namespace std;
 
 
-class Model
+class Model : Resource<Model>
 {
 public:
-    //std::vector<Texture> textures; //redundant??
+    vector<Texture> textures; //redundant??
     std::string modelName = "";
-    std::vector<Mesh> meshes;
+    vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
 
-    Model(int id = -1);
-    Model& operator=(Model newModel);
-    Model(int id, string const& path, bool gamma = false);
-    Model(int id, std::vector<glm::vec3> pos, std::vector<unsigned int> _indices);
+    Model(int id = -1) : Resource<Model>(id, RT_Model)
+    {
 
+    }
+
+    Model& operator=(Model newModel)
+    {
+        meshes = newModel.meshes;
+        directory = newModel.directory;
+        textures = newModel.textures;
+        gammaCorrection = newModel.gammaCorrection;
+        modelName = newModel.modelName;
+        return *this;
+    }
+
+    Model(int id, string const& path, bool gamma = false) : gammaCorrection(gamma), Resource<Model>(id, RT_Model)
+    {
+        //loadModel(path);
+    }
+
+    Model(int id, std::vector<glm::vec3> pos, std::vector<unsigned int> _indices) : Resource<Model>(id, RT_Model)
+    {
+        //meshes.push_back(processMesh(pos, _indices));
+    }
+
+    int getResourceID()
+    {
+        return resourceID;
+    }
+
+    ResourceType getResourceType()
+    {
+        return resourceType;
+    }
     void setMaterial(Material material);
     //Mesh processMesh(std::vector<glm::vec3> pos, std::vector<unsigned int> _indices);
 

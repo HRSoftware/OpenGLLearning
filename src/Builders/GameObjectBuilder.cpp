@@ -23,7 +23,7 @@ GameObjectBuilder& GameObjectBuilder::addModel(std::string path, std::string nam
 
 GameObject GameObjectBuilder::build()
 {
-    return GameObject(_goName, std::make_shared<Model>(_model));
+    return GameObject(_goName, _model);
 }
 
 GameObject GameObjectFactory::create(string gameObjectName)

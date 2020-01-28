@@ -1,5 +1,4 @@
 #pragma once
-#include "../GameObject.h"
 
 namespace UI {
     inline void updateUI(GLFWwindow* _window)

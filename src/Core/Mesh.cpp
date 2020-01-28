@@ -1,14 +1,12 @@
 #include "stdafx.h" 
-
-#include "../../include/Core/Data_Structures/Vertex.h"
 #include "../../include/Core/Mesh.h"
 
-std::vector<Vertex> Mesh::getVertices()
+ vector<Vertex> Mesh::getVertices()
  {
      return _vertices;
  }
 
- std::vector<unsigned> Mesh::getIndices()
+ vector<unsigned> Mesh::getIndices()
  {
      return _indices;
  }
@@ -32,22 +30,6 @@ std::vector<Vertex> Mesh::getVertices()
  {
      _material = material;
  }
-
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned> indices, Material newMaterial, bool root): _material(newMaterial)
-{
-    _vertices = std::move(vertices);
-    _indices = std::move(indices);
-    Mesh::setUpBuffers();
-}
-
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned> indices, bool root)
-{
-    _vertices = std::move(vertices);
-    _indices = std::move(indices);
-    Mesh::setUpBuffers();
-}
-
-Mesh::~Mesh() = default;
 
  void Mesh::deleteMesh(bool deleteChildMesh)
 {

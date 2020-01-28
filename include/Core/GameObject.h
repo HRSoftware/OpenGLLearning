@@ -1,22 +1,20 @@
 #pragma once
 
 
-
-class Model;
-class Mesh;
-struct Vertex;
+#include "Model.h"
 
 
-class GameObject
+class GameObject : Resource<GameObject>
 {
 public:
     GameObject() ;
-    GameObject(std::string name, std::weak_ptr<Model> model);
+
+	GameObject(std::string name, Model model);
 	GameObject(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices);
 	~GameObject();
 
 
-    void setModel(std::shared_ptr<Model> model);
+    void setModel(Model _model);
     void setName(std::string name);
 	void setPosition(glm::vec3 pos);
 	void moveBy(glm::vec3 pos);
@@ -34,13 +32,34 @@ public:
 	glm::vec3 getScale() const;
 	glm::mat4 getModelMatrix();
 	std::vector<Mesh>& getMeshes();
+    int getResourceID()
+    {
+        return resourceID;
+    }
 
+    ResourceType getResourceType()
+    {
+        return resourceType;
+    }
 
-    GameObject& operator=(const GameObject& gameObject);
+    GameObject& operator= (const GameObject& gameObject)
+    {
+        _model = gameObject._model;
+        GOName = gameObject.GOName;
+        _position = gameObject._position;
+        _scale = gameObject._scale;
+        _orientation = gameObject._orientation;
+        _isModelNULL = gameObject._isModelNULL;
+        _isModelMatrixOutdated = gameObject._isModelMatrixOutdated;
+
+        _modelMatrix = gameObject._modelMatrix;
+
+        return *this;
+    }
 
 	protected:
 
-    std::shared_ptr<Model> _model;
+    Model _model;
 
 	private:
         std::string GOName;

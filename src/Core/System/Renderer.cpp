@@ -1,13 +1,6 @@
 #include "stdafx.h"
-
-#include "../../../include/Core/Material.h"
-#include "../../../include/Helpers/ShaderFunctions.h"
-#include "../../../include/Core/Mesh.h"
-#include "../../../include/Core/GameObject.h"
-#include "../../../include/Core/Model.h"
-#include "../../../include/Core/Lighting.h"
-#include "../../../include/Core/Camera.h"
 #include "../../../include/Core/System/Renderer.h"
+#include "../../../include/Core/Material.h"
 
 
 std::shared_ptr<Model> Renderable::getModel(std::string modelName)
@@ -96,10 +89,10 @@ void Renderer::renderGameObject_ToDepthBuffer(GameObject gameobj)
     }
 }
 
-void Renderer::renderBatch_ToDepthBuffer(std::map<std::string, GameObject>& renderBatch, Shader shader)
+void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBatch, Shader shader)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, _framebufferDepth);
-    ShaderHelper::useProgram(shader.programID);
+    HR::useProgram(shader.programID);
     glViewport(0, 0, _shadowWidth, _shadowHeight);
     
 
@@ -107,10 +100,10 @@ void Renderer::renderBatch_ToDepthBuffer(std::map<std::string, GameObject>& rend
       _light->useLight();
 
        //shader.setVec3("viewPos", _light->getPosition());
-      ShaderHelper::setMat4(shader, "lightSpaceMatrix", _light->getShadowViewProjectionMatrix(true));
+      HR::setMat4(shader, "lightSpaceMatrix", _light->getShadowViewProjectionMatrix(true));
 
       for (auto GO : renderBatch) {
-        ShaderHelper::setMat4(shader,"modelMatrix", GO.second.getModelMatrix());
+        HR::setMat4(shader,"modelMatrix", GO.second.getModelMatrix());
         renderGameObject_ToDepthBuffer(GO.second);
          
       }
@@ -145,8 +138,8 @@ void Renderer::renderGameObject(GameObject gameObj, bool texture = true, bool re
             SceneStats::activeMaterial = currentMat;
 
         SceneStats::activeMaterial.setUpShader(texture);
-       ShaderHelper::setMat4(currentMat.getShader(), "view", _currentCamera->GetViewMatrix());
-       ShaderHelper::setMat4(currentMat.getShader(), "model", gameObj.getModelMatrix());
+       HR::setMat4(currentMat.getShader(), "view", _currentCamera->GetViewMatrix());
+       HR::setMat4(currentMat.getShader(), "model", gameObj.getModelMatrix());
     }
         
 
