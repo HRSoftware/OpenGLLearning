@@ -1,31 +1,27 @@
 #include "stdafx.h"
+#pragma once
+
+#include "../../../include/Core/Data_Structures/Material.h"
+#include "../../../include/Helpers/ShaderFunctions.h"
+#include "../../../include/Core/Data_Structures/Mesh.h"
+#include "../../../include/Core/Data_Structures/GameObject.h"
+#include "../../../include/Core/Data_Structures/Model.h"
+#include "../../../include/Core/Data_Structures/Shader.h"
+#include "../../../include/Core/Lighting.h"
+#include "../../../include/Core/Camera.h"
 #include "../../../include/Core/System/Renderer.h"
 #include "../../../include/Core/Material.h"
 
 
-std::shared_ptr<Model> Renderable::getModel(std::string modelName)
+
+void Renderer::setCamera(std::shared_ptr<Camera> cam)
 {
-    return std::make_shared<Model>(Renderable::RenerableModels.at(modelName));
+    Globals::RenderSystem::currentCamera = cam;
 }
 
-std::shared_ptr<Model> Renderable::addModel(std::string fileName)
+void Renderer::addLightToScene(std::shared_ptr<IBaseLight> light)
 {
-    std::shared_ptr<Model> model = Renderable::getModel(fileName);
-    return model != nullptr ? model : Renderable::getModel(fileName);
-}
-
-void Renderer::setCamera(Camera& cam)
-{
-    _currentCamera = &cam;
-}
-
-
-
-
-
-void Renderer::addLightToScene(IBaseLight* light)
-{
-   _sceneLights.push_back(light);
+   _sceneLights.push_back(std::move(light));
 }
 
 void Renderer::initDepthRender()
@@ -83,16 +79,16 @@ void Renderer::renderMesh(int VAO, int indiceCount)
 
 void Renderer::renderGameObject_ToDepthBuffer(GameObject gameobj)
 {
-    for ( auto mesh : gameobj.getMeshes())
+    for ( auto mesh : gameobj._model.get()->meshes)
     {
-       renderMesh(mesh.getVAO(), mesh.getIndices().size());
+       renderMesh(mesh->VAO, mesh->_indices.size());
     }
 }
 
-void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBatch, Shader shader)
+void Renderer::renderBatch_ToDepthBuffer(std::map<std::string, GameObject>& renderBatch, std::shared_ptr<Shader> shader)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, _framebufferDepth);
-    HR::useProgram(shader.programID);
+    MaterialHelper::useMaterial(Globals::RenderSystem::activeMaterial);
     glViewport(0, 0, _shadowWidth, _shadowHeight);
     
 
@@ -100,10 +96,10 @@ void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBat
       _light->useLight();
 
        //shader.setVec3("viewPos", _light->getPosition());
-      HR::setMat4(shader, "lightSpaceMatrix", _light->getShadowViewProjectionMatrix(true));
+      ShaderHelper::setMat4(shader, LOC_MATRIX_MVP, _light->getShadowViewProjectionMatrix(true));
 
       for (auto GO : renderBatch) {
-        HR::setMat4(shader,"modelMatrix", GO.second.getModelMatrix());
+        ShaderHelper::setMat4(shader,LOC_MATRIX_MODEL, GO.second.getModelMatrix());
         renderGameObject_ToDepthBuffer(GO.second);
          
       }
@@ -114,38 +110,37 @@ void Renderer::renderBatch_ToDepthBuffer(std::map<string, GameObject>& renderBat
 
 void Renderer::renderBatch(std::map<string, GameObject>& renderBatch, bool textured)
 {
-    for (auto GO : renderBatch) {
-        for(auto mesh : GO.second.getMeshes())
+    for (auto GO = renderBatch.begin(); GO != renderBatch.end(); GO++) {
+        for(auto mesh : GO->second._model->meshes)
         {
-            if (mesh.getMaterial().getName() != SceneStats::activeMaterial.getName()) {
-                SceneStats::activeMaterial =  mesh.getMaterial();
-               
-                SceneStats::activeMaterial.setUpShader(textured);
-                SceneStats::activeMaterial.Use();
-            } 
-            renderGameObject(GO.second, textured, false);
+            if (mesh->_material != Globals::RenderSystem::activeMaterial) 
+                MaterialHelper::useMaterial(mesh->_material);
+            
+            renderGameObject(GO->second, textured, false);
         }
     }
 }
 
+void Renderer::renderGameObject(GameObject gameobj, bool texture) {}
+
 void Renderer::renderGameObject(GameObject gameObj, bool texture = true, bool requiredShaderSetUp = false)
 {
     //if(requiredShaderSetUp)
-    for(Mesh mesh : gameObj.getMeshes())
+    for(auto mesh : gameObj._model->meshes)
     {
-        Material currentMat = mesh.getMaterial();
-        if (currentMat.getName() != SceneStats::activeMaterial.getName())
-            SceneStats::activeMaterial = currentMat;
+        auto currentMat = mesh->_material;
+        if (currentMat->name != Globals::RenderSystem::activeMaterial->name)
+               MaterialHelper::useMaterial(currentMat);
 
-        SceneStats::activeMaterial.setUpShader(texture);
-       HR::setMat4(currentMat.getShader(), "view", _currentCamera->GetViewMatrix());
-       HR::setMat4(currentMat.getShader(), "model", gameObj.getModelMatrix());
+            
+       ShaderHelper::setMat4(Globals::RenderSystem::activeMaterial->shader, LOC_MATRIX_VIEW, _currentCamera->GetViewMatrix());
+       ShaderHelper::setMat4(Globals::RenderSystem::activeMaterial->shader, LOC_MATRIX_MODEL, gameObj.getModelMatrix());
     }
         
 
     
-    for ( auto m : gameObj.getMeshes() )
+    for ( auto m : gameObj._model->meshes )
     {
-        renderMesh(m.getVAO(), m.getIndices().size());
+        renderMesh(m->VAO, m->_indices.size());
     }
 }

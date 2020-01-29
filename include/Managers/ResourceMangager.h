@@ -19,9 +19,9 @@ public:
     void loadNewResource(ResourceType type, std::string pathToFile, std::string referenceName = "");
 
     Texture loadNewTexture(aiTextureType type, std::string pathToFile, std::string referenceNamed = "");
-    Shader loadNewShader(int shaderMask, ::string pathToFile, std::string referenceName = "");
-    Material loadNewMaterial(aiMaterial* mat, std::string pathToFile, std::string referenceNamed = "");
-    Model addNewModel(std::string name, std::string path, std::string shader);
+    std::shared_ptr<Shader> loadNewShader(int shaderMask, ::string pathToFile, std::string referenceName = "");
+    std::shared_ptr<Material> loadNewMaterial(aiMaterial* mat, std::string pathToFile, std::string referenceNamed = "");
+    std::shared_ptr<Model> addNewModel(std::string name, std::string path, std::string shader);
 
 
     template<class T>

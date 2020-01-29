@@ -2,10 +2,14 @@
 #include "Interfaces/IBaseLight.h"
 #include "GameObject.h"
 
+
+struct Material;
+class GameObject;
+class IBaseLight;
 class ShadowRender
 {
 	public:
-		ShadowRender(Material& material) : _shadowMaterial(material)
+		ShadowRender(std::shared_ptr<Material> material) : _shadowMaterial(material)
 		{
 			init();
 			_shadowBiasMatrix={
@@ -15,7 +19,7 @@ class ShadowRender
 				0.5, 0.5, 0.5, 1.0
 			};
 		};
-		void castShadows(std::vector<GameObject*> &renderableObjects);
+		void castShadows(std::vector<std::shared_ptr<GameObject>> renderableObjects);
 		void addLight(IBaseLight& light);
 
 		void init();
@@ -31,7 +35,7 @@ class ShadowRender
 		const GLuint _SHADOW_WIDTH = 1024;
 		const GLuint _SHADOW_HEIGHT = 1024;
 		glm::mat4 _shadowMatrixWithBias;
-		Material& _shadowMaterial;
+		std::shared_ptr<Material> _shadowMaterial;
 		glm::mat4 _shadowBiasMatrix;
 
 

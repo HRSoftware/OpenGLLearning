@@ -6,23 +6,11 @@ class InputController
 {
 	public:
 	InputController(){}
-	InputController(GLFWwindow& window, Camera* cam = nullptr)
+	InputController(GLFWwindow& window, std::shared_ptr<Camera> cam = nullptr)
 	{
-		_window = &window;
-		firstMouse = true;
-		InputController::_camera = cam;
+
 	}
 
-
-	void setCamera(Camera& newCamera)
-	{
-		_camera = &newCamera;
-	}
-
-	static Camera* _camera;
-	static float lastX, lastY;
-	private:
-		 GLFWwindow* _window;
 		 //bool firstMouse; 
 		 
 		 

@@ -15,6 +15,8 @@ public:
     }
 };
 
+struct Texture;
+
 template<>
 class ResourceLoader<Texture>
 {
@@ -25,10 +27,10 @@ class ResourceLoader<Texture>
     }
 
     private:
-    static Texture createTexture(int id, std::string pathToFile, aiTextureType type)
+    static Texture  createTexture(int id, std::string pathToFile, aiTextureType type)
     {
-        Texture newTexture(id);
-        newTexture._path = pathToFile;
+        Texture newTexture;
+        newTexture.name = pathToFile;
         newTexture._textureID = createTextureIDFromFile(pathToFile.c_str(),"", true);
         newTexture._textureType = type;
 

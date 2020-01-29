@@ -1,14 +1,15 @@
 #include "stdafx.h"
+
+#include "../../include/Core/Data_Structures/Shader.h"
 #include "../../include/Builders/ShaderBuilder.h"
 
-
-ShaderBuilder& ShaderBuilder::createShader(int id, std::string refName , std::string fileName, bool core)
+ShaderBuilder& ShaderBuilder::createShader(int id, std::string refName, std::string fileName, bool core)
 {
     resID = id;
     shaderFileName = fileName;
     shaderProgramName = refName;
     programID = 0;
-    _uniformLocations.clear();
+    _customUniformLocations.clear();
     shadersIDs.clear();
     return *this;
 }
@@ -109,13 +110,18 @@ Shader ShaderBuilder::build()
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\t" << shaderProgramName << "\n\t" << infoLog << std::endl;
     }
 
-    _uniformLocations = findUniformLocations();
+    _customUniformLocations = findUniformLocations();
     for ( auto shaderID : shadersIDs )
     {
         glDeleteShader(shaderID);
     }
-    
-    return Shader(programID, shaderProgramName, _uniformLocations);
+
+
+    Shader newShader;
+    newShader.programID = programID;
+    newShader._shaderName = shaderProgramName;
+    newShader._customUniformLocations = _customUniformLocations;
+    return newShader;
 }
 
 std::map<std::string, int> ShaderBuilder::findUniformLocations()
@@ -153,7 +159,10 @@ std::map<std::string, int> ShaderBuilder::findUniformLocations()
         if( results[3] != -1 ) continue;  // Skip uniforms in blocks
         GLint nameBufSize = results[0] + 1;
         char * name = new char[nameBufSize];
+
         glGetProgramResourceName(programID, GL_UNIFORM, i, nameBufSize, NULL, name);
+
+
         uniforms[name] = results[2];
         delete [] name;
     }

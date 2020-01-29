@@ -1,25 +1,18 @@
 #pragma once
 
 #include "../../include/Helpers/ShaderFunctions.h"
-#include "Material.h"
+class Material;
 
 
 class Skybox
 {
 public:
-	Skybox() {
-		setUpBuffers();
-		loadSkyboxMap();
-	}
-	
-	Skybox(std::vector<std::string> textures) {
-		skyboxTextures = textures;
-		setUpBuffers();
-		loadSkyboxMap();
-	}
-	~Skybox(){}
+	Skybox();
+
+	Skybox(std::vector<std::string> textures);
+	~Skybox();
 	void Draw(glm::mat4 view, glm::mat4 projection);
-	void setMaterial(Material material);
+	void setMaterial(std::shared_ptr<Material> material);
 	void setVerticies(std::vector<float> vert);
 
 private:
@@ -31,7 +24,7 @@ private:
 	void loadSkyboxMap();
 	void setUpBuffers();
 	
-	Material skyMaterial;
+	std::shared_ptr<Material> skyMaterial;
 
 	std::vector<float> skyboxVertices = {
 	// positions          

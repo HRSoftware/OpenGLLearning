@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "../../include/Managers/ResourceMangager.h"
 
-
-Texture ResourceManager::loadNewTexture(aiTextureType type, std::string pathToFile, std::string referenceNamed)
+Texture ResourceManager::loadNewTexture(aiTextureType type, std::string pathToFile,
+                                        std::string referenceNamed)
 {
     return textureLoader.loadNewResource(2, pathToFile, type);
 }
 
-Shader ResourceManager::loadNewShader(int shaderMask, ::string pathToFile, std::string referenceName)
+std::shared_ptr<Shader> ResourceManager::loadNewShader(int shaderMask, ::string pathToFile, std::string referenceName)
 {
     return resourceCache.shaderCache.addShader(referenceName, shaderLoader.loadNewResource(shaderMask, referenceName, pathToFile));
 }
 
-Material ResourceManager::loadNewMaterial(aiMaterial* mat, std::string pathToFile, std::string referenceName)
+std::shared_ptr<Material> ResourceManager::loadNewMaterial(aiMaterial* mat, std::string pathToFile, std::string referenceName)
 {
     std::string matName = referenceName.empty() ? pathToFile : referenceName;
     MaterialBuilder newMaterial(resourceCache);
@@ -45,13 +45,13 @@ Material ResourceManager::loadNewMaterial(aiMaterial* mat, std::string pathToFil
             mat->GetTexture(_type, i, &str);
             // check if texture was loaded before and if so
             bool skip = false;
-            Texture _texture = resourceCache.textureCache.findTexture(pathToFile + str.data);
+            std::shared_ptr<Texture> _texture = resourceCache.textureCache.findTexture(pathToFile + str.data);
 
-            if (_texture._textureID == -1) {
+            if (_texture->_textureID == 0) {
                 std::string path = path + "/" + str.C_Str();
                 path = std::regex_replace(path, std::regex("//"), "/");
-                _texture = loadNewTexture(_type, pathToFile);
-                resourceCache.textureCache.addTexture(path, _texture);
+                Texture newTexture = loadNewTexture(_type, pathToFile);
+                _texture = resourceCache.textureCache.addTexture(path, newTexture);
             }
 
             newMaterial.addTexture(_texture);
@@ -63,7 +63,7 @@ Material ResourceManager::loadNewMaterial(aiMaterial* mat, std::string pathToFil
 
 }
 
-Model ResourceManager::addNewModel(std::string name, std::string path, std::string shader)
+std::shared_ptr<Model> ResourceManager::addNewModel(std::string name, std::string path, std::string shader)
 {
     return resourceCache.modelCache.addModel(name, modelLoader.loadNewResource(GUID_Allocator::getNewUniqueGUID(), name, path, shader));
 }

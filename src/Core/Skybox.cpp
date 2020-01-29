@@ -1,15 +1,31 @@
 #include "stdafx.h"
 #include "../../include/Core/Skybox.h"
+#include "../../include/Core/Data_Structures/Material.h"
 
+
+Skybox::Skybox()
+{
+	setUpBuffers();
+	loadSkyboxMap();
+}
+
+Skybox::Skybox(std::vector<std::string> textures)
+{
+	skyboxTextures = textures;
+	setUpBuffers();
+	loadSkyboxMap();
+} 
+
+Skybox::~Skybox() {}
 
 void Skybox::Draw(glm::mat4 view, glm::mat4 projection)
 {
 	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-	HR::useProgram(skyMaterial.getShader().programID);
-	HR::setInt(skyMaterial.getShader(), "skybox", 0);
+    ShaderHelper::useMaterial(skyMaterial);
+	ShaderHelper::setInt(skyMaterial->shader, LOC_MAP_CUBEMAP, 0);
 
-	HR::setMat4(skyMaterial.getShader(),"view", glm::mat4(glm::mat3(view)));
-	HR::setMat4(skyMaterial.getShader(),"projection", projection);
+	ShaderHelper::setMat4(skyMaterial->shader,LOC_MATRIX_VIEW, glm::mat4(glm::mat3(view)));
+	ShaderHelper::setMat4(skyMaterial->shader,LOC_MATRIX_PROJECTION, projection);
 	
 
 	glBindVertexArray(skyboxVAO);
@@ -20,11 +36,6 @@ void Skybox::Draw(glm::mat4 view, glm::mat4 projection)
 	glDepthFunc(GL_LESS); // set depth function back to default
 	
 }	
-
-void Skybox::setMaterial(Material material)
-{
-	skyMaterial = material;
-}
 
 void Skybox::setUpBuffers()
 {

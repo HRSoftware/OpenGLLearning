@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#include "../../include/Core/Shader.h"
+
+#include "../../../include/Core/Data_Structures/Shader.h"
 
 
 Shader::Shader(int id): Resource<Shader>(id, RT_Shader)

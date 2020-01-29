@@ -4,24 +4,70 @@
 #include "../../include/Builders/GameObjectBuilder.h"
 
 
-
-bool Scene::initScene(Camera cam)
+Scene::Scene(std::shared_ptr<GLFWwindow> wnd, std::shared_ptr<Renderer> renderer): resourceManager(resourceCache)
 {
-    glfwGetWindowSize(_window, &_screenWidth, &_screenHeight);
-    lastX = _screenWidth / 2;
-    lastY = _screenHeight / 2;
+    Globals::Window::activeWindow = wnd;
+    _renderer = renderer;
+}
+
+void processInput(std::shared_ptr<GLFWwindow> _window, float deltaTime)
+{
+    if ( glfwGetKey(Globals::Window::activeWindow.get(), GLFW_KEY_ESCAPE) == GLFW_PRESS )
+        glfwSetWindowShouldClose(Globals::Window::activeWindow.get(), true);
+
+    if ( glfwGetKey(Globals::Window::activeWindow.get(), GLFW_KEY_W) == GLFW_PRESS )
+        Globals::RenderSystem::currentCamera->ProcessKeyboard(FORWARD, deltaTime);
+    if ( glfwGetKey(Globals::Window::activeWindow.get(), GLFW_KEY_S) == GLFW_PRESS )
+        Globals::RenderSystem::currentCamera->ProcessKeyboard(BACKWARD, deltaTime);
+    if ( glfwGetKey(Globals::Window::activeWindow.get(), GLFW_KEY_A) == GLFW_PRESS )
+        Globals::RenderSystem::currentCamera->ProcessKeyboard(LEFT, deltaTime);
+    if ( glfwGetKey(Globals::Window::activeWindow.get(), GLFW_KEY_D) == GLFW_PRESS )
+        Globals::RenderSystem::currentCamera->ProcessKeyboard(RIGHT, deltaTime);
 
 
-    _currentCamera = cam;
-    InputController::_camera = &cam;
+    if ( glfwGetKey(Globals::Window::activeWindow.get(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS )
+        Globals::RenderSystem::currentCamera->MovementSpeed = Globals::RenderSystem::currentCamera->boostSpeed;
 
-    _renderDetails = RenderDetails(_currentCamera, _screenWidth, _screenHeight);
-    glfwSetCursorPosCallback(_window, mouse_callback);
+    if ( glfwGetKey(Globals::Window::activeWindow.get(), GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE )
+        Globals::RenderSystem::currentCamera->MovementSpeed = Globals::RenderSystem::currentCamera->normalSpeed;
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if ( firstMouse )
+    {
+        Globals::Window::lastX = xpos;
+        Globals::Window::lastY = ypos;
+        Globals::Window::firstMouse = false;
+    }
+
+    float xoffset = xpos - Globals::Window::lastX;
+    float yoffset = Globals::Window::lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    Globals::Window::lastX = xpos;
+    Globals::Window::lastY = ypos;
+
+    Globals::RenderSystem::currentCamera->ProcessMouseMovement(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    Globals::RenderSystem::currentCamera->ProcessMouseScroll(yoffset);
+}
+
+bool Scene::initScene(std::shared_ptr<Camera> cam)
+{
+    glfwGetWindowSize(Globals::Window::activeWindow.get(), &Globals::Display::_screenWidth,  &Globals::Display::_screenHeight);
+    Globals::Window::lastX = Globals::Display::_screenWidth / 2;
+    Globals::Window::lastY = Globals::Display::_screenHeight / 2;
+
+
+    Globals::RenderSystem::currentCamera = cam;
+
+    glfwSetCursorPosCallback(Globals::Window::activeWindow.get(), mouse_callback);
     
 
     _renderer->initDepthRender();
-    _renderer->setCamera(_currentCamera);
-
     return true;
 }
 
@@ -74,24 +120,24 @@ void Scene::loadResources()
     _sunLight.setSpecular({ 0.1f,0.1f, 0.1f });
     _sunLight.setDirection({ -0.2f, -1.0f, -0.3f });
     
-    HR::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "shininess", 10.0f);
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.position", _sunLight.getPosition());
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.ambient", _sunLight.getAmbient());
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.diffuse", _sunLight.getDiffuse());
-    HR::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.intensity", _sunLight.getStrength());
-    HR::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.specular", _sunLight.getSpecular());
+    ShaderHelper::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), LOC_COLOR_SPECULAR, _sunLight.getStrength());
+   /* ShaderHelper::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.position", _sunLight.getPosition());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.ambient", _sunLight.getAmbient());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.diffuse", _sunLight.getDiffuse());
+    ShaderHelper::setFloat(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.intensity", _sunLight.getStrength());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("modelLoadingShader"), "light.specular", _sunLight.getSpecular());*/
 
-    HR::setFloat(resourceCache.shaderCache.findShader("lightingShader"),"shininess", 10.f);
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.position", _sunLight.getPosition());
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.ambient", _sunLight.getAmbient());
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.diffuse", _sunLight.getDiffuse());
+    ShaderHelper::setFloat(resourceCache.shaderCache.findShader("lightingShader"),LOC_COLOR_SPECULAR, 10.f);
+    /*ShaderHelper::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.position", _sunLight.getPosition());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.ambient", _sunLight.getAmbient());
+    ShaderHelper::setVec3(resourceCache.shaderCache.findShader("lightingShader"), "light.diffuse", _sunLight.getDiffuse());*/
     //_shaderVec.at("lightingShader").setFloat("light.intensity", _sunLight.getStrength());
-    HR::setVec3(resourceCache.shaderCache.findShader("lightingShader"),"light.specular", _sunLight.getSpecular());
+    //ShaderHelper::setVec3(resourceCache.shaderCache.findShader("lightingShader"),"light.specular", _sunLight.getSpecular());
 
     skybox.setMaterial(resourceCache.materialCache.findMaterial("skyboxMaterial"));
         
 
-    resourceCache.modelCache.findModel("Building1").setMaterial(resourceCache.materialCache.findMaterial("building1Material"));
+  
     //resourceCache.modelCache.findModel("Building2")->setMaterial(resourceCache.materialCache.findMaterial("building1Material"));
     //resourceCache.modelCache.findModel("Building3")->setMaterial(resourceCache.materialCache.findMaterial("building2Material"));
     //resourceCache.modelCache.findModel("gridFloor")->setMaterial(resourceCache.materialCache.findMaterial("gridFloorMaterial"));
@@ -123,16 +169,17 @@ namespace ImGui {
 
 void Scene::run()
 {
+    assert(Globals::RenderSystem::currentCamera != nullptr);
     glEnable(GL_DEPTH_TEST);
-    InputController::_camera = &_currentCamera;
-    _renderer->setCamera(_currentCamera);
+    
+    
 
     const float near_plane = 0.01f;
     const float far_plane = 1000.f;
 
-    std::vector<IBaseLight*> lightVec;
-    lightVec.push_back(&_sunLight);
-    _renderer->addLightToScene(&_sunLight);
+    std::vector<std::shared_ptr<IBaseLight>> lightVec;
+    lightVec.push_back(_sunLight);
+    _renderer->addLightToScene(_sunLight);
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -140,42 +187,42 @@ void Scene::run()
 
     bool show_demo_window = true;
 
-    while (glfwWindowShouldClose(_window) == false) {
+    while (glfwWindowShouldClose(Globals::Window::activeWindow.get()) == false) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        UI::updateUI(_window);
+        UI::updateUI(Globals::Window::activeWindow.get());
         UI::selectList(_GOVec);
 
         ImGui::Render();
 
 
-        processInput(_window, deltaTime);
+        processInput(Globals::Window::activeWindow.get(), deltaTime);
         
         //shaderCache.findShader("debugDepthShader")->use();
         //_renderer->renderBatch_ToDepthBuffer(_GOVec, *resourceCache.shaderCache.findShader("debugDepthShader"));
 
-        HR::useProgram(resourceCache.shaderCache.findShader("modelLoadingShader").programID);
-        HR::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"), "lightSpaceMatrix", _sunLight.getShadowViewProjectionMatrix());
+        ShaderHelper::useMaterial(resourceCache.materialCache.findMaterial("lightMaterial"));
+        ShaderHelper::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"), LOC_MATRIX_MVP, _sunLight->getShadowViewProjectionMatrix());
 
 
-        glViewport(0, 0, _screenWidth, _screenHeight);
+        glViewport(0, 0, Globals::Display::_screenWidth, Globals::Display::_screenHeight);
 
         glClearColor(0.25f, 0.25f, 0.5f, 1.0f);		// Background Fill Color
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 projection = glm::perspective(_currentCamera.Zoom, (float)_screenWidth / (float)_screenHeight, 0.01f, 1000.f);
-        glm::mat4 view = _currentCamera.GetViewMatrix();
+        glm::mat4 projection = glm::perspective(Globals::RenderSystem::currentCamera->Zoom, (float)Globals::Display::_screenWidth / (float)Globals::Display::_screenHeight, 0.01f, 1000.f);
+        glm::mat4 view = Globals::RenderSystem::currentCamera->GetViewMatrix();
 
-        if (glfwGetKey(_window, GLFW_KEY_T) == GLFW_PRESS)
+        if (glfwGetKey(Globals::Window::activeWindow.get(), GLFW_KEY_T) == GLFW_PRESS)
             //sunLight.setPosition(camera.Position);
-            _currentCamera.Position = _sunLight.getPosition();
+            Globals::RenderSystem::currentCamera->Position = _sunLight->getPosition();
 
-        if (glfwGetKey(_window, GLFW_KEY_R) == GLFW_PRESS)
+        if (glfwGetKey(Globals::Window::activeWindow.get(), GLFW_KEY_R) == GLFW_PRESS)
             _GOVec["Building1"].rotateBy(0.1f, { 0, 1, 0 });
 
-        HR::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"),"projection", projection);
+        ShaderHelper::setMat4(resourceCache.shaderCache.findShader("modelLoadingShader"),LOC_MATRIX_PROJECTION, projection);
         _renderer->renderBatch(_GOVec);
         //_renderer->renderGameObject()
 
@@ -186,7 +233,7 @@ void Scene::run()
         
         
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        glfwSwapBuffers(_window);		// Flip Buffers and Draw
+        glfwSwapBuffers(Globals::Window::activeWindow.get());		// Flip Buffers and Draw
         glfwPollEvents();
     }
 }
@@ -199,10 +246,6 @@ void Scene::stop()
 void Scene::save()
 {
 	
-}
-
-Camera* Scene::getCurrentCamera() {
-	return &_currentCamera;
 }
 
 

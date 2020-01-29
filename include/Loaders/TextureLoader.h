@@ -1,5 +1,5 @@
 #pragma once
-#include "../Core/Texture.h"
+#include "../Core/Data_Structures/Texture.h"
 #include "ResourceLoader.h"
 #include "../Managers/ResourceMangager.h"
 
@@ -20,8 +20,8 @@ class TextureLoader : private ResourceLoader<Texture>
 
 inline Texture TextureLoader::createTexture(std::string path, aiTextureType type = aiTextureType_UNKNOWN)
 {
-    Texture newTexture(GUID_Allocator::getNewUniqueGUID());
-    newTexture._path = path;
+    Texture newTexture;
+    newTexture.name = path;
     newTexture._textureID = createTextureIDFromFile(path.c_str(),"", true);
     newTexture._textureType = type;
     return newTexture;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Core/Material.h"
+#include "../Core/Data_Structures/Material.h"
 #include "../Cache/ResourceCache.h"
 
 
@@ -14,16 +14,17 @@ class MaterialBuilder
         ~MaterialBuilder();
         MaterialBuilder& create(const int id, std::string name = "DefaultTexture");
         MaterialBuilder& addTextures(std::vector<Texture>& _textures);
-        MaterialBuilder& addTexture(Texture texture);
-        void loadTexturesFromAIMaterial(aiMaterial* mat, std::string directory);
-        MaterialBuilder& setShader(Shader _shader);
+        MaterialBuilder& addTexture(std::shared_ptr<Texture> texture);
+        void loadTexturesFromAIMaterial(std::shared_ptr<aiMaterial> mat, std::string directory);
+        MaterialBuilder& setShader(std::shared_ptr<Shader> _shader);
         Material build();
 
     private:
         
         std::string materialName;
-        std::vector<Texture> textures{};
-        Shader shader;
+        Material newMaterial;
+        std::map<ShaderLocationIndex, Texture> textures{};
+        std::shared_ptr<Shader> shader = nullptr;
 
         TextureCache& textureCache;
         ShaderCache& shaderCache;
@@ -36,7 +37,7 @@ class MaterialFactory
 public:
     MaterialFactory(ResourceCache& cache) : builder(cache){};
 
-    Material createBasicMaterial(const int id, const std::string name, Shader shdr)
+    Material createBasicMaterial(const int id, const std::string name, std::shared_ptr<Shader> shdr)
     {
         Material newMaterial = builder.create(id, name)
             .setShader(shdr)

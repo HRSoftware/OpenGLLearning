@@ -1,6 +1,10 @@
 #pragma once
 
-#include "../Core/Model.h"
+
+
+#include "../Core/Data_Structures/Texture.h"
+#include "../Core/Data_Structures/Model.h"
+
 #include "../Cache/ResourceCache.h"
 #include "MaterialBuilder.h"
 
@@ -22,7 +26,7 @@ class ModelBuilder
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
         std::string modelName;
-        Material modelMaterial;
+        std::shared_ptr<Material> modelMaterial;
         std::vector<Mesh> meshes;
         std::string directory;
         std::vector<Texture> _Textures;
@@ -39,7 +43,7 @@ class ModelFactory
         ModelFactory(ResourceCache& resCache) : modelBuilder(ModelBuilder(resCache)), resourceCache(resCache)
         {
         };
-        Model create(std::string name, string path);
+        std::shared_ptr<Model> create(std::string name, string path);
 
     private:
         ModelBuilder modelBuilder;

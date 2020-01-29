@@ -1,6 +1,7 @@
 #pragma once
-#include "../Core/GameObject.h"
+
 #include "Cache.h"
+#include "../Core/Data_Structures/GameObject.h"
 
 
 class GameObjectCache

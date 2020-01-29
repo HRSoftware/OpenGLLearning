@@ -2,20 +2,23 @@
 #include "../Core/Shader.h"
 
 
+#include "../../include/Core/Data_Structures/Shader.h"
+enum ShaderType;
+
 class ShaderBuilder {
     public:
 
         ShaderBuilder& createShader(int id, std::string refName, std::string fileName = "", bool core = false);
         ShaderBuilder& addShader(ShaderType shaderType, std::string fileName = "");
         Shader build();
-    std::map<std::string, int> findUniformLocations();
+        std::map<std::string, int> findUniformLocations();
 
     private:
         std::string shaderProgramName;
         std::string shaderFileName;
         std::vector<int> shadersIDs;
         
-        std::map<std::string, int> _uniformLocations = {};
+        std::map<std::string, int> _customUniformLocations{};
         int programID = -1;
         int resID = -1;
 };

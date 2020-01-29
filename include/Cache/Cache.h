@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Core/Resource.h"
-#include "../Core/GameObject.h"
+#include "../Core/Data_Structures/GameObject.h"
 
 template <class T>
 class Cache

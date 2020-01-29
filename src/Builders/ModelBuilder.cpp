@@ -1,5 +1,8 @@
 
 #include "stdafx.h"
+
+#include "../../include/Helpers/GUIDAllocator.h"
+#include "../../include/Core/Data_Structures/Mesh.h"
 #include "../../include/Builders/ModelBuilder.h"
 #include "../../include/Helpers/GUIDAllocator.h"
 
@@ -21,7 +24,7 @@ ModelBuilder& ModelBuilder::loadFromPath(std::string path)
 
     if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) // if is Not Zero
     {
-        cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
+        std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
         return *this;
     }
 
@@ -68,15 +71,16 @@ Mesh ModelBuilder::processMesh(std::vector<glm::vec3> pos, std::vector<unsigned>
         vertices.push_back(vertex);
     }
     indices = _indices;
-
-    return Mesh(vertices, indices, true);
+    std::string name = modelName + "_Mesh_" + std::to_string(meshes.size());
+    return Mesh(name, vertices, indices, nullptr);
 }
 
 Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
 {
+    
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    Material _material;
+    std::shared_ptr<Material> _material;
 
     for ( unsigned int i = 0; i < mesh->mNumVertices; i++ )
     {
@@ -141,31 +145,34 @@ Mesh ModelBuilder::processMesh(aiMesh* mesh, const aiScene* scene)
 
     _material = materialCache.findMaterial(MaterialName.C_Str());
 
-    if(_material.getName() == "")
+    if(_material->name == "")
     {
         materialBuilder.create(GUID_Allocator::getNewUniqueGUID(), MaterialName.C_Str())
         .loadTexturesFromAIMaterial(material, directory);
        _material = materialCache.addMaterial(MaterialName.C_Str(), materialBuilder.build());
     }
-    return Mesh(vertices, indices, _material);
+    std::string name = modelName + "_Mesh_" + std::to_string(meshes.size());
+    return Mesh(name, vertices, indices, _material);
 }
 
 
 Model ModelBuilder::build()
 {
-    Model newModel(GUID_Allocator::getNewUniqueGUID());
-        newModel.meshes = meshes;
+    Model newModel;
+
+        for(auto mesh : meshes)
+            newModel.meshes.push_back(std::make_shared<Mesh>(mesh));
+        
         newModel.directory = directory;
-        newModel.gammaCorrection = true;
-        newModel.textures = _Textures;
+        //newModel.textures = _textures;
         newModel.modelName = modelName;
     return newModel;
 }
 
-Model ModelFactory::create(std::string name, string path)
+std::shared_ptr<Model> ModelFactory::create(std::string name, string path)
 {
-    Model model = resourceCache.modelCache.findModel(name);
-    if(model.getResourceID() == -1)
+    auto model = resourceCache.modelCache.findModel(name);
+    if(model->modelName == "")
     {
         Model newModel = modelBuilder.create(GUID_Allocator::getNewUniqueGUID(), name)
             .loadFromPath(path)

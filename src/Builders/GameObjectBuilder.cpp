@@ -2,6 +2,7 @@
 #include "../../include/Builders/GameObjectBuilder.h"
 
 
+GameObjectBuilder::GameObjectBuilder(ResourceCache& cache): modelFactory(cache) {}
 
 GameObjectBuilder& GameObjectBuilder::create(std::string name)
 {

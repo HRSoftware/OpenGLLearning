@@ -1,91 +1,102 @@
 {
   "Model1": {
     "Name": "exampleModel",
-    "Vertex": {
-      "Position": [
-        0.2,
-        0.5,
-        0.5,
-        0.1
-      ],
-      "Normals": [
-        0.2,
-        0.5,
-        0.5,
-        0.1
-      ],
-      "TexCoords": [
-        0.2,
-        0.5,
-        0.5,
-        0.1
-      ],
-      "Tangents": [
-        0.2,
-        0.5,
-        0.5,
-        0.1
-      ],
-      "Bitangents": [
-        0.2,
-        0.5,
-        0.5,
-        0.1
-      ]
-    },
-    "Textures": [
-      "Texture1",
-      "Texture2",
-      "TextureN"
-    ],
-    "Indicies": [
-      1,
-      4,
-      2,
-      5,
-      6,
-      7,
-      3,
-      2,
-      1,
-      5,
-      6,
-      6,
-      6,
-      3,
-      3,
-      5,
-      5
-    ],
-    "Materials": {
-      "Material1": {
-        "Shader": "ModelLoadingShader",
-        "Diffuse": {
-          "Texture": "Texture4",
-          "Strength": 10
+    "Meshes": {
+      "Mesh1": {
+        "Vertex": {
+          "Position": [
+            0.2,
+            0.5,
+            0.5,
+            0.1
+          ],
+          "Normals": [
+            0.2,
+            0.5,
+            0.5,
+            0.1
+          ],
+          "TexCoords": [
+            0.2,
+            0.5,
+            0.5,
+            0.1
+          ],
+          "Tangents": [
+            0.2,
+            0.5,
+            0.5,
+            0.1
+          ],
+          "Bitangents": [
+            0.2,
+            0.5,
+            0.5,
+            0.1
+          ]
         },
-        "Specular": {
-          "Texture": "Texture7",
-          "Strength": 10
-        },
-        "Normal": {
-          "Texture": "Texture2",
-          "Strength": 10
-        }
-      },
-      "Material2": {
-        "Shader": "ModelLoadingShader",
-        "Diffuse": {
-          "Texture": "Texture2",
-          "Strength": 10
-        },
-        "Specular": {
-          "Texture": "Texture1",
-          "Strength": 10
-        },
-        "Normal": {
-          "Texture": "Texture6",
-          "Strength": 10
+        "Textures": [
+          "Texture1",
+          "Texture2",
+          "TextureN"
+        ],
+        "Indicies": [
+          1,
+          4,
+          2,
+          5,
+          6,
+          7,
+          3,
+          2,
+          1,
+          5,
+          6,
+          6,
+          6,
+          3,
+          3,
+          5,
+          5
+        ],
+        "Materials": {
+          "Material1": {
+            "Shader": "ModelLoadingShader",
+            "Textures": {
+
+              "Texture1": {
+                "Name": "Brick.png",
+                "Type": 4,
+                "Strength": 10
+              },
+
+              "Texture2": {
+                "Name": "Glass.png",
+                "Type": 4,
+                "Strength": 10
+              },
+              "Texture3": {
+                "Name": "Roof.png",
+                "Type": 4,
+                "Strength": 10
+              }
+            }
+          },
+          "Material2": {
+            "Shader": "ModelLoadingShader",
+            "Diffuse": {
+              "Texture": "Texture2",
+              "Strength": 10
+            },
+            "Specular": {
+              "Texture": "Texture1",
+              "Strength": 10
+            },
+            "Normal": {
+              "Texture": "Texture6",
+              "Strength": 10
+            }
+          }
         }
       }
     }

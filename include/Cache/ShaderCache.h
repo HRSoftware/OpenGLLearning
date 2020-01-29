@@ -1,32 +1,25 @@
 #pragma once
-#include "../Core/Shader.h"
+
 #include "Cache.h"
+#include "../Core/Data_Structures/Shader.h"
 
 class ShaderCache {
     friend class ShaderBuilder;
 public:
-    Shader findShader(std::string refName);
-    Shader addShader(const std::string& refName, Shader shader);
+    std::shared_ptr<Shader> findShader(std::string refName);
+    std::shared_ptr<Shader> addShader(const std::string& refName, Shader shader);
 
 private:
     std::map<std::string, Shader> shader_Map;
     std::map<int, std::map<string, int>> uniformLocationMap;
 };
 
-inline Shader ShaderCache::findShader(std::string refName)
+inline std::shared_ptr<Shader> ShaderCache::findShader(std::string refName)
 {
-    for ( auto _shader : shader_Map )
-    {
-        if(_shader.second._shaderName == refName)
-        {
-            return _shader.second;
-        }
-    }
-
-    return Shader(); //return default invalid Texture
+    return std::make_shared<Shader>(shader_Map.at(refName));
 }
 
-inline Shader ShaderCache::addShader(const std::string& refName, Shader shader)
+inline std::shared_ptr<Shader> ShaderCache::addShader(const std::string& refName, Shader shader)
 {
     shader_Map.insert_or_assign(refName, shader);
     uniformLocationMap.insert_or_assign(shader.programID, shader._uniformLocations);
